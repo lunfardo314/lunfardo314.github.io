@@ -13,6 +13,11 @@
       name: 'Proxima docs',
       loadSidebar: true,
       subMaxLevel: 2,
+      afterEach: function () {
+        if (window.MathJax && window.MathJax.typesetPromise) {
+          window.MathJax.typesetPromise();
+        }
+      }
     };
   </script>
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
