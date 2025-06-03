@@ -1,2 +1,2 @@
-# proxima.github.io
-Docs related to Proxima project
+# DOCS 
+Docs mostly related to Proxima
