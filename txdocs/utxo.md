@@ -6,7 +6,7 @@ Further in the text, we will use terms *UTXO* and *output* interchangeably as sy
 ## UTXO transaction
 
 The humble picture of what will later be called UTXO transaction from the Bitcoin whitepaper:
-<p style="text-align:center"><img src="btc-utxo.png" width="300">
+<p style="text-align:center"><img src="/txdocs/btc-utxo.png" width="300">
 </p>
 
 
@@ -15,7 +15,7 @@ UTXO transaction represents a deterministic update of the ledger state.
 
 A bit more advanced picture, which, however, represents the same concept:
 
-<p style="text-align:center;"><img src="utxo.png">
+<p style="text-align:center;"><img src="/txdocs/utxo.png">
 </p>
 
 Proxima transaction is a data structure which, at it's core, is equivalent to the classical UTXO transaction. It's function in Proxima, however, spans far beyond a simple ledger update.
