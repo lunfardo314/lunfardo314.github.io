@@ -1,4 +1,6 @@
-# Main index
+---
+layout: none
+---
 
 * kuku
 * mumu
