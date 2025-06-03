@@ -25,15 +25,11 @@
       subMaxLevel: 2,
     };
   </script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      if (window.MathJax && window.MathJax.typesetPromise) {
-        window.MathJax.typesetPromise();
-      }
-    });
-  </script>
 
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <p>This is an inline equation: $\frac{1}{2}$</p>
+  <p>This is a displayed equation:</p>
+  \[ \int_a^b x^2 dx \]
 </body>
 </html>
