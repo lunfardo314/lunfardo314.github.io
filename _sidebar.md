@@ -1,6 +1,6 @@
 # Proxima transaction model
 
-- [Introduction](txdocs/base.md) 
+- [Introduction](txdocs/intro.md) 
 - [Classical UTXO](txdocs/utxo.md) 
 - [Proxima transaction](txdocs/tx.md) 
 - [Base data elements](txdocs/base.md)
