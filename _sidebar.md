@@ -1,5 +1,4 @@
-# Proxima transaction model
-
+Proxima transaction model
 - [Introduction](txdocs/intro.md) 
 - [Classical UTXO](txdocs/utxo.md) 
 - [Proxima transaction](txdocs/tx.md) 
