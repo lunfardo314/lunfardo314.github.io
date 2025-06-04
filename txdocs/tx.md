@@ -2,7 +2,7 @@
 
 ## Tuple trees
 When composing a transaction, we aim to operate with the most generic data structures possible:
-* a *byte array* (or *byte string*). *Byte array* may be empty, i.e. of zero length. Byte array can have any length (not exceeding practical limits set by the protocol);
+* a *byte array*. *Byte array* may be empty, i.e. of zero length. Byte array can have any length (not exceeding practical limits set by the protocol);
 * a *tuple* $(e_0, \dots e_{n-1})$, where each $e_i$ is either a *byte array*, or a *tuple* again.
 
 Nested *tuples* may represent a finite hierarchical data structure, a *tree*, which has byte arrays as terminal elements and tuples as interim vertices.
@@ -32,7 +32,7 @@ bytes(T) = header(n, l)||e'_0||\dots||e'_{n-1}
 $$ 
 where
 * $||$ is concatenation
-* $header(n,l)$ is 2 bytes which contain information about number of elements in the tuple $len(T)$ and $l$ is number of of bytes reserved for the size prefix of elements. Parameter $l$ is selected the way, that size of any element  would fit $l$ bytes (e.g. $l=1$ for a tuple with elements are no longer than  255 bytes, or, otherwise, $l=2$ if elements are no longer than $2^{16}-1$);
+* $header(n,l)$ is 2 bytes which contain information about number of elements in the tuple $len(T)$ and $l$ is number of bytes reserved for the size prefix of elements. Parameter $l$ is selected the way, that size of any element  would fit $l$ bytes (e.g. $l=1$ for a tuple with elements are no longer than  255 bytes, or, otherwise, $l=2$ if elements are no longer than $2^{16}-1$);
 * $e'_{i} = sz^l_i||bytes(e_i)$, where $sz^l_i$ is $len(bytes(e_i))$ in the form of $l$ bytes (big-endian). In other words, $e'_{i}$ is $bytes(e_i)$ prefixed with few bytes of size information.
 
 Tuple serialization rule is applied recursively down to the terminal byte arrays. The serialized transaction is a nested blob of bytes.
