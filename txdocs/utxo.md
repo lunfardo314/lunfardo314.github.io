@@ -6,7 +6,7 @@ Further in the text, we will use terms *UTXO* and *output* interchangeably as sy
 ## UTXO transaction
 
 The humble picture of what will later be called UTXO transaction from the Bitcoin whitepaper:
-<p style="text-align:center"><img src="../static/img/btc-utxo.png" width="300">
+<p style="text-align:center"><img src="../static/img/btc-utxo.png">
 </p>
 
 

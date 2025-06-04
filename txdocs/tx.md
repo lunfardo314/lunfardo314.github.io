@@ -64,7 +64,7 @@ The *raw transaction* is a tuple, consisting of 11 data elements listed below. T
 
 For example, for a transaction $T$, element $T_0$ will be a tuple of inputs while $T_6$ will be total produced amount. The *i-th* produced output is $T_{2,i}$
 
-<p style="text-align:center;"><img src="../static/img/utxo-tx.png" width="500">
+<p style="text-align:center;"><img src="../static/img/utxo-tx.png">
 </p>
 
 ## Transaction context
@@ -88,10 +88,10 @@ Path to the *i-th* input in the *transaction context* $T^{ctx}$ is $(0,0,i)$.
 
 From the path of the input, we can easily find all other data elements corresponding to it:
 * the ID of a consumed output is $T^{ctx}_{0,0,i}$
-* the coresponding consumed output is $T^{ctx}_{1,0,i}$
-* the coresponding unlock parameters is $T^{ctx}_{0,1,i}$
+* the corresponding consumed output is $T^{ctx}_{1,0,i}$
+* the corresponding unlock parameters are $T^{ctx}_{0,1,i}$
 
-<p style="text-align:center;"><img src="../static/img/utxo-tx-context.png" width="500">
+<p style="text-align:center;"><img src="../static/img/utxo-tx-context.png">
 </p>
 
 ## Outputs (UTXOs). Validation scripts/formulas
