@@ -63,7 +63,7 @@ Each function can have `arity` from 0 to 7, i.e. the function can take from none
 If function `fun` takes 0 arguments, the expressions `fun` and `fun()` are equivalent. For example `selfUnlockParameters` is equivalent to `selfUnlockParameters()` and is a function call with no arguments, it returns a value, a byte array, upon evaluation.
 
 ### Literals
-By zero-prefix-trimmed integers we will understand big-endian byte representations of integers with all leading zero bytes trimmed. For example integer `1025` will be represented as 2 bytes `0201`, while $2^16+3$ will be represented by `010003`. 
+By `zero-prefix-trimmed` integers we understand big-endian byte representations of integers with all leading zero bytes trimmed. For example integer `1025` will be represented as 2 bytes `0201`, while $2^{16}+3$ will be represented by `010003`. 
 Zero will be represented as an empty (zero length) byte array.
 
 Each `literals`  are constants, i.e. expressions which always returns the same value. There are the following types of literals:
@@ -79,18 +79,53 @@ Each `literals`  are constants, i.e. expressions which always returns the same v
 * the literal which starts with `x/` represents inline *EasyFL* formula in its canonic bytecode form, represented as hexadecimal. For example literal expression `x/10856369616f21` is equivalent to the literal `!!!ciao!`
 * the literal which start with the prefix `#` returns 1 or 2-byte long array with encoded binary code of the function with the name in the postfix. For example expression `#concat` is equivalent to the literal of the `concat` function code and `#address25519` is a code of the `address25519` function. The `#` literal is used in bytecode manipulations: a script for example can check is some specified bytecode indeed represents `address25519` siglock constraint.
 
-### Examples 1
+### Examples of closed expressions
+Below we will introduce EasyFL formulas with open parameters, the library and what is context of evaluation. 
 
-The standard library contains embedded functions. Here are some of them: `fail`, `concat`, `slice`, `byte`, `equal`, `if`, `and`, `or`, `not`, `len8` and many others. The following are valid expressions:
+Meanwhile, for simplicity, we will provide examples of closed (without parameters) EasyFL expressions whcih have obvious semantics of evaluation and always evaluates to the same value in the context.  
 
-* `slice(0x0102,0,0)` takes the element with index 0 (slice bounds are inclusive), return 1-byte long array.
-* `byte(0x0102, 0)` is an equivalent to the above
-* `concat(1, 5)` is equivalent to `0x0105` and is equivalent to `u16/21`
-* `concat` always returns empty slice
+The standard library contains embedded functions. Here are some of them: `fail`, `concat`, `slice`, `byte`, `tail`, `equal`, `if`, `and`, `or`, `not`, `len8` and many others. The following are valid expressions:
+
+* `0x` and `z32/0`returns empty slice
+* `slice(0x01020304,1,2)` takes slice of bytes from 1 to 2 (inclusive) from its 3rd element, i.e. it returns 2-byte long array `0x0203`.
+* `slice(0x0102,1,1)` takes the element with index 0, return 1-byte long array `0x02`.
+* `byte(0x0102, 1)` is an equivalent to the above
+* `concat(1, 5)` is equivalent to `0x0105` and is equivalent to `u16/21`, which is equivalent to `z64/21`
+* `concat` (without arguments) always returns empty slice. This is equivalent to `false` and to `0x`.
 * `equal(concat(1, 5), 0x01ff)` always returns empty slice, i.e. `false`
 * `if(0, u16/31415, u32/271828` will always evaluate to 2-byte slice `u16/31415`
 * `or` will always return empty slice `false`
 * `and` will always return non-empty slice `true`, undefined which one exactly
+
+### Parameters of the expression
+An `expression` can use special function calls `$0`, `$1` ... `$7`.  They represent *open parameters of the expression*. Parameters of the expression will be instantiated with values whenever `expression` is evaluated, i.e. whenever it calls the corresponding `$i` function. The use of the parameter `$i` in the expression means that at least `i+1` arguments must be supplied when `expression` is evaluated.
+
+For example expression `concat($0,$1)` will evaluate to the concatenation of the arguments, provided by the call context and `concat(byte($0,1), byte($0,0), tail($0,2)))` will return byte array with swapped first two bytes. 
+
+Expression parameters can be used at any level of the expression, i.e. `not(not(not(not($0))))` is a correct expression, it will require 1 argument.
+
+Expression `or($3)` will return 4th argument, however all 4 must be supplied in the call context, only first 3 won't be used.
+
+### Function definitions
+Expression, which may or may not have open parameters, can be assigned the name and thus become part of the library. This usually happens before library is used to validate transactions (see below).
+
+The syntax we use is:
+```
+func <function name> : <expression>
+```
+For example
+```
+func lessOrEqualTo : or(lessThan($0, $1), equalUint($0,$1))
+```
+defines a function with two arguments for the relation $\le$ between byte arrays, interpreted as big-endian integers.
+
+### Library of functions
+
+
+
+
+
+
 
 ### Evaluation
 Expressions are evaluated in the form of the internal evaluation tree, derived from the bytecode. So, the workflow is always like this:
@@ -108,12 +143,7 @@ The embedded function `fail` always panics with its only argument interpreted as
 
 The evaluation engine (the Go function `EvalFromBinary`) does not process exceptions. The transaction validation context, which invokes the evaluation engine, must intercept panic and treat transaction as invalid.
 
-### Parameters of the expression
-An `expression` can use special function calls `$0`, `$1` ... `$15`.  They represent *parameters of the expression*. Parameters of the expression will be instantiated with values whenever `expression` is evaluated and it call the corresponding `$i` function. The use of the parameter `$i` in the expression means that at least `i+1` arguments must be supplied when `expression` is evaluated.
 
-For example expression `or($3)` will return 4th argument, however all 4 must be supplied, only first 3 won't be used.
-
-Expression parameters can be used at any level of the expression, i.e. `not(not(not(not($0))))` is a correct expression, it will require 1 argument.
 
 ### Examples 2
 * `if($0,$2,$1)` will evaluate `$2` if `$0` will return true and will evaluate `$1` if `$0` is nil. It deserves the name `ifNot`.
@@ -253,65 +283,3 @@ func addressED25519: and(
 )
 ```
 
-## Extension of Stardust UTXO ledger with *EasyFL* constraints
-
-This a draft plan how *EasyFL* could be made a part of the Stardust specs. It will require adding one new feature block. It means full backwards compatibility. This would make existing Stadust ledger programmable with huge variety of use cases: from NFT logic to DeFi.
-
-The special *EasyFL* feature block will contain a compiled *EasyFL* bytecode of the constraint. In many situations it will be a handfull of bytes long.
-
-The validation of this feature block will mean evaluating the encoded expression in the context of the transaction (global data) and the invocation location:
-* is it a consumed output, or produced output of the transaction, the `yes/no` flag
-* the output index (currently 1 byte is enough). It is either input index, or output index
-* the index of the invoked *EasyFL* feature block in the output
-  The all 3 things above may be compressed in one `invocation path/location` concept. It will be 3 byte-long value.
-
-We need to extend *EasyFL* library by embedding functions, which provide the script access to the elements of the transaction. The access should be parametrized by the invocation path values:
-* access to the data of the corresponding `unlockBlock`
-* access to the data of any specified block of any input/output, like `blockData(consumedYN, outputIndex, blockIndex)`.
-
-The current high level concept of the unlock block in Stardust should be extended with the possibility to append any raw binary data to it. It will not be interpreted by the `iota.go` validation logic, but `EasyFL` script will access it by a special embedded function.
-
-These simple extentions of the current Stardust will enormously increase the flexibility and extendability of the Stardust ledger. Sky will be the limit.
-
-Of course, it will require special functions for the ZK-validation, BLS signature validation and all other advanced cryptography
-
-### Example
-
-Let's imagine we have the following embedded functions:
-
-* function `@` always returns 3-byte array:
-    *  0-byte contains `0` if the invoked script is in the consumed output, `1` if it is in the produced output
-    *  1-byte contains index of the output in the transaction
-    *  2-byte contains block index of the invoked constraint
-*  function `unlockData(idx)` return bytes attached to the unlock block with the index `idx` (1 byte)
-*  function `amountOut(idx)` returns the amount of base tokens of the produced output with index `idx`
-*  functions `addressIn(idx)` and `addressOut(idx)` are addresses of the corresponding consumed output and produced output.
-
-So, the expression `unlockData(byte(@,1))` returns unlock block data of the consumed output, and expression `addressOut(byte(unlockData(byte(@,1)),0))` is the address of produced output, index of which is provided in the 0-byte of the unlock data.
-
-Then the following expression is a return condition: the consumer of the output must insert output which sends at least 10000 base tokens to the sender:
-```go
-if(
-	equal(byte(@,0),0),  // it is a consumed output
-	and(
-		greaterOrEqualThan(
-			amountOut(byte(unlockData(byte(@,1)),0)), 
-			u64/10000
-		),
-		equal(
-			addressIn(byte(@,1)),
-			addressOut(byte(unlockData(byte(@,1)),0))
-		)
-	),
-	and      // always true (no effect) for a produced output
-)
-```
-
-More preceisely, it expresses the following constraint:
-
-to consume the output with this constraint:
-- you have to provide index of a produced output in the unlock data of the input, in the byte at index 0
-- **and** the referenced produced output must contain address equal to the address of the consumed output
-- **and** the amount of base tokens in the referenced produced output must be more than 10000
-
-Estimated size of the binary for this constraint should be some 15-20 bytes (never really compiled, sorry).
