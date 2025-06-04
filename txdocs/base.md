@@ -1,19 +1,20 @@
 # Base data elements
 
-Transaction is defined and validated at the low, the byte level. Number of high level concepts, such as data types, is very limited. Certain data elements, however, have special meaning and we will describe it here.
+Transaction is defined and validated at the byte level. Number of high level concepts, such as byte arrays interpreted as particular data types, is very limited. Certain data elements, however, have special meaning, and we will describe it here.
 
 ## Ledger time (timestamp)
-*Ledger time* consists of values *slot* and *tick*. Each slot has 128 ticks.
+*Ledger time* is similar to the _block height_, however it intentionally uses semantics of the timescale. 
+The ledger time consists of values *slot* and *tick*. Each slot has 128 ticks.
 At genesis, *slot = 0* and *tick=0*
-Maximum possible *slot* value is $2^{32}-1$.
-Maximum enforced *tick* value is 127.
 
-In Proxima, each transaction and each UTXO has *number of ticks from genesis*:
+Maximum possible *slot* value is $2^{32}-1$. Maximum enforced *tick* value is 127.
+
+In Proxima, each transaction and each UTXO has the number of ticks from genesis:
 $$
 numberOfTicksSinceGenesis = slots \times 128 + tick
 $$
 
-In Go the *LedgerTime* is defined the following way:
+In Go the ledger time is defined the following way:
 ```go
 type (
    Slot       uint32
@@ -35,13 +36,13 @@ The *ledger time* is serialized as 5 bytes-long byte array:
 Serialized ledger time is called *timestamp*. Each transaction contains *timestamp*. The bit 0 of the last byte in the timestamp is reserved and must be 0. It is used in the transaction ID prefix (see below).
 
 ## Transaction ID
-Each transaction is uniquely identified by the 32 byte-long ID, deterministically formed from the the data of the transaction. The transaction ID bears information about timestamp of the transaction, number of UTXOs it produced and a flag indicating if it is a sequencer transaction:
+Each transaction is uniquely identified by the 32 byte-long ID, deterministically formed from the the data of the transaction. By the assumption, transaction ID never repeats. The transaction ID (cryptographically) commits to the transaction and also bears information about timestamp of the transaction, number of UTXOs it produced and a flag indicating if it is a sequencer transaction:
 
-|Byte indices | Description|
-| -------- | -------- |
-|0-4|*transaction ID prefix*, 5 bytes (see below)|
-|6|index of the last UTXO produced by the transaction.<br>1 byte -> maximum index is 255 -> maximum number of outputs produced by a transaction is 256 |
-|5-31|The last 26 bytes of the transaction ID are the last 26 bytes of the  $blake2b(essence(T))$|
+|Byte indices | Description                                                                                                                                     |
+| -------- |-------------------------------------------------------------------------------------------------------------------------------------------------|
+|0-4| *transaction ID prefix*, 5 bytes (see below)                                                                                                    |
+|6| index of the last UTXO produced by the transaction.<br>1 byte -> maximum index is 255 -> maximum number of outputs produced by a transaction is 256 |
+|5-31| The last 26 bytes of the transaction ID are the last 26 bytes of the  $blake2b(essence(T))$                                                     |
 
 The *transactions essence* is a concatenation of all elements of the raw transaction, except signature:
 $$
@@ -50,6 +51,7 @@ $$
 where $\bigoplus$ is concatenation.
 
 The 5 bytes of the *transaction ID prefix* are:
+
 |Byte indice(s) | Description|
 | -------- | -------- |
 |0-3|*slot* of the transaction as big-endian `uint32`|
@@ -76,7 +78,7 @@ The genesis transaction is a branch transaction. It has 2 produced UTXOs, theref
 Most of the code of transaction and output ID can be found in the `proxima/ledger/base` package.
 
 Format of the transaction ID is designed for:
-- early and fast enforcement of the *transaction pace constraints*: timestamps of the inputs must always be strictly before the timestamp of the transaction by a fixed constant;
+- early and fast enforcement of the *transaction pace constraints*, which enforce that timestamps of the inputs must always be strictly before the timestamp of the transaction by a fixed constant;
 - early and fast recognition if transaction ID represents a sequencer transaction;
 - making sorting by transaction IDs equivalent to the topological sorting of the transaction DAG. This makes canonical (temporal) order of outputs on the ledger state consistent with the causal order of transactions on the DAG.
 
@@ -103,9 +105,9 @@ For example:
 ## Language bindings
 Here we will only provide examples of how low level transaction concepts are mapped into high-level programming language concepts.
 
-Transaction and its validation is self describing and platform-independent. In theory it can be composed and validated at the byte level. However, it is practical and covenient to provide higer level language-specific bindings for low level concepts. The Go language bindings for Proxima ledger is implemented in `proxima/ledger` package.
+Transaction and its validation is self describing and platform-independent. In theory, it can be composed and validated at the byte level. However, it is practical and convenient to provide higher level language-specific bindings for low level concepts. The Go language bindings for Proxima ledger are implemented in `proxima/ledger` package.
 
-The specific constraints from the ledger library, which implements specific scripts, used in the composition of the UTXO, implements interface:
+The specific constraints implemented as functions in the shared ledger library, takes for of Go object, used in the composition of the UTXO in the Go program. Those objects implements interface:
 ```go
 type Constraint interface {
   Name() string   // EasyFL function name in the ledger library
@@ -115,7 +117,7 @@ type Constraint interface {
 }
 ```
 
-For example, *time lock* constraint, which prevents UTXO from consuming until slot `1000` can be created as Go structure (which implements `Constraint` interface) the following way:
+For example, *time lock* constraint, thet prevents UTXO from being consumed until slot `1000` can be created as a Go object, the following way:
 ```go
 timeLock := ledger.NewTimeLock(1000)
 fmt.Printf("source: %s\n", timelock.Source())
@@ -129,14 +131,14 @@ human-readable: timelock(1000)
 bytecode: 45bf84000003e8
 ```
 
-In Go, the UTXO is defined as type (a wrapped tuple):
+In Go, the UTXO is defined as type which wraps the tuple:
 ```go
 type Output struct {
    *tuples.Tuple
 }
 ```
 
-We can create new UTXO this way:
+The example of how we can create new UTXO:
 ```go
 utxo := ledger.NewOutput(func(o *ledger.OutputBuilder) {
 	o.WithAmount(1337)
@@ -152,3 +154,4 @@ The code above will compose the UTXO and will print it as a list of constraint s
 2: timelock(1000)
 ```
 
+The `txbuilder.TransactionBuilder` type defines transaction builder object. It is used for the incremental building of a transaction, by consuming and producing UTXOs, setting other values and parts of it, and finally signing transaction with the private key and making final form of it, a blob of bytes which can be persisted. 

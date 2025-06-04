@@ -109,11 +109,11 @@ For example, instead of using hardcoded types of unlock conditions of UTXOs, pro
 
 In Proxima, we adopt this approach too: we treat each UTXO as tuple of terminal elements $(c_0, \dots c_{k-1})$ where each $c_i$ is a bytecode of a script.
 
-All the data, such as amounts or addresses, are wrapped into those scripts too: there are no such thing as _data field_ in the Proxima's UTXO, all is scripts. The scripts can access all elements in the transaction context $T^{ctx}$ and enforce **logical relations between any data elements of the transaction context**: inside one UTXO, between several of them, between inputs and outputs and so on.
+All the data, such as amounts or addresses, are wrapped into those scripts too: there are no such thing as "data field" in the Proxima's UTXO, all is scripts. The scripts can access all elements in the transaction context $T^{ctx}$ and enforce **logical relations between any data elements of the transaction context**: inside one UTXO, between several of them, between inputs and outputs and so on.
 
 Further we will describe a simple functional language *EasyFL* which is used for the scripting. Here, the main point is that **each script is a closed formula, which represents a composition of function calls and data**, serialized as a bytecode.
 
-The formula plays two roles: as a validation script and as serialization primitive for the UTXO data.
+The formula plays two roles: as a validation script and as a serialization primitive for the UTXO data.
 
 Formula is a **validity constraint imposed on the transaction data elements**, specified by their paths in the $T^{ctx}$. For a transaction $T$ to be valid, all of its scripts must return *true* when evaluated in the context of $T^{ctx}$. The producer of the transaction, by placing those scripts into a UTXO, impose validity constraints on the transaction: both on the producing, and, later, on the consuming one;
 
@@ -121,8 +121,8 @@ The **bytecode of the formula also serves as a data type descriptor** for the se
 
 Some examples:
 
-* the formula `amount(100)` not only invokes library-defined function `amount` with data `100` (which must return `true`), but also wraps `100` with the descriptor `amount`. Bytecode (compiled form) of such formula can be recognized as `amount` and the wrapped data (`100` in this case) can be parsed-out by other scripts/formulas and by the node. Otherwise, the function `amount`, when evaluated, checks if the provided amount meets the minimum requirement for the particular UTXO;
-* the formula  `addressED25519(0x370563b1f08fcc06fa250c59034acfd4ab5a29b60640f751d644e9c3b84004d0)` invokes library-defined function `addressED25519` which verifies if the signature at $T_3$ is a valid signature of the transaction ID and if the hash of the public key is equal to the data `0x370563b1f08fcc06fa250c59034acfd4ab5a29b60640f751d644e9c3b84004d0` provided as the parameter of the call. It is a siglock script.
+* the formula `amount(100)` not only invokes library-defined function `amount` with argument `100`, which is expected to return `true`, but also wraps `100` with the descriptor `amount`. Such formula, can be recognized as `amount` and the wrapped data (`100` in this case) can be parsed-out from the bytecode by other scripts/formulas and by the node. Otherwise, the function `amount`, when evaluated, checks if the provided amount meets the minimum requirement for the particular UTXO;
+* the formula  `addressED25519(0x370563b1f08fcc06fa250c59034acfd4ab5a29b60640f751d644e9c3b84004d0)` invokes library-defined function `addressED25519` which verifies if the signature at $T_3$ is a valid signature of the transaction ID and if the hash of the public key is equal to the data `0x370563b1f08fcc06fa250c59034acfd4ab5a29b60640f751d644e9c3b84004d0` provided as the argument of the call. It is a siglock script.
   From the other side, another script or user, can parse the bytecode and check if the script is indeed the `addressED215519` function and, say, check if the parameter is the public key it expects.
 
 All participants share a globally trusted **library of validation function definitions**. The most primitive of those functions are hardcoded (embedded), akin **opcodes** in other UTXO models. Majority of it is defined as open *EasyFL* formulas with parameters.
