@@ -6,7 +6,7 @@
 
 The *EasyFL* compiler, a core library and runtime engine are available at the [EasyFL repository](https://github.com/lunfardo314/easyfl). _EasyFL_ is the scripting language used in the Proxima UTXO transactions.  
 
-The requirements for such a transaction model extension are:
+The requirements for such a language and the endgine are:
 * minimalism and maximum simplicity of the language and of the runtime semantics
 * easy formally verifiable, and, potentially, efficiently zk-provable
 * as tiny bytecode as possible
@@ -19,46 +19,24 @@ The requirements for such a transaction model extension are:
 
 The models such as *Bitcoin Script*, *Algorand VM* and the likes meet most of the requirements, exept verifiability, understandability and minimalism. To make language understandable, verifiable and minimalistic we choose path of the pure functional style of it.
 
-## Characteristics of *EasyFL*
+Example: the following EasyFL expression interpreted in the context of a transaction states that the length of the unlock block for the consumed output must be 96 bytes long:
 
-The following are traits of the *EasyFL*.
-* it is minimalist and very simple. It minimizes chances for all kind of implementation bugs. There is not much more to learn  beyond this preliminary presentation
-* it is a **pure functional language**. The constraint script semantics is a function call which returns *yes/no* or panics. Only *yes* indicates satisfied constraint. Other outcomes invalidates the transaction. Each function call has no side effects. Functional semantics is an advantage over VM/sequential processor-based scripting, such as *Bitcoin Script* or *Algorand VM*.
-* the embeddable transaction constraint takes a form of the *EasyFL* expression, such as `lessThan(selfAmount, 1000)`
-* the computational model of *EasyFL* is **stateless** and **non-Turing-equivalent** by intention. This makes no need for gas budgeting, however it does not prevent introduction of gas burn for other purposes. Note, that wrt computational model, all of them, *EasyFL*, *Bitcoin Script* and *Algorand VM* (the *stateless TEAL*), are non-Turing complete and therefore **all are fundamentally equivalent to the finite state automaton**.
-* the **runtime library** is a runtime environment of the *EasyFL*. The library of functions is extendable by embedding (a) hardcoded function hooks, for example for complex cryptographic computations or (b) by *EasyFL* expressions
-* the above makes each transaction a finite **circuit**:
-    * it is bounded by nature, so, ideal for validation of bounded data structures, such as UTXO transactions
-    * it is **formally verifiable**. Theoretically it is possible to automatically *prove* validity statements about the data structure form the set of constraint. For example. "the output cannot be consumed without knowing a private key or a validity proof". The *EasyFL* constraint is a programm and same time its specification.
-    * it **zk-friendly** without the need of recursive zk-techniques such as PLONK. (this potentially can make UTXO ledger based on *EasyFL* constraints, zk-provable. It is a trait which may be explored in the future)
-* *EasyFL* is a simplistic low level language, operating at the byte level, i.e. before any serialization logic. The level of the language can be increased by the means provided in the language itself.
-* the *EasyFl* program exists in the form of **source code**, **canonical bytecode** and evaluation tree form.
-    * the *source code* is human readable
-    * the *canonical bytecode* is deterministically compiled from the *source code*
-    * the *canonical bytecode* is highly compressed. This makes it ideal for embedding inline into the constraint into any restricted environments, including UTXO transactions
-    * the internal, platform specific, evaluation tree is deterministically generated from the canonical bytecode
-* the execution means an evaluation of the *EasyFL* expression in the context of *EasyFL library* environment and the externally provided data, namely the data structure being validated
-
-Example: the following expression states that the length of the unlock block for the consumed output must be 96 bytes long:
-
-```Go!
-equal(len8(selfUnlockBlock), 96)
+```go
+equal(len(selfUnlockBlock), u64/96)
 ```
 
 In the above we assume the following:
 * expression is evaluated for the particular consumed UTXO
-* function `selfUnlockBlock` returns the bytes of the unlock block corresponding to the consumed UTXO. If it does not exist, the evaluation panics.
+* function `selfUnlockBlock` returns the bytes of the unlock block corresponding to the consumed UTXO. If it does not exist, the evaluation panics
 
 ## The language
 
 ### Data types
-The only data type in *EasyFL* is *byte array* aka *byte slice*. It can be empty.
+The only data type in *EasyFL* is *byte array* (aka *byte slice*). It can be empty (zero length).
 
-Function calls take *byte arrays* as call arguments and returns a *byte array* as a result.
+The only type of EasyFL statement has form and semantics of a function call, that take *byte arrays* as call arguments and returns a *byte array* as a result.
 
-The empty byte array is interpreted as `false` value wherever appropriate. Any non-empty value is interpreted as `true`.
-
-The source language provides shortcuts, such as `u32/1337` means 4 bytes of *big-endian* bytes of `uint32(1337)`.
+Wherever appropriate, the empty byte array is interpreted as `false` value . Any non-empty value is interpreted as `true`.
 
 ### Expressions
 *EastFL source* is any ASCII text with line delimiters.
@@ -67,37 +45,39 @@ Any text in the line from symbols `//` to the end of line are comments. They hav
 
 *Expression* is a text where all *space* symbols (`\n`, `\r`, `\t`, ` `) are ignored. The source code of the `expression `is parsed to a sequence of `lexems`. A `lexem` is an ASCII string between `delimiters`.
 
-The `delimiters` are `(`, `)` and `,`
-
+The `delimiters` are `(`, `)` and `,`.
 
 Source of the `expression` has the following form of the function `call`:
 
-`<expression> ::= <funName>[(<call args>)] || <constant literal>`
+`<expression> ::= <funcName>[(<call args>)] || <literal>`
 
-Here with meta symbols `[]` we enclose optional part.
+Here with meta symbols `[]` we enclose optional part. `<call args>` is a comma-delimited list of `<expression>`-s, which can be missing.
 
-`<funName>` is a name of the function which is present in the library or is a `constant literal`.
-`Constant literals` are distinguished from library function names by syntax (see below).
+`<funName>` is a name of the function which is present in the library or is a `literal`.
+`literals` are distinguished from library function names by syntax (see below).
 
 Each function in the library defines its *arity*, the number of parameters it takes.
 
-Each function can have `arity` from 0 to 15, i.e. the function can take from none to 15 call arguments. Also, an embedded library function can define it takes any number from 0 to 15 of call arguments, i.e. to be a *vararg* function.
+Each function can have `arity` from 0 to 7, i.e. the function can take from none to 7 call arguments. Embedded library functions, if defined so, can take any number of arguments from 0 to 7.
 
-If function `fun` takes 0 arguments, the expressions `fun` and `fun()` are equivalent. For example `selfUnlockParameters` is a function call with no arguments, however it returns a value, a byte array, upon evaluation.
+If function `fun` takes 0 arguments, the expressions `fun` and `fun()` are equivalent. For example `selfUnlockParameters` is equivalent to `selfUnlockParameters()` and is a function call with no arguments, it returns a value, a byte array, upon evaluation.
 
-`<call args>` is a comma-delimited list of `<expression>`-s. The list can be empty.
+### Literals
+By zero-prefix-trimmed integers we will understand big-endian byte representations of integers with all leading zero bytes trimmed. For example integer `1025` will be represented as 2 bytes `0201`, while $2^16+3$ will be represented by `010003`. 
+Zero will be represented as an empty (zero length) byte array.
 
-### Constant literals
-Each `constant literal` represents an expression:
-* decimal number between `0` and `255`, it is a 1-byte array with the respective value. For example `0`, `42` are correct `constant literals` while `1337` is not.
-* a literal with the prefix `0x` is interpreted as a hexadecimal representation of the `byte array` of length, less than 127 bytes. For example `0xff0102` is a 3-byte array, while `0x123` is incorrect
-* in the literal with the prefix `u16/` the tail after the prefix is interpreted as 2-byte array, a *big-endian* representation of `uint16`
-* in the literal with the prefix `u32/` the tail after the prefix is interpreted as 4-byte array, a *big-endian* representation of `uint32`
-* in the literal with the prefix `u64/` the tail after the prefix is interpreted as 8-byte array, a *big-endian* representation of `uint64`
-* the literal which starts with `!!!` is a a call to embedded `fail` function. The tail after the `!!!` prefix is interpreted as inline error message in the `panic` statement. For example, when and if expression `!!!not_enough_storage_deposit` is evaluated, it results to the whole scipt failed with the message `not enough storage deposit` (the `_` are replaced with spaces)
-* the literal which starts with `x/` represents inline *EasyFL* formula in its canonic bytecode form, presented as hexadecimal. For example literal expression `x/10856369616f21` is equivalent to the literal `!!!ciao!`
-
-(Note. Options for `constant literals` may be extended in the future, for example *little-endian* numbers, signed integers, big-ints with various encodings etc)
+Each `literals`  are constants, i.e. expressions which always returns the same value. There are the following types of literals:
+* decimal number between `0` and `255`, it is a 1-byte array with the respective value. For example `0`, `42` are correct `constant literals` while `1337` is not;
+* a literal with the prefix `0x` is interpreted as a hexadecimal representation of the `byte array` of length, less than 127 bytes. For example `0xff0102` is a 3-byte array, while `0x123` is incorrect;
+* literal with the prefix `u16/` is a function which returns 2-byte array, a *big-endian* representation of the tail after the prefix;
+* literal with the prefix `u32/` is a function which returns 4-byte array, a *big-endian* representation of the tail after the prefix;
+* literal with the prefix `u64/` is a function which returns 8-byte array, a *big-endian* representation of the tail after the prefix;
+* literal with the prefix `z16/` is a function which returns zero-prefix-trimmed value of `u16`, i.e. up to 2 bytes;
+* literal with the prefix `z32/` is a function which returns zero-prefix-trimmed value of `u32`, i.e. up to 4 bytes;
+* literal with the prefix `z64/` is a function which returns zero-prefix-trimmed value of `u64`, i.e. up to 8 bytes;
+* the literal which starts with `!!!` is a call to embedded `fail` function. The tail after the `!!!` prefix is interpreted as an inline error message in the `panic` statement. For example, when and if expression `!!!not_enough_storage_deposit` is evaluated, it results in failure of the whole script with the message `not enough storage deposit` (the `_` are replaced with spaces)
+* the literal which starts with `x/` represents inline *EasyFL* formula in its canonic bytecode form, represented as hexadecimal. For example literal expression `x/10856369616f21` is equivalent to the literal `!!!ciao!`
+* the literal which start with the prefix `#` returns 1 or 2-byte long array with encoded binary code of the function with the name in the postfix. For example expression `#concat` is equivalent to the literal of the `concat` function code and `#address25519` is a code of the `address25519` function. The `#` literal is used in bytecode manipulations: a script for example can check is some specified bytecode indeed represents `address25519` siglock constraint.
 
 ### Examples 1
 
