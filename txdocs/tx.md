@@ -26,7 +26,11 @@ Let's say $bytes(e)$ is a function which gives a serialized binary representatio
 
 Serialized form of the byte array $b$ is itself: $bytes(b)=b$
 
-Serialized form of the tuple $T=(e_0, \dots e_{n-1})$ is $bytes(T) = header(n, l)||e'_0||\dots||e'_{n-1}$ where
+Serialized form of the tuple $T=(e_0, \dots e_{n-1})$ is 
+$$
+bytes(T) = header(n, l)||e'_0||\dots||e'_{n-1}
+$$ 
+where
 * $||$ is concatenation
 * $header(n,l)$ is 2 bytes which contain information about number of elements in the tuple $len(T)$ and $l$ is number of of bytes reserved for the size prefix of elements. Parameter $l$ is selected the way, that size of any element  would fit $l$ bytes (e.g. $l=1$ for a tuple with elements are no longer than  255 bytes, or, otherwise, $l=2$ if elements are no longer than $2^{16}-1$);
 * $e'_{i} = sz^l_i||bytes(e_i)$, where $sz^l_i$ is $len(bytes(e_i))$ in the form of $l$ bytes (big-endian). In other words, $e'_{i}$ is $bytes(e_i)$ prefixed with few bytes of size information.
