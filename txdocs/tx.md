@@ -9,7 +9,7 @@ Nested *tuples* may represent a finite hierarchical data structure, a *tree*, wh
 
 Proxima transactions are represented as such a tree of tuples. Let's say $T$ is such a tree. Every element in the tree has unique *path* $(i_0, \dots i_{m-1})$ which uniquely specifies place of that element in the whole structure. Empty path $()$ points to the tip of the tree, the top tuple itself. Every part of the transaction has its *path*, a unique "address" in the transaction.
 
-For a tuple $T$, we will denote $T_i$ as it's i-th element. In the hierachical case, element with the path $(i_0, \dots i_{m-1})$ we will denote:
+For a tuple $T$, we will denote $T_i$ as it's i-th element. In the hierarchical case, element with the path $(i_0, \dots i_{m-1})$ we will denote:
 $$
 T_{i_0,\dots i_{m-1}} = ((T_{i_0})_{i_1}\dots)_{i_{m-1}}
 $$
@@ -22,12 +22,11 @@ Similarly, $len(b)$ is number if bytes in the byte array $b$.
 
 ## Serialization
 
-Let's say $bytes(e)$ is a function which gives a serialized binary representation of the element $e$ as a byte array. The serialization rules are simplest possible:
+Let's say $bytes(e)$ is a function which gives a serialized binary representation of the element $e$ as a byte array. The serialization rules are the simplest possible:
 
 Serialized form of the byte array $b$ is itself: $bytes(b)=b$
 
-Serialized form of the tuple $T=(e_0, \dots e_{n-1})$ is $bytes(T) = header(n, l)||e'_0||\dots||e'_{n-1}$
-where
+Serialized form of the tuple $T=(e_0, \dots e_{n-1})$ is $bytes(T) = header(n, l)||e'_0||\dots||e'_{n-1}$ where
 * $||$ is concatenation
 * $header(n,l)$ is 2 bytes which contain information about number of elements in the tuple $len(T)$ and $l$ is number of of bytes reserved for the size prefix of elements. Parameter $l$ is selected the way, that size of any element  would fit $l$ bytes (e.g. $l=1$ for a tuple with elements are no longer than  255 bytes, or, otherwise, $l=2$ if elements are no longer than $2^{16}-1$);
 * $e'_{i} = sz^l_i||bytes(e_i)$, where $sz^l_i$ is $len(bytes(e_i))$ in the form of $l$ bytes (big-endian). In other words, $e'_{i}$ is $bytes(e_i)$ prefixed with few bytes of size information.
@@ -38,7 +37,7 @@ Note, that in the serialized form, the element of the tuple tree does not contai
 
 This is intentional: the user of a serialized tuple tree must know if a certain path $(i_0, \dots i_{m-1})$ is a valid path or not. Attempt to access element with invalid path will lead to exception with immediate invalidation of the entire data structure. This trait enables *lazy deserialization*: we can delay deserialization of part of the tuple tree until we need them.
 
-The data structures described above are low level binary bytes. Serilaization uses only very basic primitives, are platform-independent and have no dependencies on language-specific data types, nor on particular mechanisms such as Protobuf. Go implementation of it can be found in [github.com/lunfardo314/easyfl/tree/develop/tuples](https://github.com/lunfardo314/easyfl/tree/develop/tuples).
+The data structures described above are low level binary bytes. Serialization uses only very basic primitives, are platform-independent and have no dependencies on language-specific data types, nor on particular mechanisms such as Protobuf. Go implementation of it can be found in [github.com/lunfardo314/easyfl/tree/develop/tuples](https://github.com/lunfardo314/easyfl/tree/develop/tuples).
 
 ## Raw transaction
 
