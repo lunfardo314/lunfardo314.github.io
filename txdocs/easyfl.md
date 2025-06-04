@@ -4,6 +4,8 @@
 ## Introduction
 **EasyFL** stands for **Easy** **F**unctional **L**anguage. It is a very simple, a LISP-like functional programming language, without recursion and `eval` function though. It is extendable and is based on platform-independent bytecode.
 
+**Note, that _EasyFL_ is not a rich programming environment or universal programming language, or even, a smart contract language. It is a low level tool intended for scripting validity constraints of the UTXO transactions at the lowest, a byte level. One may see it as an assembly language of the Proxima UTXO transactions. EasyFL is equivalent to the stack-based VMs, used in Bitcoin and elsewhere, however it offers a pure functional syntax and semantics, which we see more convenient and verifiable.**  
+
 The *EasyFL* compiler, a core library and runtime engine are available at the [EasyFL repository](https://github.com/lunfardo314/easyfl). _EasyFL_ is the scripting language used in the Proxima UTXO transactions.  
 
 The requirements for such a language and the endgine are:
