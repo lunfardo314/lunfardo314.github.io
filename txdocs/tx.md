@@ -46,24 +46,24 @@ The data structures described above are low level binary bytes. Serialization us
 ## Raw transaction
 
 We distinguish two forms of the same Proxima transaction:
-* *raw transaction*, aka *canonical transaction* or *transferable transaction*. It is the transaction which is persisted, exchanged between nodes and stored in the transaction store;
-* *transaction context*. It is the *raw transaction*, extended with the fragment of the ledger state it updates. This form is transient and is only used for transaction validation, never persisted.
+* **raw transaction**, aka *canonical transaction* or *transferable transaction*. It is the transaction which is persisted, exchanged between nodes and stored in the transaction store;
+* **transaction context**. It is the *raw transaction*, extended with the fragment of the ledger state it updates. This form is transient and is only used for transaction validation, never persisted.
 
 The *raw transaction* is a tuple, consisting of 11 data elements listed below. The following are the top level tuple elements of the raw transaction:
 
-| Index | Name | Description |
-| -------- | -------- | -------- |
-|0|Inputs|Non-empty tuple of up to 256 output IDs of consumed UTXOs (not the consumed UTXOs themselves)|
-| 1     | Unlock data     | a tuple of *unlock parameters*. 1-to-1 correspondence with the tuple of inputs|
-|2|Produced outputs|Non-empty tuple of up to 256 produced outputs|
-|3|Signature| a terminal. It is ED25519-signed *transaction ID* with the public key|
-|4|Sequencer and stem output indices| a terminal. 2 bytes with sequencer-related indices of produced outputs|
-|5|Timestamp|a terminal. 5 bytes of transaction [ledger time](#ledger-time) value|
-|6|Total produced amount|a terminal. `uint64` sum of token amounts of the produced outputs as [zero-trimmed big-endian bytes](#integers-and-token-amounts)|
-|7|Input commitment|a terminal. Hash of concatenated all consumed outputs (which are not part of the transaction): $hash(consumed(T))$ (see below)|
-|8|Endorsements|a tuple of up to 8 transaction IDs|
-|9|Explicit baseline|a terminal. Optional explicit transaction ID of a branch transaction|
-|10|Local libraries|a tuple. Uninterpreted in the version 1, usually empty|
+| Index | Name | Description                                                                                                                                 |
+| -------- | -------- |---------------------------------------------------------------------------------------------------------------------------------------------|
+|0|Inputs| Non-empty tuple of up to 256 output IDs of consumed UTXOs (not the consumed UTXOs themselves)                                               |
+| 1     | Unlock data     | a tuple of *unlock parameters*. 1-to-1 correspondence with the tuple of inputs                                                              |
+|2|Produced outputs| Non-empty tuple of up to 256 produced outputs                                                                                               |
+|3|Signature| a terminal. It is ED25519-signed *transaction ID* with the public key                                                                       |
+|4|Sequencer and stem output indices| a terminal. 2 bytes with sequencer-related indices of produced outputs                                                                      |
+|5|Timestamp| a terminal. 5 bytes of transaction _ledger time_ value (see below)                                                                          |
+|6|Total produced amount| a terminal. `uint64` sum of token amounts of the produced outputs as _zero-trimmed big-endian bytes_(see below about encoding of integeres) |
+|7|Input commitment| a terminal. Hash of concatenated all consumed outputs (which are not part of the transaction): $hash(consumed(T))$ (see below)              |
+|8|Endorsements| a tuple of up to 8 transaction IDs                                                                                                          |
+|9|Explicit baseline| a terminal. Optional explicit transaction ID of a branch transaction                                                                        |
+|10|Local libraries| a tuple. Uninterpreted in the version 1, usually empty                                                                                      |
 
 For example, for a transaction $T$, element $T_0$ will be a tuple of inputs while $T_6$ will be total produced amount. The *i-th* produced output is $T_{2,i}$
 
@@ -72,7 +72,7 @@ For example, for a transaction $T$, element $T_0$ will be a tuple of inputs whil
 
 ## Transaction context
 
-Let'denote $utxo(id)$ is the UTXO loaded from the ledger state by its ID $id$.
+Let's denote $utxo(id)$ is the UTXO loaded from the ledger state by its ID $id$.
 
 Let's say $T=(T_0, \dots T_{10})$ is a raw transaction. Then
 $$
@@ -84,7 +84,7 @@ $$
 T^{ctx}=(T, (consumed(T)))
 $$
 
-**The transaction context $T^{ctx}$ contains all the information needed for the validation of the transaction $T$**. It is the transaction itself plus all consumed outputs, loaded from the ledger state, in one data structure with all elemebts uniforml accecssible with their paths.
+**The transaction context $T^{ctx}$ contains all the information needed for the validation of the transaction $T$**. It is the transaction itself plus all consumed outputs, loaded from the ledger state, in one data structure with all elements uniformly accessible with their paths.
 
 It is always true that $T^{ctx}_0 = T$ and $T_{path}=T^{ctx}_{0,path}$
 Path to the *i-th* input in the *transaction context* $T^{ctx}$ is $(0,0,i)$.
@@ -100,15 +100,16 @@ From the path of the input, we can easily find all other data elements correspon
 ## Outputs (UTXOs). Validation scripts/formulas
 The node is using globally trusted rules to determine if transaction $T$ is valid or not. Invalid transaction is rejected immediately.
 
-Transaction validity rules are applied to the *transaction context* $T^{ctx}$.
+Transaction validity rules are applied to the transaction context $T^{ctx}$.
 
-Ultimately, globaly trusted transaction validity rules are hardcoded in the node's software. However, in order to increase flexibility, UTXO transaction models usually implement some kind of programmability, such as Bitcoin Script. In that case, node has interpreter of the scripts hardcoded in its software, and is only responsible for running it on scripts, provided with the transaction.
+Ultimately, transaction validity rules are public and globally trusted. They are hardcoded in the node's software. 
+However, in order to increase flexibility, UTXO transaction models usually implement some kind of programmability of validity rules, such as [Bitcoin Script](https://en.bitcoin.it/wiki/Script). In that case, node has the interpreter of the scripts hardcoded in its software, and is only responsible for running the scripts, provided in the transaction.
 
-For example, instead of using hardcoded types of unlock conditions of UTXOs, producer of the transaction can compose a script and embed it into the UTXO. When run in the context of the consuming transaction, checks if transaction meets certain unlock criteria.
+For example, instead of using hardcoded types of unlock conditions of UTXOs, producer of the transaction can compose a script with their own unlock rule and embed the script into the UTXO. When run in the context of the consuming transaction, the script checks if transaction meets certain unlock criteria, as intended by the producer.
 
-In Proxima, we adopt this approach too. Each UTXO is treated as tuple of terminal elements $(c_0, \dots c_{k-1})$ where each $c_i$ is interpreted as a bytecode of a script.
+In Proxima, we adopt this approach too: we treat each UTXO as tuple of terminal elements $(c_0, \dots c_{k-1})$ where each $c_i$ is a bytecode of a script.
 
-**In Proxima, each UTXO is a tuple of validation scripts**. All the data, such as amounts or addresses, are wrapped into those scripts. The scripts can access and define **logical relations between any data elements of the transaction context**: inside one UTXO, between several of them, between inputs and outputs and so on.
+All the data, such as amounts or addresses, are wrapped into those scripts too: there are no such thing as _data field_ in the Proxima's UTXO, all is scripts. The scripts can access all elements in the transaction context $T^{ctx}$ and enforce **logical relations between any data elements of the transaction context**: inside one UTXO, between several of them, between inputs and outputs and so on.
 
 Further we will describe a simple functional language *EasyFL* which is used for the scripting. Here, the main point is that **each script is a closed formula, which represents a composition of function calls and data**, serialized as a bytecode.
 
