@@ -109,7 +109,7 @@ Expression parameters can be used at any level of the expression, i.e. `not(not(
 Expression `or($3)` will return 4th argument, however all 4 must be supplied in the call context, only first 3 won't be used.
 
 ## Library of definition. Compilation. Execution
-EasyFL library defines a correspondence between function names, function codes and function descriptors.
+EasyFL library defines a correspondence between function names, function codes (opcodes) and function descriptors.
 Function codes are 1-2 byte long values. 
 
 Library is needed for the compilation from the source to the bytecode and back, as well for the compilation of the bytecode to the executable form. The library provides ledger definitions, shared and trusted between Proxima nodes. It defines determinism of the ledger. If two participants of the distributed system would assume different ledger definitions, they cannot come to the consensus, because what seems to be valid for one, will look invalid to another. 
@@ -153,32 +153,69 @@ The source expression is recursively compiled to the nested array of bytecodes, 
 
 ### Library of functions
 
-[YAML link](txdocs/library.md)
+[Here](txdocs/library.md) we provide base EasyFL library in the form of the _YAML_ file. In the Proxima ledger, the base library is extended with additional functions, specific to the Proxima transactions.  
 
-### Base library in YAML
+The library is a list of function descriptors. Function descriptor take a form: 
+```
+      sym: <function name>
+      description: <free description of the purpose>
+      funCode: <function code>
+      numArgs: <number of parameters. -1 mean vararg>
+      embedded: <true for embeded (hardcoded) functions, false for EasyFL expressions>
+      short: <true for short code (up to 63), long  >
+      bytecode: <if embedded=false, hex-encoded bytecode of the expression>
+      source: <if embedded=false, source of the expression>
+```
+For the ledger definitions, the library is immutable:
 
+- it must be sorted in the ascending order of function codes
+- it has `hash: ..` keyword, which is `blake2b-256` hash of concatenated following data elements: 
+  - function names
+  - function codes
+  - number of arguments
+  - embedded flag
+  - the bytecode (if relevant)
+- for formula elements (with embedded=false), compiled source code must be equal to the bytecode
 
+When library is loaded into the environment which interprets it (node, wallet and similar), consistency of the library definitions is checked. Library contains all the information needed to check for its consistency. 
 
+The embedded functions are implemented outside the library, by the node. They must be provided upon instantiating library and starting reading tge ledger state and transactions.
 
+The genesis ledger genesis is created with the particular library definitions, called `ledger ID`. After the genesis ledger state is created, library of definitions becomes an immutable part of the ledger state. 
 
+### Extending the library
+Normally we treat the library of definition as an atomic, immutable object.
+However, before the ledger starts its existence, the base library is extended with a number of new functions.
 
+Let's say we have library $L$ and want to extend it with the new function. This will result in new library $L'$. Requirements for such operations:
+- **no recursion**: if we are adding a new EasyFL formula with the new function name, the expression can only use function names already present in the library
+- **backward compatibility of bytecodes**: function code (opcode) of the new function must be strictly larger that all the opcodes in its category (short embedded, long embedded and extended has different ranges of their opcodes). This will ensure, that any bytecode used in transaction created for the library $L$ will be valid with the library $L'$.
 
+This way. after we modified library with the number of functions, both embedded or not, the old library $L$ will be compatible with the new library $L'$ in a sense, that old valid transaction will remain to be valid with the upgraded library. 
+
+The hash of the upgraded library will change. Taking into account all of this, **we can ensure upgrades in the ledger (hard forks) without losing backward compatibility**. 
 
 ### Evaluation
 Expressions are evaluated in the form of the internal evaluation tree, derived from the bytecode. So, the workflow is always like this:
 
 `<expression source> -> <canonical bytecode> -> <evaluation tree> -> <evaluation>`.
 
-The engine (function `EvalExpression`) is using **lazy evaluation**. It means argument expression is only evaluated when and if it is needed for the evaluation of the context where it is used as a parameter. For example, the expression:
-`if(concat, byte(0,1), 0x01)` will never panic even if `byte(0,1)` always panics (see *Exceptions* below). It is because `concat` always returns `false` and `if` function always evaluates only one of two branches.
+Each script/formula is evaluated in the context of the transaction, i.e. script expression should be able to access the (immutable) context. For this reason, EasyFL engine ensures means of providing evaluation context to the formula interpreted.   
 
+Evaluation steps:
+- convert bytecode to a tree-like evaluation form. Vertices are function descriptors. It is enforced, that opcodes of function must strictly diminish going down the evaluation tree. **This prevents any recursion/loops at the bytecode level** (a possible attack vector) 
+- provide evaluation context, usually the _transaction context_.
+- run evaluation recursively along the tree down to the terminal data elements (embedded functions)
+
+The evaluation engine (function `EvalExpression` in Go implementation) is using **lazy evaluation**. It means argument expression is only evaluated when and if it is needed for the evaluation of the context where it is used as a parameter. For example, the expression:
+`if(concat, byte(0,1), 0x01)` will never panic even if `byte(0,1)` always panics (see [Exceptions](#exceptions) below). It is because `concat` always returns `false` and `if` function always evaluates only one of two branches.
 
 ### Exceptions
 Evaluation of the expression may fail with the panic. For example, expression `byte(0,1)` will always panic, because it tries to take a byte with index `1` from the 1-byte array `[0]`.
 
 The embedded function `fail` always panics with its only argument interpreted as the error message/string. The `!!!<msg>` is a shortcut literal of the `fail` function call.
 
-The evaluation engine (the Go function `EvalFromBinary`) does not process exceptions. The transaction validation context, which invokes the evaluation engine, must intercept panic and treat transaction as invalid.
+The evaluation engine (the Go function `EvalFromBinary` in Go implementation) does not process exceptions. The transaction validation context, which invokes the evaluation engine, must intercept panic and treat transaction as invalid.
 
 
 
