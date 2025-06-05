@@ -191,7 +191,7 @@ Let's say we have library $L$ and want to extend it with the new function. This 
 - **no recursion**: if we are adding a new EasyFL formula with the new function name, the expression can only use function names already present in the library
 - **backward compatibility of bytecodes**: function code (opcode) of the new function must be strictly larger that all the opcodes in its category (short embedded, long embedded and extended has different ranges of their opcodes). This will ensure, that any bytecode used in transaction created for the library $L$ will be valid with the library $L'$.
 
-This way. after we modified library with the number of functions, both embedded or not, the old library $L$ will be compatible with the new library $L'$ in a sense, that old valid transaction will remain to be valid with the upgraded library. 
+This way, after we modify the library with several new functions, embedded and expressions, the old library $L$ will remain compatible with the new library $L'$ in a sense, that old valid transaction will remain valid with the upgraded library. 
 
 The hash of the upgraded library will change. Taking into account all of this, **we can ensure upgrades in the ledger (hard forks) without losing backward compatibility**. 
 
