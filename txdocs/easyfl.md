@@ -108,7 +108,11 @@ Expression parameters can be used at any level of the expression, i.e. `not(not(
 
 Expression `or($3)` will return 4th argument, however all 4 must be supplied in the call context, only first 3 won't be used.
 
-## Library and compilation
+## Library of definition. Compilation. Execution
+EasyFL library defines a correspondence between function names, function codes and function descriptors.
+Function codes are 1-2 byte long values. 
+
+Library is needed for the compilation from the source to the bytecode and back, as well for the compilation of the bytecode to the executable form. The library provides ledger definitions, shared and trusted between Proxima nodes. It defines determinism of the ledger. If two participants of the distributed system would assume different ledger definitions, they cannot come to the consensus, because what seems to be valid for one, will look invalid to another. 
 
 ### Function definitions
 Expression, which may or may not have open parameters, can be assigned the name and thus become part of the library, used to validate transactions.
@@ -122,6 +126,8 @@ For example
 func lessOrEqualTo : or(lessThan($0, $1), equalUint($0,$1))
 ```
 defines a function with two arguments for the relation $\le$ between byte arrays, interpreted as big-endian integers.
+
+In the library, definition of the function takes form of a _function descriptor_.
 
 ### Bytecode
 So far we introduced the _source form_ of the expression. The source is a human-readable form, while the canonical form of expression, used in libraries and embedded in the transactions, is its **bytecode**.
@@ -146,6 +152,11 @@ The source expression is recursively compiled to the nested array of bytecodes, 
 * the parameter calls `$0`, `$1`.., which are special function, which evaluates argument expressions
 
 ### Library of functions
+
+[YAML link](library.yaml)
+
+### Base library in YAML
+
 
 
 
