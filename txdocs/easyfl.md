@@ -108,6 +108,8 @@ Expression parameters can be used at any level of the expression, i.e. `not(not(
 
 Expression `or($3)` will return 4th argument, however all 4 must be supplied in the call context, only first 3 won't be used.
 
+## Library and compilation
+
 ### Function definitions
 Expression, which may or may not have open parameters, can be assigned the name and thus become part of the library, used to validate transactions.
 
@@ -124,26 +126,24 @@ defines a function with two arguments for the relation $\le$ between byte arrays
 ### Bytecode
 So far we introduced the _source form_ of the expression. The source is a human-readable form, while the canonical form of expression, used in libraries and embedded in the transactions, is its **bytecode**.
 
-The _bytecode_ of the expression is a highly compressed form of it with names of functions encoded. 
+The _bytecode_ of the expression is a compressed form of it with names of functions encoded. 
 The bytecode is **compiled** from the source, using the library of functions (see below [library](#library-of-functions)), which assigns codes to the function names. 
 
 Note, that the bytecode may equally represent a closed formula (used in transactions), or open formula with parameters (used in the library)
 
-The $code(\cdot)$ function denotes compilation: $code(source) \rightarrow bytecode$. In _EasyFL_ compilation is essentially a serialization of the source code to the byte code.
+The $code(\cdot)$ function denotes compilation: $code(source) \rightarrow bytecode$. In _EasyFL_ compilation is essentially a serialization of the source code to the bytecode.
 
 Let's say we have source expression $E = fn(e_0, \dots e_{n-1})$, where $fn$ is function name and $e_i$ is expression source. Then serialized form of the expression, the bytecode is the following concatenation:  
 $$
 code(E) = callPrefix(fn)||code(e_0)||\dots ||code(e_{n-1})
 $$
 
-We will not define exact format of the $callPrefix(f)$, just will say it is from 1 to 3 bytes which point to the particular function in the library and, specifies number of call arguments, the call _arity_. 
+We will not define exact format of the $callPrefix(f)$ (it can be found in the open repository), just will say here it is 1 to 3 bytes which point to the particular function in the library and, specifies number of call arguments, the call _arity_. 
 
 The source expression is recursively compiled to the nested array of bytecodes, down to the terminal elements. The terminal elements are function calls without parameters:
 * calls to parameter-less library functions
 * the literals (see [above](#literals)), which usually define inline data such as `123`, `u32/1337` or `0x01ff` 
 * the parameter calls `$0`, `$1`.., which are special function, which evaluates argument expressions
-
-
 
 ### Library of functions
 
