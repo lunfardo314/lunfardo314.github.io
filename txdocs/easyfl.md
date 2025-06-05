@@ -187,8 +187,8 @@ The genesis ledger genesis is created with the particular library definitions, c
 Normally we treat the library of definition as an atomic, immutable object.
 However, before the ledger starts its existence, the base library is extended with new functions. For example, Proxima extends base library, provided by the EasyFL with functions needed for the Proxima transaction model. The resulting library becomes immutable part of the Proxima ledger. 
 
-Let's say we have library $L$ and want to extend it with the new function. This will result in new library $L'$. Requirements for such operations:
-- **no recursion**: if we are adding a new EasyFL formula with the new function name, the expression can only use function names already present in the library
+Let's say we have library $L$ and want to extend it with the new function. This will result in new library $L'$. Requirements for such operation:
+- **no recursion**: if we are adding a new EasyFL formula with the new function name to the existing library, the expression can only use function names already present in the library
 - **backward compatibility of bytecodes**: function code (opcode) of the new function must be strictly larger that all the opcodes in its category (short embedded, long embedded and extended has different ranges of their opcodes). This will ensure, that any bytecode used in transaction created for the library $L$ will be valid with the library $L'$.
 
 This way, after we modify the library with several new functions, embedded and expressions, the old library $L$ will remain compatible with the new library $L'$ in a sense, that old valid transaction will remain valid with the upgraded library. 
@@ -203,7 +203,7 @@ Expressions are evaluated in the form of the internal evaluation tree, derived f
 Each script/formula is evaluated in the context of the transaction, i.e. script expression should be able to access the (immutable) context. For this reason, EasyFL engine ensures means of providing evaluation context to the expression interpreted. The script of the expression accesses parts of the evaluation context (the transaction) via special embedded functions.
 
 Evaluation steps:
-- convert bytecode to a tree-like evaluation form. Vertices are function descriptors. It is enforced, that opcodes of function must strictly diminish going down the evaluation tree. **This prevents any recursion/loops at the bytecode level** (a possible attack vector) 
+- convert bytecode to a tree-like evaluation form
 - provide evaluation context, usually the _transaction context_.
 - run evaluation recursively along the tree down to the terminal data elements (embedded functions)
 
