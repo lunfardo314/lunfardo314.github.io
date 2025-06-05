@@ -185,7 +185,7 @@ The genesis ledger genesis is created with the particular library definitions, c
 
 ### Extending the library
 Normally we treat the library of definition as an atomic, immutable object.
-However, before the ledger starts its existence, the base library is extended with a number of new functions.
+However, before the ledger starts its existence, the base library is extended with new functions. For example, Proxima extends base library, provided by the EasyFL with functions needed for the Proxima transaction model. The resulting library becomes immutable part of the Proxima ledger. 
 
 Let's say we have library $L$ and want to extend it with the new function. This will result in new library $L'$. Requirements for such operations:
 - **no recursion**: if we are adding a new EasyFL formula with the new function name, the expression can only use function names already present in the library
