@@ -7,7 +7,7 @@ When composing a transaction, we aim to operate with the most generic data struc
 
 Nested *tuples* may represent a finite hierarchical data structure, a *tree*, which has byte arrays as terminal elements and tuples as interim vertices.
 
-Proxima transactions are represented as such a tree of tuples. Let's say $T$ is such a tree. Every element in the tree has unique *path* $(i_0, \dots i_{m-1})$ which uniquely specifies place of that element in the whole structure. Empty path $()$ points to the tip of the tree, the top tuple itself. Every part of the transaction has its *path*, a unique "address" in the transaction.
+Each Proxima transaction is represented as such a tree of tuples. Let's say $T$ is such a tree. Every element in the tree has unique *path* $(i_0, \dots i_{m-1})$ which uniquely specifies place of that element in the whole structure. Empty path $()$ points to the tip of the tree, the top tuple itself. Every part of the transaction has its *path*, a unique "address" in the transaction.
 
 For a tuple $T$, we will denote $T_i$ as it's i-th element. In the hierarchical case, element with the path $(i_0, \dots i_{m-1})$ we will denote:
 $$
