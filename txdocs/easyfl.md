@@ -1,4 +1,3 @@
-
 # EasyFL: a simple functional language
 
 ## Introduction

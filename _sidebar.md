@@ -4,4 +4,5 @@ Proxima transaction model
 - [Proxima transaction](txdocs/tx.md) 
 - [Base data elements](txdocs/base.md)
 - [Validation of transaction](txdocs/validation.md)
-- [EasyFL](txdocs/easyfl.md)
+- [Proxima ledger](txdocs/ledger.md)
+- [Annex: EasyFL](txdocs/easyfl.md)
