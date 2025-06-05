@@ -34,11 +34,11 @@
       name: 'Proxima documentation',
       loadSidebar: true,
       subMaxLevel: 3,
-      // afterEach: function () {
-      //   if (window.MathJax && window.MathJax.typesetPromise) {
-      //     window.MathJax.typesetPromise();
-      //   }
-      // }
+      afterEach: function () {
+        if (window.MathJax && window.MathJax.typesetPromise) {
+          window.MathJax.typesetPromise();
+        }
+      }
     };
   </script>
 
