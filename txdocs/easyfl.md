@@ -195,12 +195,12 @@ This way, after we modify the library with several new functions, embedded and e
 
 The hash of the upgraded library will change. Taking into account all of this, **we can ensure upgrades in the ledger (hard forks) without losing backward compatibility**. 
 
-### Evaluation
+### Evaluation of expressions
 Expressions are evaluated in the form of the internal evaluation tree, derived from the bytecode. So, the workflow is always like this:
 
-`<expression source> -> <canonical bytecode> -> <evaluation tree> -> <evaluation>`.
+`<expression source> -> <bytecode> -> <evaluation tree> -> <evaluation>`.
 
-Each script/formula is evaluated in the context of the transaction, i.e. script expression should be able to access the (immutable) context. For this reason, EasyFL engine ensures means of providing evaluation context to the formula interpreted.   
+Each script/formula is evaluated in the context of the transaction, i.e. script expression should be able to access the (immutable) context. For this reason, EasyFL engine ensures means of providing evaluation context to the expression interpreted. The script of the expression accesses parts of the evaluation context (the transaction) via special embedded functions.
 
 Evaluation steps:
 - convert bytecode to a tree-like evaluation form. Vertices are function descriptors. It is enforced, that opcodes of function must strictly diminish going down the evaluation tree. **This prevents any recursion/loops at the bytecode level** (a possible attack vector) 
@@ -217,9 +217,7 @@ The embedded function `fail` always panics with its only argument interpreted as
 
 The evaluation engine (the Go function `EvalFromBinary` in Go implementation) does not process exceptions. The transaction validation context, which invokes the evaluation engine, must intercept panic and treat transaction as invalid.
 
-
-
-### Examples 2
+### Examples
 * `if($0,$2,$1)` will evaluate `$2` if `$0` will return true and will evaluate `$1` if `$0` is nil. It deserves the name `ifNot`.
 * `concat($0, $0, $0, $0)` will repeat argument by concatenating it 4 times.
 
@@ -232,128 +230,3 @@ will compile the source to the bytecode form, will evaluate it with provided arg
 ```go
 []byte{111,222}
 ```
-
-### Extension of the library
-The semantics of execution of the expressions depends on the functions itself. The runtime environment of *EasyFL* assumes `the library`, which contains all function definitions, available for the evaluation engine. For the UTXO transaction validation, the library must be the same on each node.
-
-There are two types of functions: `embedded` and `extended`.
-
-#### Embedded functions
-`Embedded` functions are hardcoded executable code of the host environment, for example Go code. They are defined by `name`, `arity` and the Go function to be executed (or other language environment). Example of embedding:
-
-Function with variable number of arguments.
-```go
-EmbedShort("concat", -1, func (par *CallParams) []byte {
-	var buf bytes.Buffer
-	for i := byte(0); i < par.Arity(); i++ {
-		buf.Write(par.Arg(i))
-	}
-	return buf.Bytes()
-})
-```
-
-Function with fixed `arity` 3.
-```go
-EmbedLong("validSignatureED25519", 3, func(ctx *CallParams) []byte {
-	msg := ctx.Arg(0)
-	signature := ctx.Arg(1)
-	pubKey := ctx.Arg(2)
-	if ed25519.Verify(pubKey, msg, signature) {
-		return []byte{0xff} // anything not nil is true
-	}
-	return nil
-})
-```
-
-Embedded functions usually have a very simple and clear semantics. They usually contains very core functions or very complicated, such as cryptography.
-
-The embedded code accesses arguments of the call through provided context of type `ctx *CallParams`. The global data structure being validated, such as UTXO transaction, is accessed as `ctx.DataContext()`. This way embedded code have access to the whole data context it is validating.
-
-Notably, the embedded code is running any code on the host environment, so it is not restricted to the *non-Turing equivalence*, i.e. it may run any loops and queries on the provided data context. This is up to the developer of the embedded code with all the consequences, because embedded code is out of control of the transaction validation context.
-
-Note, that embedded code is always provided by the node developer. Meanwhile, the transaction production environment can only provide *EasyFL* expessions, bytecode or source and they are protected by the bounded nature of the computation model (see *Extended functions* below).
-
-So, the embedded functions can also contain calls to other, more complicated, environmens, VMs and interpreters, such as EVM or Wasm. **Function embedding is a natural point where ledger protocol may be extended.**
-
-The call context `ctx *CallParams` provides access to parameters of the call and access to the data structure the expression is validating. In the UTXO case the data structure is the UTXO transaction itself.
-
-#### Extended functions
-
-Extended funtions are defined by expression in the source form. For example:
-
-```go
-	Extend("nil", "or")
-	Extend("false", "or")
-	Extend("true", "and")
-	Extend("lessOrEqualThan", "or(lessThan($0,$1),equal($0,$1))")	
-```
-adds functions `nil` (0 parameters, call `or()` always returns `false/nil` and `and` always returns some non-empty slice, interpreted as `true` ) and `lessOrEqualThan` (2 parameters) as an expressions to the library. The `Extend` call compiles expression and prepares it for evaluation. It automatically calculates `arity` of the function as `i+1`, where `$i` is the largest number of the parameter.
-
-The strict requirement is: **any function referenced in the expression must already exist in the library**. This restriction makes the *EasyFL* compiler extemely simple and **prevents recursive definitions of functions**. It also and makes the computational model of *EasyFL* expressions **non-Turing equivalent**, just as intended.
-
-#### Extension with many functions
-*EasyFL* compiler provides following notation to extend library with many function definition. It is usefull extend library with more complex transaction constraints.
-
-Each library extension of this kind has a form:
-
-`func <function name>: <expression>`
-
-In the source may be many these function definitions.
-
-#### Local libraries
-The *EasyFL* compiled and runtime support embedable libraries, so called **local libraries**. The *local library* is a collection of *EasyFL* functions compiled into the canonical bytecode format. Another  *EasyFL* function can call (invoke) an *EasyFL* function from the compiled local library, which is provided as parameter. This feature enables use cases, for example when constraint requires to know another unocking script to unlock the first one. Example may be hash-locking the output and to unlock it we must provide script as pre-image of the hash.
-
-## Bigger example: ED25519 sig lock constraint
-The following is an example of a *sigLocED25519* constraint, which only allows transaction to be valid, if the output is unlocked by the valid ED25519 signature of the transaction essence or points to another input, which contains a valid signature verifiable with  the same address.
-
-The source code is taken from the `EasyUTXO` PoC ledger implementation. It is provided here to demonstrate expressiveness of the language.
-
-```go
-// ED25519 address constraint wraps 32 bytes address, the blake2b hash of the public key
-// For example expression 'addressED25519(0x010203040506..)' used as constraint in the output makes 
-// the output unlockable only with the presence of signature correspomding 
-// to the address '0x010203040506..'
-
-// $0 = address data 32 bytes
-// $1 = signature
-// $2 = public key
-// return true if transaction essence signature is valid for the address
-func unlockedWithSigED25519: and(
-	equal($0, blake2b($2)), 		       // address in the address data must be equal to the hash of the public key
-	validSignatureED25519(txEssenceBytes, $1, $2)
-)
-
-// 'unlockedByReference'' specifies validation of the input unlock with the reference.
-// The referenced constraint must be exactly the same  but with strictly lesser index.
-// This prevents from cycles and forces some other unlock mechanism up in the list of outputs
-func unlockedByReference: and(
-	lessThan(selfUnlockParameters, selfOutputIndex),              // unlock parameter must point to another input with 
-							                                      // strictly smaller index. This prevents reference cycles	
-	equal(self, consumedLockByOutputIndex(selfUnlockParameters))  // the referenced constraint bytes must be equal to the self constraint bytes
-)
-
-// if it is 'produced' invocation context (constraint invoked in the input), only size of the address is checked
-// Otherwise the first will check first condition if it is unlocked by reference, otherwise checks unlocking signature
-// Second condition not evaluated if the first is true
-// $0 - ED25519 address, 32 byte blake2b hash of the public key
-func addressED25519: and(
-	equal(selfBlockIndex,2), // locks must be at block #2
-	or(
-		and(
-			selfIsProducedOutput, 
-			equal(len8($0), 32) 
-		),
-		and(
-			selfIsConsumedOutput, 
-			or(
-					// if it is unlocked with reference, the signature is not checked
-				unlockedByReference,
-					// tx signature is checked
-				unlockedWithSigED25519($0, signatureED25519(txSignature), publicKeyED25519(txSignature)) 
-			)
-		),
-		!!!addressED25519_unlock_failed
-	)
-)
-```
-
