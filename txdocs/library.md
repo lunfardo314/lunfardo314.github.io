@@ -1,3 +1,4 @@
+```
 # Base EasyFL library
 hash: 8d5795e2395cb0ef70181f6e5701df2dfcfa18590abc2711b2f0eab29fb0821e
 functions:
@@ -370,3 +371,4 @@ functions:
          
 # END EXTENDED function definitions (defined by EasyFL formulas)
 # END all function definitions
+```

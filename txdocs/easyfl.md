@@ -153,7 +153,7 @@ The source expression is recursively compiled to the nested array of bytecodes, 
 
 ### Library of functions
 
-[YAML link](library.yaml)
+[YAML link](library.md)
 
 ### Base library in YAML
 
