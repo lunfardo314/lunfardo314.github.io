@@ -152,7 +152,7 @@ The source expression is recursively compiled to the nested array of bytecodes, 
 
 ### Library of functions
 
-[Here](txdocs/library.md) we provide base EasyFL library in the form of the _YAML_ file. In the Proxima ledger, the base library is extended with additional functions, specific to the Proxima transactions.  
+[Here](txdocs/library_base.md) we provide base EasyFL library in the form of the _YAML_ file. In the Proxima ledger, the base library is extended with additional functions, specific to the Proxima transactions.  
 
 The library is a list of function descriptors. Function descriptor take a form: 
 ```
