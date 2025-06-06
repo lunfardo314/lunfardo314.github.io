@@ -21,7 +21,7 @@ We already introduced [validation process](txdocs/validation.md) of a transactio
 Proxima ledger definitions embeds two special embedded functions, which enables access to the evaluation context and the transaction context in the EasyFL formulas:
 
 ### Evaluation context: `at`
-Each time constraint script is evaluated in the transaction context$, its path in $T^{ctx} is provided in the context.
+Each time constraint script is evaluated in the transaction context, its path in $T^{ctx}$ is provided in the context.
 
 The path always have the form $(0, 2, i, j)$ for the constraint $j$ of the **produced** UTXO $i$.
 The path always have the form $(1, 0, i, j)$ for the constraint $j$ of the **consumed** UTXO $i$.
