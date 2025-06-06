@@ -58,10 +58,41 @@ For example, each script formula can retrieve its own bytecode with the function
 func self : atPath(at)
 ```
 
+### Access to the tuple element: `atTuple8`
 
+Embedded function `atTuple8` treats its argument `$0` as a serialized tuple and argument `$1` as index of the element. The index must be 1 byte-long. 
 
+Function returns element of the tuple. 
 
 ## Ledger constants
+At genesis, number of values, such as initial supply and genesis public key, must be set up in for the ledger. These values are called *ledger constants*. The values of the ledger constants are encoded right in the ledger definitions and therefore are immutable.  
+
+Constants are represented by EasyFL functions without parameters with name starting with `const`. Here are examples of typical definitions of ledger constants in EasyFL (they can also be found in the [proxima.genesis.id](ledgerdocs/genesis.id.md) YAML file):
+
+```go
+func constInitialSupply : u64/1000000000000000
+func constGenesisControllerPublicKey : 0x9ad4caddd2356a7853eb038a5b4fd3197522af51af4073584260c53bbfaf1816
+func constGenesisTimeUnix : u64/1749146740
+func constTickDuration : u64/80000000
+func constMaxTickValuePerSlot : u64/127
+func ticksPerSlot64 : add(constMaxTickValuePerSlot, u64/1)
+func constSlotInflationBase : u64/33000000
+func constLinearInflationSlots : u64/3
+func constBranchInflationBonusBase : u64/5000000
+func constMinimumAmountOnSequencer : u64/1000000000000
+func constMaxNumberOfEndorsements : u64/8
+func constPreBranchConsolidationTicks : u64/25
+func constPostBranchConsolidationTicks : u64/12
+func constTransactionPace : u64/64
+func constTransactionPaceSequencer : u64/2
+func constVBCost16 : u16/1
+```
+
+Constant `constInitialSupply` sets the initial supply of tokens on the genesis output. 
+Constant `constGenesisTimeUnix` sets the absolute time reference in Unix seconds for the ledger.
+Constant `constTickDuration` is a constant in nanoseconds, which determines correspondence between ledger time duration and clock duration.
+
+The correspondence between ledger time and clock time is crucial for the cooperative consensus, because token holder must come together "in real time and space" with approximately the same assumptions about clock time in order to be able to cooperate.
 
 ## Helper functions
 
