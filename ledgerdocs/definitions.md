@@ -87,14 +87,59 @@ func constTransactionPace : u64/64
 func constTransactionPaceSequencer : u64/2
 func constVBCost16 : u16/1
 ```
-
 Constant `constInitialSupply` sets the initial supply of tokens on the genesis output. 
 Constant `constGenesisTimeUnix` sets the absolute time reference in Unix seconds for the ledger.
 Constant `constTickDuration` is a constant in nanoseconds, which determines correspondence between ledger time duration and clock duration.
 
 The correspondence between ledger time and clock time is crucial for the cooperative consensus, because token holder must come together "in real time and space" with approximately the same assumptions about clock time in order to be able to cooperate.
 
+Genesis controller public key belongs to the owner of all tokens at genesis and is also provided in the lock script of the genesis output. Later, the owner of tokens will change, but the public key of the originator will remain in the ledger forever. 
+
 ## Helper functions
+Apart from embedded (hardcoded) function and ledger validity constraints, Proxima ledger definitions contain many EasyFL definition of the helper functions. All of it can be found in [proxima.genesis.id](ledgerdocs/genesis.id.md). Some of it we will describe here:
+
+Functions with the names starting with `path` represent paths of various parts of the $T^{ctx}$. For example:
+```go
+func pathToTimestamp : 0x0005
+```
+Function `mustSize` enforces certain size of the data:
+```go
+func mustSize : if(equalUint(len($0), $1), $0, !!!wrong_data_size)
+```
+
+Transaction ID calculation (needed for checking the signature) is defined the following way:
+```go
+func txTimestampBytes : atPath(pathToTimestamp)
+	
+func txEssenceBytes :
+    concat( 
+        concat( 
+            atPath(pathToInputIDs), 
+            atPath(pathToUnlockParams), 
+            atPath(pathToProducedOutputs), 
+            atPath(pathToSeqAndStemOutputIndices), 
+            atPath(pathToTimestamp) 
+        ), 
+        concat( 
+            atPath(pathToTotalProducedAmount), 
+            atPath(pathToInputCommitment), 
+            atPath(pathToEndorsements), 
+            atPath(pathToExplicitBaseline), 
+            atPath(pathToLocalLibraries) 
+        ) 
+    )
+
+func txIDPrefix : if(isSequencerTransaction, bitwiseOR(txTimestampBytes, 0x0000000001), txTimestampBytes)
+
+func txID : 
+    concat(
+        txIDPrefix, 
+        byte(sub(numProducedOutputs,1), 7), 
+        slice(blake2b(txEssenceBytes),6,31)
+    )
+```
+
+## Bytecode manipulation
 
 ## Mandatory UTXO constraints
 
