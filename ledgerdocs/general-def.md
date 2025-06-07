@@ -43,12 +43,6 @@ For example, each script formula can retrieve its own bytecode with the function
 func self : atPath(at)
 ```
 
-### Access to the tuple element: `atTuple8`
-
-Embedded function `atTuple8` treats its argument `$0` as a serialized tuple and argument `$1` as index of the element. The index must be 1 byte-long. 
-
-Function returns element of the tuple. 
-
 ## Ledger constants
 At genesis, number of values, such as initial supply and genesis public key, must be set up in for the ledger. These values are called *ledger constants*. The values of the ledger constants are encoded right in the ledger definitions and therefore are immutable.  
 
@@ -123,26 +117,35 @@ func txID :
         slice(blake2b(txEssenceBytes),6,31)
     )
 ```
+Another example would be `selfOutputPath` and `selfSiblingConstraint`:
+
+Their definitions:
+
+```
+// selfOutputPath returns first 3 bytes of 4 byte-long current evaluation context path
+func selfOutputPath : slice(at,0,2)
+
+// selfSiblingConstraint returns bytecode of the constraint script on the current UTXO with the index $0
+func selfSiblingConstraint : atPath(concat(selfOutputPath, $0))
+```
+
+It just returns the bytecode of the constraint script on the same UTXO, where the caller is located, with specified index. For example `selfSiblingConstraint(0)` will always return bytecode of the `amount` constraint and `selfSiblingConstraint(1)` will always return bytecode of the lock constraint on the same UTXO.
 
 ## Bytecode manipulation
 
-Bytecode manipulation function allows the script formula to analyze the bytecodes of scripts itself. This is powerful feature, which enables rich programmability of the transaction constraints.
+Bytecode manipulation functions allow the script formula to analyze bytecodes of scripts itself. This is powerful feature, which enables rich programmability of the transaction constraints.
 
 For example, a particular constraint may require another constraint, on the same or another UTXO, to be of particular kind or have particular parameters.
 
-### parsePrefixBytecode
-Function `parsePrefixBytecode` treats its only argument as a bytecode of the formula and returns call prefix of that bytecode as its value, essentially a function code.
+#### parsePrefixBytecode
+Function `parsePrefixBytecode` treats its only argument as a bytecode of the formula and returns call prefix of that bytecode as its value. One may think the call prefix is an encoded function name. 
 
 For example, the following expression will check if constraint at index 3 on the same UTXO  is a `chain` constraint: `equal(parsePrefixBytecode(selfSiblingConstraint, 3), #chain)`
 
 Remember, literal `#chain` is constant bytecode value of the call prefix of the function `chain`.
 Here, the helper function `selfSiblingConstraint` is defined the following way:
 
-```
-func selfSiblingConstraint : atPath(concat(selfOutputPath, $0))
-```
-
-### parseArgumentBytecode
+#### parseArgumentBytecode
 Function `parseArgumentBytecode` takes 3 arguments. 1st argument is treated as a bytecode of the formula. 2nd argument must be one byte and it s interpreted as index of the formula argument.
 3rd argument is treated as a function call prefix.
 
@@ -150,13 +153,34 @@ It is enforced, that call prefixes in the 1st and 3rd argument should be equal, 
 
 Function returns bytecode of the argument with number specified in the 2nd argument.  
 
-
-
-
 ### parseInlineData
 
-Function `parseInlineData` treats its single argument as a formula bytecode. It checks if it is a data function (a constant value, represented as a literal). If it is, it returns the data by stripping the data call prefix. Otherwise, panics.  
+Let's say,amount constraint at index 0 of some UTXO is bytecode of `amount(z64/1337)`.
 
-For example, `parseInlineData(0x0102ff)` is just equivalent to the value of `0x0102ff`, because both return 3 bytes-long array `0102ff`.
+Expression `selfSiblingConstraint(0)` will always return bytecode of the `amount` constraint, with actual amount data as the argument.
 
-The function is useful in parsing-out arguments 
+However, formula `parseArgumentBytecode(selfSiblingConstraint(0))` will not return bytes of number `1337`, but instead a literal formula, which, upon evaluation, returns `1337`. It is because bytecode of the literal `z64/1337` is also a formula, which return trat value, not the value itself 
+
+To retrieve the value itself, we have function `parseInlineData`.
+
+It treats its single argument as a formula bytecode, which is literal (aka inlinde data). It checks if it is indeed a data function. If it is, it returns the data by stripping the data call prefix. Otherwise, panics.  
+
+So, expression `parseInlineData(parseArgumentBytecode(selfSiblingConstraint(0)))` will always return bytes of the amount, a big-endian bytes of an integer.
+
+For example, `parseInlineDataArgument` retrieves inline data from the particular output
+```
+// in bytecode $0, 
+// function parses argument with index $2, treats it as inline data call, 
+// returns the inline data, Enforces call prefix is equal to $1
+func parseInlineDataArgument : parseInlineData(parseArgumentBytecode($0,$1,$2))
+```
+Other functions helps to retrieve amount value from any UTXO: 
+```
+// $0 is a path to output
+// Returns amount value 8 bytes from the output at path given in $0
+func amountValueByOutputPath : 
+    uint8Bytes(parseInlineDataArgument(atPath(concat($0, amountConstraintIndex)), #amount,0))
+
+func selfAmountValue: amountValueByOutputPath(selfOutputPath)
+
+```
