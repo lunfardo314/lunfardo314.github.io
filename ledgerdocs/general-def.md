@@ -153,7 +153,7 @@ It is enforced, that call prefixes in the 1st and 3rd argument should be equal, 
 
 Function returns bytecode of the argument with number specified in the 2nd argument.  
 
-### parseInlineData
+#### parseInlineData
 
 Let's say,amount constraint at index 0 of some UTXO is bytecode of `amount(z64/1337)`.
 
