@@ -1,4 +1,4 @@
 Proxima ledger
-- [Introduction](ledgerdocs/intro.md)
-- [Ledger definitions](ledgerdocs/definitions.md)
-- [Multi-state database](ledgerdocs/multistate.md)
+- [Ledger definition library](ledgerdocs/library.md)
+- [General purpose ledger functions](ledgerdocs/general-def.md)
+- [UTXO constraints](ledgerdocs/constraints.md)

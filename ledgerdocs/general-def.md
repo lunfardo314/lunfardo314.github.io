@@ -1,21 +1,6 @@
-# Ledger definition library
-Proxima ledger definitions are contained in the ledger definition file, also known as the _ledger ID_,
-which is usually YAML. It is used to create a database with genesis ledger state for the first node in the network.
-
-Besides hardcoded functions, the transaction validity rules, are written in _EasyFL_, a simple scripting language with functional syntax and semantics. We introduced it [here](txdocs/easyfl.md).
-
-Here we provide the entire [proxima.genesis.id](ledgerdocs/genesis.id.md) file as an example of ledger definitions. It lists all embedded (hardcoded) functions as well as source and bytecode forms of the EasyFL formulas. 
-
-The ledger definitions becomes an immutable part of ledger state (we will skip hardfork/upgrade topic here). It is also always a part of the snapshot.
-
-The Proxima ledger definitions is an extension of the base EasyFL library of functions. It is crucial, that all nodes in the network share the ledger definitions with exactly the same hash of the library. 
-
-We will go through many of the functions, defined in the ledger ID. Those functions encode rules of how assets on the ledger can be created and modified, together with inflation rules and on-ledger incentives. All this is designed with the intention to impose certain behavior of token holders in the ledger, that leads to the cooperative consensus. 
-
-One may think about ledger definitions as core set of smart contracts, that defines core concepts on the ledger.
+# General purpose ledger definitions
 
 ## Embedded functions
-
 We already introduced [validation process](txdocs/validation.md) of a transaction $T$: all formulas are evaluated in each of the consumed and produced UTXOs. Transaction is valid if all evaluations return `true`. 
 
 Proxima ledger definitions embeds two special embedded functions, which enables access to the evaluation context and the transaction context in the EasyFL formulas:
@@ -108,7 +93,7 @@ func mustSize : if(equalUint(len($0), $1), $0, !!!wrong_data_size)
 ```
 
 Transaction ID calculation (needed for checking the signature) is defined the following way:
-```go
+```
 func txTimestampBytes : atPath(pathToTimestamp)
 	
 func txEssenceBytes :
@@ -140,22 +125,3 @@ func txID :
 ```
 
 ## Bytecode manipulation
-
-## Mandatory UTXO constraints
-
-## Amount
-
-## Locks
-
-### AddressED25519 lock
-
-### Stem lock
-
-## Chain constraint
-
-### Chain lock
-
-## Sequencer constraint
-
-## Inflation
-

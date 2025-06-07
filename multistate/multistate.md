@@ -8,20 +8,18 @@ In other words, each UTXO transaction represents a consistent ledger state. If t
 In Proxima, we track all ledger states, for their consistency. However, we persist in the database only ledger states, that correspond to special transactions, called _branch transactions_. **Each branch transactions, which was validated by the node, have a corresponding persistent ledger state in the database.
 
 So, by our requirements, the Proxima node must be able to handle multiple ledger states in the same  database efficiently.
-## Key-value database
 
-## Root record partition
+## Trie. Merkle tree
 
-### Root records
-
-### Branch records
-
-## State partition
-
-### Trie. Merkle tree
+## State
 
 ### Ledger state
 
 ### Ledger index
 
+## Key-value store. Partitions
+
+## Root and branch records
+
 ## Snapshots
+
