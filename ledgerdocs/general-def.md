@@ -125,3 +125,38 @@ func txID :
 ```
 
 ## Bytecode manipulation
+
+Bytecode manipulation function allows the script formula to analyze the bytecodes of scripts itself. This is powerful feature, which enables rich programmability of the transaction constraints.
+
+For example, a particular constraint may require another constraint, on the same or another UTXO, to be of particular kind or have particular parameters.
+
+### parsePrefixBytecode
+Function `parsePrefixBytecode` treats its only argument as a bytecode of the formula and returns call prefix of that bytecode as its value, essentially a function code.
+
+For example, the following expression will check if constraint at index 3 on the same UTXO  is a `chain` constraint: `equal(parsePrefixBytecode(selfSiblingConstraint, 3), #chain)`
+
+Remember, literal `#chain` is constant bytecode value of the call prefix of the function `chain`.
+Here, the helper function `selfSiblingConstraint` is defined the following way:
+
+```
+func selfSiblingConstraint : atPath(concat(selfOutputPath, $0))
+```
+
+### parseArgumentBytecode
+Function `parseArgumentBytecode` takes 3 arguments. 1st argument is treated as a bytecode of the formula. 2nd argument must be one byte and it s interpreted as index of the formula argument.
+3rd argument is treated as a function call prefix.
+
+It is enforced, that call prefixes in the 1st and 3rd argument should be equal, otherwise call panics. 
+
+Function returns bytecode of the argument with number specified in the 2nd argument.  
+
+
+
+
+### parseInlineData
+
+Function `parseInlineData` treats its single argument as a formula bytecode. It checks if it is a data function (a constant value, represented as a literal). If it is, it returns the data by stripping the data call prefix. Otherwise, panics.  
+
+For example, `parseInlineData(0x0102ff)` is just equivalent to the value of `0x0102ff`, because both return 3 bytes-long array `0102ff`.
+
+The function is useful in parsing-out arguments 
