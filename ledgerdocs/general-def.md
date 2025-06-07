@@ -137,7 +137,7 @@ Bytecode manipulation functions allow the script formula to analyze bytecodes of
 
 For example, a particular constraint may require another constraint, on the same or another UTXO, to be of particular kind or have particular parameters.
 
-#### parsePrefixBytecode
+### parsePrefixBytecode
 Function `parsePrefixBytecode` treats its only argument as a bytecode of the formula and returns call prefix of that bytecode as its value. One may think the call prefix is an encoded function name. 
 
 For example, the following expression will check if constraint at index 3 on the same UTXO  is a `chain` constraint: `equal(parsePrefixBytecode(selfSiblingConstraint, 3), #chain)`
@@ -145,7 +145,7 @@ For example, the following expression will check if constraint at index 3 on the
 Remember, literal `#chain` is constant bytecode value of the call prefix of the function `chain`.
 Here, the helper function `selfSiblingConstraint` is defined the following way:
 
-#### parseArgumentBytecode
+### parseArgumentBytecode
 Function `parseArgumentBytecode` takes 3 arguments. 1st argument is treated as a bytecode of the formula. 2nd argument must be one byte and it s interpreted as index of the formula argument.
 3rd argument is treated as a function call prefix.
 
@@ -153,7 +153,7 @@ It is enforced, that call prefixes in the 1st and 3rd argument should be equal, 
 
 Function returns bytecode of the argument with number specified in the 2nd argument.  
 
-#### parseInlineData
+### parseInlineData
 
 Let's say,amount constraint at index 0 of some UTXO is bytecode of `amount(z64/1337)`.
 
