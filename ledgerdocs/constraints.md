@@ -92,17 +92,17 @@ Note that amount can also be 0. The minimum storage deposit is enforced by locks
 
 ### Locks
 
-Lock defines minimal mandatory conditions for consuming the output (there may be other arbitrary unlock conditions too. They play special role in th transaction. In the current version of the Proxima ledger, we will mention the following lock scripts (in the future, locking functionality will be expanded):
+Lock defines minimal mandatory conditions for consuming the output (there may be other arbitrary unlock conditions too. They play special role in the transaction. In the current version of the Proxima ledger, we will mention the following lock scripts (in the future, locking functionality will be expanded):
 
-* `addressED25519` (or short version `a`), aka `siglock`, enforces for the UTXO to be consumed, the transaction's signature must correspond to the lock's address
-* `chainLock` lock requires particular chain output to be unlocked on the same transaction. 
-* `stemLock` special lock for branch transactions 
-* `delegationLock` delegates tokens to the target chain
+* `addressED25519` (or short version `a`), aka `siglock`, enforces for the UTXO to be consumed, the transaction's signature must correspond to the lock's address (see [AddressED25519 lock](#addressed25519-lock)))
+* `chainLock` lock requires particular chain output to be unlocked on the same transaction. Will be introduced together with the [chain constraint](#chain-constraint).
+* `stemLock` special lock for branch transactions. It can be consumed by any other branch transaction, no signature is needed. It makes sequencers conflicting branch transactions, by intention;  
+* `delegationLock` delegates tokens to the target chain. Two different addresses can unlock delegation lock with their private keys, however in different time slots
 
 ### Unlock parameters
-In many cases, lock script requires particular context in the transaction to be satisfied. For this, each constraint in the consumed output, including lock scripts, are expecting particular `unlock` parameters in the in advance known place in the transaction.
+In many cases, lock script requires a particular context in the transaction to be satisfied. For this, each constraint in the consumed output, including lock scripts, are expecting particular `unlock` parameters in the in advance known place in the transaction.
 
-Let's say, current validation context path is $(1,0,i,j)$, i.e. bytecode of $T^{ctx}_{1,0,i,j}$ is being evaluated. Script can always access its unlock parameters at the path $(0,1,i,j)$.
+Let's say, current validation context path of the consumed output is $(1,0,i,j)$, i.e. bytecode of $T^{ctx}_{1,0,i,j}$ is being evaluated. Script can always access its unlock parameters at the path $(0,1,i,j)$.
 
 The _unlock parameters_ is essential part of the UTXO programmability: the script cannot _dynamically search_ the transaction for needed data, it must be _statically pointed_ to the particular place with that data. Below we will provide several examples (such as consumed `chain` constraint requires to be provided with the index of the produced successor output).   
 
@@ -155,8 +155,6 @@ If there's no such reference (i.e. it is at the top of the list), script check i
 This way we need calculate hash of the public key only once for multiple inputs.
 
 Note, that the siglock script assumes valid signature of the transaction.
-
-### Stem lock
 
 ## Chain constraint
 
