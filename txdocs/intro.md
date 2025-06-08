@@ -1,47 +1,50 @@
 # Introduction
 
-(*This is **version 1.0** of the document. The document and definitions presented in it will be modified in subsequent versions, while trying the best to preserve backwards compatibility with the core concepts*)
+(_This is **version 1.0** of the document. The content and definitions presented here may be revised in future versions, with a strong effort to maintain backward compatibility with the core concepts._)
 
-This document is "down-to-the-technical level". It's main purpose is knowledge transfer. The document aims to provide both, the general philosophy and the precise definitions of the Proxima core data structures. Its intended audience are core and other developers, as well as anybody who is interested in studying Proxima and bringing it forward.
+This document delves into the technical details of Proxima. Its primary purpose is knowledge transfer. It aims to convey both the overarching philosophy and the precise definitions of Proxima’s core data structures. The intended audience includes core developers, other contributors, and anyone interested in studying Proxima and contributing to its evolution.
 
-We intend to provide links to the particular places of the implemented Go code, as well as descriptions of some core Go APIs and data structures. The document, however, is not a API documentation. The code links serves as examples and illustrations.
+We provide links to specific parts of the implemented Go code, along with descriptions of key Go APIs and data structures. However, this is not API documentation. The code links are meant to serve as illustrative examples.
 
-## Importance of transaction in Proxima
+## The importance of transactions in Proxima
 
-In Proxima, the **transaction is a central concept**. Everything else is derived from the model of the transaction and its validity rules. Including the consensus.
+In Proxima, the transaction is a foundational concept. Everything else, including consensus, derives from the transaction model and its associated validity rules.
 
-In other crypto ledgers, usually blockhains/blockDAGs, the concept of *transaction* is somehow secondary: transaction can be anything defined as such. One can pack whatever is defined as "a transaction" in blocks and then consensus is run on (a sequence) of blocks. Meanwhile, **we have no blocks in Proxima.**
+In many other crypto ledgers—typically blockchains or blockDAGs—the concept of a transaction is secondary: a transaction is simply whatever is defined as such, and these are packed into blocks on which consensus is run. **Proxima, by contrast, has no blocks**.
 
-Raw transaction, a canonical form of it, in Proxima is a *blob* of data, which is deserialized to the hierarchical(nested), finite and deterministic structure of tuples of binary data, which is validated according to the trusted rules. Invalid transactions are immediately rejected by the network.
+A **raw transaction** in Proxima is a *blob* of data that is deserialized into a hierarchical (nested), finite, and deterministic structure of tuples of binary data. This structure is validated against trusted rules. Invalid transactions are immediately rejected by the network.
 
-Raw transaction is **the only type of message exchanged between participants** of the distributed ledger. From the other side, **anybody who is able to produce a valid transaction, is entitled to post it to the network of peers**, via the open gossip protocol.
+The raw transaction is **the only** type of message exchanged between participants in the distributed ledger. Anyone who can produce a valid transaction may submit it to the peer network via an open gossip protocol.
 
-The "anybody" is an owner of private keys, a **token holder**. Any token holder is entitled to send transactions to peers. It is the only category of participants in the Proxima distributed ledger: no miners, no chosen set of validators.
+"Anyone," in this context, refers to private key-holders — **token holders**. Any token holder can submit transactions to peers. This is the only category of participants in the Proxima network: there are no miners or designated validators.
 
-The above makes the system completely **permissionless** in a sense, that anybody who is able to buy tokens, automatically becomes a participant of the consensus because of their ability to exchange transactions with peers.
+This setup makes Proxima **completely permissionless**. Anyone who acquires tokens can participate in the consensus process by exchanging transactions with peers.
 
-Each token holder produces transactions by maximising their profits, which is either inflating their holdings or collecting fees from fellow peers. The emerging behavior is a converging (probabilistic) consensus called **cooperative consensus**, which we consider a particular kind of a *Nakamoto consensus* due to its *permissionless-ness*.
+Each token holder produces transactions to maximize their own benefit — either by inflating their holdings or collecting fees from peers. The resulting system behavior leads to a probabilistic yet convergent consensus mechanism we call **cooperative consensus**. We consider this a specific form of Nakamoto consensus, owing to its permissionless nature.
 
-**The cooperative behavior of peers is derived from the validity rules of the transaction**, that's why transaction is a central concept in Proxima.
+The cooperative behavior of peers emerges from the transaction validity rules — hence, the central role of the transaction in Proxima.
 
-By abstracting details, one can imagine a shared global structure, a *DAG*, with transactions as vertices, which is incrementally, independently yet deterministically constructed by the participants. The constructed data structure, called **the tangle** depends only on the set of transactions which reached the participant at particulat moment. It is independent on the order in which transactions arrived.
+At a higher level of abstraction, one can imagine a shared global data structure: a **DAG** (directed acyclic graph) with transactions as vertices. This structure, called **the tangle**, is constructed incrementally, independently, and deterministically by each participant. The tangle depends only on the set of transactions a participant has seen at a given moment, not on their arrival order.
 
-In the deterministic DAG of transactions, each vertex defines a deterministic and **totally ordered set of transactions** in its past cone, thus making **sequencing not necessary** (unlike in blockchains/blockDAGs).
+In this deterministic DAG, each vertex defines a fully ordered set of transactions in its past cone. As a result, explicit sequencing (as used in blockchains or blockDAGs) is not required.
 
-All this makes Proxima a unique and unorthodox approach in the crypto space.
-By our claim, Proxima is significantly simpler than other crypto ledgers (except, maybe, Bitcoin), because it is based on fewer underlying basic concepts.
+This makes Proxima a unique and unorthodox entry in the crypto space. We claim that Proxima is significantly simpler than most other crypto ledgers (with the possible exception of Bitcoin), as it is built upon a smaller set of foundational concepts.
 
 ## Transactions and the ledger
-At its core, Proxima transaction model is a classical UTXO model, because. it retains all fundamental traits of the UTXO, as it was introduced in the Bitcoin whitepaper.
+At its core, Proxima’s transaction model is a classical UTXO model, preserving all the essential traits described in the original Bitcoin whitepaper.
 
-It is also is fundamentally similar to [EUTXO](https://docs.cardano.org/about-cardano/learn/eutxo-explainer), however Proxima takes somehow different direction from Cardano's models: the programmability of the former has no intention for *smart contracts* (at least not in the form it is known in Ethereum, SUI and similar Turing-complete designs).
+It is also conceptually similar to [EUTXO](https://docs.cardano.org/about-cardano/learn/eutxo-explainer) models. However, Proxima diverges from Cardano’s approach: while programmable, Proxima's model is not designed for smart contracts in the Ethereum, SUI, or other Turing-complete paradigms.
 
-The main trait of UTXO (and Proxima transaction model for that matter) is its **deterministic** transactions, which are **validation-oriented**. This is in contrast with *non-deterministic* or **execution-oriented** transactions, used in Ethereum (there are deep reasons and implications of this difference but this discussion is outside of the scope of this document). Each Proxima transaction is either *valid* according to globally trusted formal validity rules, or it is not treated as a transaction (i.e. it is *invalid*) and is immediately rejected by the system.
+The hallmark of the UTXO model (and thus Proxima’s model) is that transactions are **deterministic** and **validation-oriented**. This contrasts with the **non-deterministic**, **execution-oriented** transactions of platforms like Ethereum. (The deeper implications of this distinction are outside the scope of this document.) In Proxima, a transaction is either valid—according to globally trusted formal rules—or it is invalid and immediately rejected.
 
-While remaining classical UTXO, the Proxima model enhances the former with the following features needed for the Proxima's *cooperative consensus*:
-* **endorsement**. Each Proxima transaction can optionally *endorse* other transactions by pointing at them with immutable links, which are signed by the producer of the transactions, the token holder. Endosements and UTXO consumption links allows interpretation of the ledger as a *directed acyclic graph* (DAG). The trait of *endorsement* is needed for the consolidation of different non-conflicting ledger states into one.
-* **progammability**. Proxima makes transaction and each individual output (UTXO) programmable via validation scripts which are an immutably part of it. The scripts specify enforced logical relations between different parts of the transaction data. Proxima uses formulas of a simple **functional language** [*EasyFL*](https://github.com/lunfardo314/EasyFL) (introduced in this document) instead of imperative scripts for the stack-based VM used in the [Bitcoin Script](https://en.bitcoin.it/wiki/Script) and many other crypto ledgers. Computationally, however, Proxima's approach to the UTXO programmability is equivalent to Bitcoin's: both are non-Turing complete by intention, i.e. equivalent to a *finite automaton*. The purpose of the validation scripts is to **enforce intended behavior** on the ledger. Consumers of the UTXOs can only produce valid transactions that satisfy immutable validity constraints embedded in those UTXOs by the producers of it. One can imagine a Proxima transaction as a programmable finite automaton.
+While remaining a classical UTXO model, Proxima introduces two key enhancements to support its _cooperative consensus_:
 
 
-More details on the rationale of the design choices can be found in the [Proxima whitepaper](https://arxiv.org/abs/2411.16456).
+
+* **Endorsements**: Each Proxima transaction can optionally endorse other transactions by referencing them with immutable links, signed by the transaction’s producer (the token holder). These endorsements, along with UTXO consumption links, allow the ledger to be interpreted as a DAG. Endorsements help consolidate different non-conflicting ledger states into a unified view.
+
+* **Programmability**: In Proxima, each transaction and individual output (UTXO) can be made programmable using validation scripts, which are an immutable part of the transaction. These scripts define enforced logical relationships between different parts of the transaction data. Instead of imperative, stack-based scripting (like Bitcoin Script), Proxima uses formulas from a simple functional language called [EasyFL](ledgerdocs/easfl.md). Despite differences in syntax and structure, Proxima’s UTXO programmability is computationally equivalent to Bitcoin’s — intentionally non-Turing complete and effectively a finite automaton. The purpose of these scripts is to enforce intended behavior on the ledger. A consumer of a UTXO can only create a valid transaction if it satisfies the immutably embedded validity constraints imposed by the UTXO’s creator.
+
+
+You can find further rationale for these design choices in the [Proxima whitepaper](https://arxiv.org/abs/2411.16456).
 
