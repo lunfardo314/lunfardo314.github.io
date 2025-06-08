@@ -169,7 +169,7 @@ The _chain constrain_ is implemented as a EasyFL script `chain` in the Proxima l
 
 This results in the chain of chain-constrained UTXO outputs, a `UTXO chain`.
 
-<p style="text-align:center;"><img src="../static/img/chain-succ-pred.png"></p>
+<p style="text-align:center;"><img src="../static/img/chain_succ_pred.png"></p>
 
 The source of the chain constraint function in EasyFL we provide [here](ledgerdocs/chain.md):
 
