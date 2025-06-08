@@ -157,6 +157,31 @@ This way we need calculate hash of the public key only once for multiple inputs.
 Note, that the siglock script assumes valid signature of the transaction.
 
 ## Chain constraint
+The `chain constrain` is one of central concepts in Proxima. It is used in many contexts, for sequencing, for delegation, UTXO NFTs. The very concept of the `inflation` is based on the _chain constraint_. See Proxima whitepaper or more details.
+
+UTXOs (outputs) are one-time transient assets on the UTXO ledger. The UTXO disappears after consumed, some new are created on the ledger state instead, like particles in the particle accelerator. 
+
+_Chain constraint_ introduces permanent, long-lived, non-fungible assets on the UTXO ledger.  Chain constraint implements concept if **mutable state** on the UTXO ledger. One can track history of the state, stored in such a chain-constrained UTXOs. It can be used many different contexts.  
+
+The _chain constrain_ is implemented as a EasyFL script `chain` in the Proxima ledger library. The essence of it is simple: 
+* each _chain constraint_ bears unique identifier, as 32 byte-long _chain ID_. 
+* to be consumed by a transaction $T$ , UTXO with _chain constraint_ requires to be provided with and exactly one produced output on $T$ which is chain constrained with the same _chain ID_. The latter is called _successor_, while the consumed one is _predecessor_. 
+
+This results in the chain of chain-constrained UTXO outputs, a `UTXO chain`.
+
+<p style="text-align:center;"><img src="../static/img/chain-succ-pred.png"></p>
+
+The source of the chain constraint function in EasyFL we provide [here](ledgerdocs/chain.md):
+
+* each chain constraint bears as its argument: _chain ID_ and the location of the predecessor among consumed outputs: predecessor output and chain constraint index on it. So, constraint by its syntax enforces single predecessor; 
+* chain origin is created without predecessor, but instead the _chain ID_ is all-zero value. The chain ID is deterministically assumed as `blake25-256` hash of the _output ID_ of the origin. **This guarantees unique chain ID** during the history of the ledger. This chain ID will be enforced in all UTXOs descended from the chain origin;
+* in the consumed UTXO the `chain` constraint will require unlock data (2 bytes), which points to the successor output index and the `chain` constrain on it. The script will check if the successor have the same chain ID as itself. **This guarantees the single successor for each consumed chain constrained output** (unless chain is discontinued).  
+
+This enforces exactly one UTXO with `chain` constraint with specific _chain ID_ on the ledger: essentially an NFT. It can be retrieved by _chain ID_ from the ledger index. 
+
+
+
+
 
 ### Chain lock
 
