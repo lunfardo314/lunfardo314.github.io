@@ -17,17 +17,12 @@ Formula can determine its location by analyzing the path returned by function `a
 
 There are special helper functions for this in the Proxima ledger  definitions:  
 
-```go
+```yaml
 func pathToConsumedOutputs : 0x0100
-
 func pathToProducedOutputs : 0x0002
-
 func isPathToConsumedOutput : hasPrefix($0, pathToConsumedOutputs)
-
 func isPathToProducedOutput : hasPrefix($0, pathToProducedOutputs)
-
 func selfIsConsumedOutput : isPathToConsumedOutput(at)
-
 func selfIsProducedOutput : isPathToProducedOutput(at)
 ```
 
@@ -48,7 +43,7 @@ At genesis, number of values, such as initial supply and genesis public key, mus
 
 Constants are represented by EasyFL functions without parameters with name prefixed with `const`. Here are examples of typical definitions of ledger constants in EasyFL (they can also be found in the [proxima.genesis.id](ledgerdocs/genesis.id.md) YAML file):
 
-```godebug
+```json
 func constInitialSupply : u64/1000000000000000
 func constGenesisControllerPublicKey : 0x9ad4caddd2356a7853eb038a5b4fd3197522af51af4073584260c53bbfaf1816
 func constGenesisTimeUnix : u64/1749146740
