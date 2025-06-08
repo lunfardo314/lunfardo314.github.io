@@ -46,9 +46,9 @@ func self : atPath(at)
 ## Ledger constants
 At genesis, number of values, such as initial supply and genesis public key, must be set up in for the ledger. These values are called *ledger constants*. The values of the ledger constants are encoded right in the ledger definitions and therefore are immutable.  
 
-Constants are represented by EasyFL functions without parameters with name starting with `const`. Here are examples of typical definitions of ledger constants in EasyFL (they can also be found in the [proxima.genesis.id](ledgerdocs/genesis.id.md) YAML file):
+Constants are represented by EasyFL functions without parameters with name prefixed with `const`. Here are examples of typical definitions of ledger constants in EasyFL (they can also be found in the [proxima.genesis.id](ledgerdocs/genesis.id.md) YAML file):
 
-```go
+```godebug
 func constInitialSupply : u64/1000000000000000
 func constGenesisControllerPublicKey : 0x9ad4caddd2356a7853eb038a5b4fd3197522af51af4073584260c53bbfaf1816
 func constGenesisTimeUnix : u64/1749146740

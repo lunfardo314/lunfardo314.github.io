@@ -157,7 +157,7 @@ This way we need calculate hash of the public key only once for multiple inputs.
 Note, that the siglock script assumes valid signature of the transaction.
 
 ## Chain constraint
-The `chain constraint` is one of central concepts and a distinctive trait of Proxima. It is used in many contexts, for sequencing, for delegation, UTXO NFTs. The very concept of the `inflation` is based on the _chain constraint_. See Proxima whitepaper or more details.
+The `chain constraint` is one of central concepts and a distinctive trait of Proxima. It is used in many contexts: for sequencing, for delegation, UTXO NFTs. The very concept of the `inflation` is based on the _chain constraint_. See Proxima whitepaper or more details.
 
 UTXOs (outputs) are one-time transient assets on the UTXO ledger. The UTXO disappears after consumed, some new are created on the ledger state instead, like particles in the particle accelerator. 
 
@@ -193,7 +193,9 @@ The chain locks are the basis for the _tag-along_ function of sequencers. It als
 The _sequencer constraint_ `sequencer`, adds additional conditions to the `chain` constraint. Sequencer chain is a special kind of chain. Its purpose is to support cooperative consensus among sequence, such as branches, baseline and other.  
 
 ## Inflation
-Inflation constraint `inflation(<inflation amount>, <sibling chain constraint index>)` when added, ensures, that `<inflation ammount>` is correct inflation amount, deterministically calculated for the output. For branch transactions, it is provably random _branch inflation bonus_, calculated from the _verifiable randomness proof_, provided in the `stem` lock. For any other chain output, it is calculated according to the chain inflaton rules.
+Inflation constraint `inflation(<inflation amount>, <sibling chain constraint index>)` when added, on the produced output ensures that `<inflation ammount>` is correct deterministically calculated inflation amount for the output.
+
+For branch transactions, it is provably random _branch inflation bonus_, calculated from the _verifiable randomness proof_, provided in the `stem` lock. For any other chain output, it is calculated according to the chain inflaton rules. In Proxima, each chain can inflate its amount, proportionally to ledger time.
 
 It is enforced, that total sum of consumed amounts plus sum of all inflation amounts on produced outputs is equal to total produced amount.
 
