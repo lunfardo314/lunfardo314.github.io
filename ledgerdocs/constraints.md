@@ -157,35 +157,39 @@ This way we need calculate hash of the public key only once for multiple inputs.
 Note, that the siglock script assumes valid signature of the transaction.
 
 ## Chain constraint
-The `chain constrain` is one of central concepts in Proxima. It is used in many contexts, for sequencing, for delegation, UTXO NFTs. The very concept of the `inflation` is based on the _chain constraint_. See Proxima whitepaper or more details.
+The `chain constrain` is one of central concepts and a distinctive trait of Proxima. It is used in many contexts, for sequencing, for delegation, UTXO NFTs. The very concept of the `inflation` is based on the _chain constraint_. See Proxima whitepaper or more details.
 
 UTXOs (outputs) are one-time transient assets on the UTXO ledger. The UTXO disappears after consumed, some new are created on the ledger state instead, like particles in the particle accelerator. 
 
 _Chain constraint_ introduces permanent, long-lived, non-fungible assets on the UTXO ledger.  Chain constraint implements concept if **mutable state** on the UTXO ledger. One can track history of the state, stored in such a chain-constrained UTXOs. It can be used many different contexts.  
 
-The _chain constrain_ is implemented as a EasyFL script `chain` in the Proxima ledger library. The essence of it is simple: 
-* each _chain constraint_ bears unique identifier, as 32 byte-long _chain ID_. 
-* to be consumed by a transaction $T$ , UTXO with _chain constraint_ requires to be provided with and exactly one produced output on $T$ which is chain constrained with the same _chain ID_. The latter is called _successor_, while the consumed one is _predecessor_. 
-
-This results in the chain of chain-constrained UTXO outputs, a `UTXO chain`.
+The _chain constrain_ is implemented as a EasyFL script `chain` in the Proxima ledger library. The essence of it is simple: the `chain` constraint enforces a non-forkable chain of transactions on the ledger and always a single tip (UTXO) of that chain on the ledger state.
 
 <p style="text-align:center;"><img src="../static/img/chain_succ_pred.png"></p>
 
 The source of the chain constraint function in EasyFL we provide [here](ledgerdocs/chain.md):
 
 * each chain constraint bears as its argument: _chain ID_ and the location of the predecessor among consumed outputs: predecessor output and chain constraint index on it. So, **chain constraint enforces single predecessor** by its very syntax; 
-* chain origin is created without predecessor, but instead the _chain ID_ is all-zero value. The chain ID is deterministically assumed as `blake25-256` hash of the _output ID_ of the origin. **This guarantees unique chain ID** during the history of the ledger. This chain ID will be enforced in all UTXOs descended from the chain origin;
+* chain origin is created without predecessor, but instead the _chain ID_ is all-zero value. The chain ID is deterministically assumed as `blake25-256` hash of the _output ID_ of the origin. **This guarantees non-repeating chain IDs** during the history of the ledger. This chain ID will be enforced in all UTXOs descended from the chain origin;
 * in the consumed UTXO the `chain` constraint will require unlock data (2 bytes), which points to the successor output index and the `chain` constrain on it. The script will check if the successor have the same chain ID as itself. **This guarantees the single successor for each consumed chain constrained output** (unless chain is discontinued).  
 
 This enforces exactly one UTXO with `chain` constraint with specific _chain ID_ on the ledger: essentially an NFT. It can be retrieved by _chain ID_ from the ledger index. 
 
-
-
-
-
 ### Chain lock
 
-## Sequencer constraint
+Another distinctive feature of the Proxima ledger is `chainLock` constraint, aka the `chain lock`.
 
+Commonly, on other ledgers, we are sending tokens to and `address`, which is a commitment (hash) of the public/private key pair behind it. Whenever private key change, address changes too. This presents certain challenges, because private key may need to be changed, for what ever reason.
+
+`Chain lock` together with the `chain` concept, is a solution to this problem: chain-locked output can be unlocked, by whoever controls some chain with a particular _chain ID_. 
+
+EasyFL source of the `chainLock` is provided [here](ledgerdocs/chain_lock.md).
+
+The output with lock script `chainLock(<chain ID>)` (of short version `c(<chain ID>)`) can be consumed on the transaction which consumes (and unlocks) a chain output with _chain ID_ `<chain ID>`. So, instead of sending tokens to particular address, with `c(<chain ID>)` we send them to particular chain. The chain may change it controlling address, however _chain-locked_ output will be consumable.
+
+The chain locks are the basis for the _tag-along_ function of sequencers. It also is basis for the trust-less _on-ledger messaging_ between chains.
+
+## Sequencer constraint
+The _sequencer constraint_ function `sequencer` is an extension of the `chain`
 ## Inflation
 

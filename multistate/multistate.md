@@ -9,6 +9,8 @@ In Proxima, we track all ledger states, for their consistency. However, we persi
 
 So, by our requirements, the Proxima node must be able to handle multiple ledger states in the same  database efficiently.
 
+TBD TBD TBD TBD TBD TBD TBD TBD TBD
+
 ## Trie. Merkle tree
 
 ## State
