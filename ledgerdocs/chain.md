@@ -1,6 +1,6 @@
 # Chain constraint source
 
-```
+```go
 // chain(<chain constraint data>)
 // <chain constraint data: 35 bytes:
 // - 0-31 bytes chain id 

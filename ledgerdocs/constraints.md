@@ -173,7 +173,7 @@ This results in the chain of chain-constrained UTXO outputs, a `UTXO chain`.
 
 The source of the chain constraint function in EasyFL we provide [here](ledgerdocs/chain.md):
 
-* each chain constraint bears as its argument: _chain ID_ and the location of the predecessor among consumed outputs: predecessor output and chain constraint index on it. So, constraint by its syntax enforces single predecessor; 
+* each chain constraint bears as its argument: _chain ID_ and the location of the predecessor among consumed outputs: predecessor output and chain constraint index on it. So, **chain constraint enforces single predecessor** by its very syntax; 
 * chain origin is created without predecessor, but instead the _chain ID_ is all-zero value. The chain ID is deterministically assumed as `blake25-256` hash of the _output ID_ of the origin. **This guarantees unique chain ID** during the history of the ledger. This chain ID will be enforced in all UTXOs descended from the chain origin;
 * in the consumed UTXO the `chain` constraint will require unlock data (2 bytes), which points to the successor output index and the `chain` constrain on it. The script will check if the successor have the same chain ID as itself. **This guarantees the single successor for each consumed chain constrained output** (unless chain is discontinued).  
 
