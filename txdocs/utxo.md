@@ -12,7 +12,7 @@ The simple illustration of what later became known as a UTXO transaction—taken
 
 A UTXO transaction, among other elements, includes at least inputs and outputs, which we refer to as **consumed UTXOs** and **produced UTXOs**, respectively. It must satisfy a globally trusted set of validity rules, also known as **validity constraints** or **ledger constraints**. The most basic rule is that the total number of fungible tokens in the inputs must equal the total in the outputs.
 
-UTXO transaction represents a deterministic update to the ledger state.
+UTXO transaction represents a deterministic update to the ledger state. It updates a bounded part of the ledger state, which is unbounded, in general.
 
 Here is a more detailed diagram, which still conveys the same core concept:
 
