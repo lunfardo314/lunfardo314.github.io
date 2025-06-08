@@ -1,4 +1,14 @@
-# UTXO constraints and programmability
+# UTXO constraints and ledger programmability
+
+Proxima UTXO transactions are programmable. By adding validity constraints to UTXOs, user can set the validity conditions of the transaction and put specific unlock conditions of UTXOs. This way, user can pre-define future states of the asset, i.e. to program its behavior.
+
+UTXO transactions are capable to update (consume) only finite, bounded and deterministic fragment of the otherwise unbounded ledger state. This makes the whole state update machine non-Turing complete. That why the EasyFL language intentionally does not have loops and does not allow recursive definitions. 
+
+Programmability of the UTXO ledger essentially is **non-Turing complete, parallel and asynchronous smart contracts**, equivalent to finite state machines or even cellular automata. 
+
+We avoid using term _smart contract_ for the Proxima programmability, because this name is usually applied to Ethereum-style smart contracts, that assume and can update (consume) unbounded infinite state, they are synchronous (atomically-composable) and therefore they need Turing-complete engine (a VM) with loops or recursion and unbounded data structures, in order to perform their logic.  
+
+However, UTXO programmability may be seen also as a programming of the **emerging behavior** on the ledger, by multiple asynchronous and independent agents, which, at large, are capable to achieve arbitrary behaviors of assets. This makes the whole ledger a **quasi-Turing complete**. 
 
 ## Trust-less evidence of transaction data in UTXO 
 In order to demonstrate power of UTXO programming with EasyFL constraint scripts, we will describe two examples. Both are implemented as standard functions in the ledger definition library, however they also can be put entirely inline, into the UTXO with relatively small overhead.
@@ -63,13 +73,88 @@ func msgED25519: or(
 Constraint script, say `msgED25519(0x1ce4df1ded3a8cebd503adb255bda0c949121bece9639363e940fbf1727472d6, 0x0102ff)`, when added to the produced output, means secure message `0x0102ff` from account `addressED25519(0x1ce4df1ded3a8cebd503adb255bda0c949121bece9639363e940fbf1727472d6)`. 
 
 ## Mandatory UTXO constraints
-During transaction validation, it is enforced that in each UTXO constraint script at index `0` must be `amount` script and at the index `1` must be one of known lock scripts.
+UTXO validity constraints on indices 0 and 1 are singled out. They are mandatory. At the index 0 must be an `amount` constraint, while at the index `1` must be one of known lock scripts.
 
 ### Amount
+The amount constraint is more of a placeholder for the amount data: it only enforces the size of its argument and the index where it is located on the UTXO: 
+
+```
+// $0 - amount up to 8 bytes big-endian. Will be expanded to 8 bytes by padding
+func amount: 
+   require(
+       // constraint must be at index 0 and arg0 must no more than 8 byte-long 
+       and(equal(selfBlockIndex,0), lessOrEqualThan(len($0), u64/8)), 
+       !!!amount_constraint_must_be_at_index_0_and_len_arg0<=8
+   )
+```
+
+Note that amount can also be 0. The minimum storage deposit is enforced by locks.
 
 ### Locks
 
+Lock defines minimal mandatory conditions for consuming the output (there may be other arbitrary unlock conditions too. They play special role in th transaction. In the current version of the Proxima ledger, we will mention the following lock scripts (in the future, locking functionality will be expanded):
+
+* `addressED25519` (or short version `a`), aka `siglock`, enforces for the UTXO to be consumed, the transaction's signature must correspond to the lock's address
+* `chainLock` lock requires particular chain output to be unlocked on the same transaction. 
+* `stemLock` special lock for branch transactions 
+* `delegationLock` delegates tokens to the target chain
+
+### Unlock parameters
+In many cases, lock script requires particular context in the transaction to be satisfied. For this, each constraint in the consumed output, including lock scripts, are expecting particular `unlock` parameters in the in advance known place in the transaction.
+
+Let's say, current validation context path is $(1,0,i,j)$, i.e. bytecode of $T^{ctx}_{1,0,i,j}$ is being evaluated. Script can always access its unlock parameters at the path $(0,1,i,j)$.
+
+The _unlock parameters_ is essential part of the UTXO programmability: the script cannot _dynamically search_ the transaction for needed data, it must be _statically pointed_ to the particular place with that data. Below we will provide several examples (such as consumed `chain` constraint requires to be provided with the index of the produced successor output).   
+
 ### AddressED25519 lock
+We provide full EasyFL source for the ED25519 address lock. The lock function name is `addressED25519`, but we also provide short alias name `a`, so target addresses can be specified like `a(0x846446dfc5600ca372649df286018b6c3d7da3b6b6ec59cd511ec15157899e4c)`.
+
+Note, that addresses and other locks in Proxima are not a passive data, but a formula, which, upon evaluation, will check itself if it is satisfied in the context or not.
+
+```
+// $0 self unlock parameters
+func unlockedByReference: and(
+    equal(len($0), u64/1),                     // prevent panic in compound locks
+	lessThan($0, selfOutputIndex),             // unlock parameter must point to another input with 
+                                               // strictly smaller index. This prevents reference cycles	
+	equal(self, consumedLockByInputIndex($0))  // the referenced constraint bytes must be equal to the self constraint bytes
+)
+
+// $0 - ED25519 address, 32 byte blake2b hash of the public key
+// Unlock data is 1 byte with reference index to the previous input or signature unlock with 0xff
+func addressED25519: and(
+	require(equal(selfBlockIndex,1), !!!locks_must_be_at_block_1), 
+	enforceMinimumStorageDeposit,
+	or(
+		and(
+			selfIsProducedOutput, 
+			equal(len($0), u64/32) 
+		),
+		and(
+			selfIsConsumedOutput, 
+			or(
+					// if it is unlocked with reference, the signature is not checked
+				unlockedByReference(selfUnlockParameters),
+					// checked if tx signature corresponds to the address
+                equal($0, blake2b(publicKeyED25519(txSignature)))
+			)
+		)
+	)
+)
+
+// short form of lock a(<hex bytes>)
+// $0 - ED25519 address, 32 byte blake2b hash of the public key
+func a : addressED25519($0)
+```
+In the "produced" context the lock script does not check anything more than syntactical validity of its argument: it must be 32 byte-long. 
+
+If consumed, script checks unlock parameters, which supposedly can contain strictly smaller index pointing to analogous output, which has exactly the same lock bytecode. If it finds one, it means the previous one is unlocked, so the current one is as well.  
+
+If there's no such reference (i.e. it is at the top of the list), script check if it's address data equal to `blake2b` hash of the public key of the transaction signature.  
+
+This way we need calculate hash of the public key only once for multiple inputs.
+
+Note, that the siglock script assumes valid signature of the transaction.
 
 ### Stem lock
 
