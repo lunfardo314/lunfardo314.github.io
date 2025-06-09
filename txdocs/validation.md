@@ -34,7 +34,7 @@ Transaction context validation assumes that $T$ has already passed raw transacti
 Steps for validating the transaction context:
 
 1. All consumed UTXOs of $T$ are loaded from the ledger state using their IDs provided in $T_0$. This yields $consumed(T)$.
-   If the ledger state does not contain any of the referenced UTXOs, validation fails (for that particular ledger state, if it exists at all).
+   If the ledger state does not contain any of the referenced UTXOs, transaction is not-applicable to that particular ledger state (if it exists at all) and validation fails.
 2. The transaction context $T^{ctx}=(T, (consumed(T))$ is constructed.
 3. For each **consumed** UTXO $(c_0, \dots c_{k-1})$ in $T^{ctx}_{1,0}$, each of its validation script $c_i$ is **evaluated** in the context of $T^{ctx}$.  Failure of any script results in an invalid transaction.
 4. For each **produced** UTXO $(c_0, \dots c_{k-1})$ in $T^{ctx}_{0,2}$, each of its validation script $c_i$ is **evaluated** in the context of $T^{ctx}$.  Failure of any script results in an invalid transaction.
