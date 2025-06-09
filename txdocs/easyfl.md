@@ -103,7 +103,7 @@ Some valid expressions:
 * `and` and `and()` $\rightarrow$ `true` (value undefined)
 
 ### Parameters of the expression
-Expressions (formulas) can include parameter references:  `$0`, `$1` ... `$15`.  These represent **open parameters** that will be instantiated during evaluation of the formula.
+Expressions (formulas) can include parameter references:  `$0`, `$1` ... `$14`.  These represent **open parameters** that will be instantiated during evaluation of the formula.
 Examples:
 * `concat($0,$1)` $\rightarrow$ concatenates two arguments
 * `concat(byte($0,1), byte($0,0), tail($0,2)))` $\rightarrow$ swaps first two bytes. 
