@@ -142,7 +142,7 @@ Formula `parseArgumentBytecode(selfSiblingConstraint(0))` will not return bytes 
 
 Function `parseInlineData` evaluates literal and returns its formula.
 
-### Examples 
+### Bytecode manipulation examples 
 
 Expression `parseInlineData(parseArgumentBytecode(selfSiblingConstraint(0)))` will always return bytes of the amount, a big-endian bytes of an integer.
 
