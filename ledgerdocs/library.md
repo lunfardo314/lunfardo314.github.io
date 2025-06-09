@@ -1,17 +1,21 @@
 # Ledger definition library
-Proxima ledger definition library is contained in the ledger definition file, also known as the _ledger ID_, which is usually YAML. It is used to create a database with genesis ledger state for the first node in the network.
 
-The ledger definition library contains a list of embedded (hardcoded) functions as well as a list of functions, defined as EasyFL formulas. We introduced EasyFL [here](txdocs/easyfl.md).
+The Proxima ledger definition library is contained in the ledger definition file, also known as the _ledger ID_. This file is typically written in YAML and is used to initialize the genesis ledger state for the first node in the network.
 
-Here we provide the entire [proxima.genesis.id](ledgerdocs/genesis.id.md) file as an example of ledger definition library.
+The ledger definition library includes:
 
-The Proxima ledger definitions is an extension of the base EasyFL library of functions. It is crucial, that all nodes in the network share the ledger definitions with exactly the same hash of the library.
+* A list of embedded (hardcoded) functions
+* A list of functions defined as [EasyFL](txdocs/easyfl.md) formulas
 
-All functions we divide in two broad categories: general-purpose functions and validity constraint functions. 
+As an example, we provide the complete [proxima.genesis.id](ledgerdocs/genesis.id.md) file, which represents a full ledger definition library.
 
-General purpose functions are all embedded functions and other functions for manipulation of byte arrays and accessing particular parts of the transaction. 
+The Proxima ledger definition extends the base EasyFL function library. It is crucial that all nodes in the network share the exact same version of the ledger definitions—identified by the hash of the library.
 
-Ledger validity constraints are functions, which are used as constraints in the UTXOs, such as different lock functions (siglock, chain lock, time lock etc), chain constraints, sequencer, inflation, delegation and many other. One may think about ledger validity constraints as core set of smart contracts, that defines core concepts on the ledger.
+We classify all functions into two broad categories: general-purpose functions and ledger validity constraint functions.
 
-We will go through examples of functions, defined in the Proxima ledger, hoping that the rest are self explanatory or deserves separate documentation. 
+**General-purpose functions** include all embedded functions and other utilities for manipulating byte arrays or accessing specific parts of a transaction.
+
+**Ledger validity constraints** are functions used as constraints within UTXOs. These include various types of locks (e.g., signature locks, chain locks, time locks), as well as mechanisms for chain building, sequencer behavior, inflation, delegation, and more. You can think of these constraints as a core set of smart contracts that define fundamental concepts on the ledger.
+
+In the following sections, we will walk through examples of functions defined in the Proxima ledger. We hope the rest are either self-explanatory or will be covered in separate documentation.
 
