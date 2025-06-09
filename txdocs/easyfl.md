@@ -105,63 +105,35 @@ Some valid expressions:
 >>>>>  TODO here
 
 ### Parameters of the expression
-An `expression` can use special function calls `$0`, `$1` ... `$7`.  They represent *open parameters of the expression*. Parameters of the expression will be instantiated with values whenever `expression` is evaluated, i.e. whenever it calls the corresponding `$i` function. The use of the parameter `$i` in the expression means that at least `i+1` arguments must be supplied when `expression` is evaluated.
-
-For example expression `concat($0,$1)` will evaluate to the concatenation of the arguments, provided by the call context and `concat(byte($0,1), byte($0,0), tail($0,2)))` will return byte array with swapped first two bytes. 
-
-Expression parameters can be used at any level of the expression, i.e. `not(not(not(not($0))))` is a correct expression, it will require 1 argument.
-
-Expression `or($3)` will return 4th argument, however all 4 must be supplied in the call context, only first 3 won't be used.
+Expressions can include parameter references:  `$0`, `$1` ... `$15`.  These represent **open parameters** that will be instantiated during evaluation.
+Examples:
+* `concat($0,$1)` $\rightarrow$ concatenates two arguments
+* `concat(byte($0,1), byte($0,0), tail($0,2)))` $\rightarrow$ swaps first two bytes. 
+* `not(not(not(not($0))))` requires one argument.
+* `or($3)` returns 4th argument; all 4 must be supplied
 
 ## Library of definition. Compilation. Execution
-EasyFL library defines a correspondence between function names, function codes (opcodes) and function descriptors.
-Function codes are 1-2 byte long values. 
+The EasyFL library maps function names to opcodes and descriptors. Function codes are 1–2 bytes.
 
-Library is needed for the compilation from the source to the bytecode and back, as well for the compilation of the bytecode to the executable form. The library provides ledger definitions, shared and trusted between Proxima nodes. It defines determinism of the ledger. If two participants of the distributed system would assume different ledger definitions, they cannot come to the consensus, because what seems to be valid for one, will look invalid to another. 
+The library enables:
+* Compilation from source to bytecode
+* Bytecode execution
+* Ledger determinism, essential for consensus
 
 ### Function definitions
-Expression, which may or may not have open parameters, can be assigned the name and thus become part of the library, used to validate transactions.
-
-The syntax we use for extending library with the enw function is:
+Named expressions can be added to the library:
 ```
 func <function name> : <expression>
 ```
-For example
+Example:
 ```
 func lessOrEqualTo : or(lessThan($0, $1), equalUint($0,$1))
 ```
-defines a function with two arguments for the relation $\le$ between byte arrays, interpreted as big-endian integers.
+This defines a two-parameter function for the $\le$ relation.
 
 In the library, definition of the function takes form of a _function descriptor_.
-
-### Bytecode
-So far we introduced the _source form_ of the expression. The source is a human-readable form, while the canonical form of expression, used in libraries and embedded in the transactions, is its **bytecode**.
-
-The _bytecode_ of the expression is a compressed form of it with names of functions encoded. 
-The bytecode is **compiled** from the source, using the library of functions (see below [library](#library-of-functions)), which assigns codes to the function names. 
-
-Note, that the bytecode may equally represent a closed formula (used in transactions), or open formula with parameters (used in the library)
-
-The $code(\cdot)$ function denotes compilation: $code(source) \rightarrow bytecode$. In _EasyFL_ compilation is essentially a serialization of the source code to the bytecode.
-
-Let's say we have source expression $E = fn(e_0, \dots e_{n-1})$, where $fn$ is function name and $e_i$ is expression source. Then serialized form of the expression, the bytecode is the following concatenation:  
-$$
-code(E) = callPrefix(fn)||code(e_0)||\dots ||code(e_{n-1})
-$$
-
-We will not define exact format of the $callPrefix(f)$ (it can be found in the open repository), just will say here it is 1 to 3 bytes which point to the particular function in the library and, specifies number of call arguments, the call _arity_. 
-
-The source expression is recursively compiled to the nested array of bytecodes, down to the terminal elements. The terminal elements are function calls without parameters:
-* calls to parameter-less library functions
-* the literals (see [above](#literals)), which usually define inline data such as `123`, `u32/1337` or `0x01ff` 
-* the parameter calls `$0`, `$1`.., which are special function, which evaluates argument expressions
-
-### Library of functions
-
-[Here](txdocs/library_base.md) we provide base EasyFL library in the form of the _YAML_ file. In the Proxima ledger, the base library is extended with additional functions, specific to the Proxima transactions.  
-
-The library is a list of function descriptors. Function descriptor take a form: 
-```
+Function descriptor in the library include:
+```yaml
       sym: <function name>
       description: <free description of the purpose>
       funCode: <function code>
@@ -171,62 +143,48 @@ The library is a list of function descriptors. Function descriptor take a form:
       bytecode: <if embedded=false, hex-encoded bytecode of the expression>
       source: <if embedded=false, source of the expression>
 ```
-For the ledger definitions, the library is immutable:
 
-- it must be sorted in the ascending order of function codes
-- it has `hash: ..` keyword, which is `blake2b-256` hash of concatenated following data elements: 
-  - function names
-  - function codes
-  - number of arguments
-  - embedded flag
-  - the bytecode (if relevant)
-- for formula elements (with embedded=false), compiled source code must be equal to the bytecode
+The library is immutable in the ledger and must:
 
-When library is loaded into the environment which interprets it (node, wallet and similar), consistency of the library definitions is checked. Library contains all the information needed to check for its consistency. 
+* Be sorted by function code
+* Include a hash of all descriptor fields except `description` and `source` (blake2b-256)
+* Ensure source and bytecode match if `embedded=false`
 
-The embedded functions are implemented outside the library, by the node. They must be provided upon instantiating library and starting reading tge ledger state and transactions.
+### Compilation
+Compilation serializes source code into bytecode using the library:
+$$
+code(E) = callPrefix(fn)||code(e_0)||\dots ||code(e_{n-1})
+$$
+The $callPrefix(fn)$ encodes the function's ID and arity (1–3 bytes).
 
-The genesis ledger genesis is created with the particular library definitions, called `ledger ID`. After the genesis ledger state is created, library of definitions becomes an immutable part of the ledger state. 
+### Bytecode
+Bytecode represents expressions as nested arrays of compiled calls. Literals are also calls, which returns constant value.
 
-### Extending the library
-Normally we treat the library of definition as an atomic, immutable object.
-However, before the ledger starts its existence, the base library is extended with new functions. For example, Proxima extends base library, provided by the EasyFL with functions needed for the Proxima transaction model. The resulting library becomes immutable part of the Proxima ledger. 
+### Library extensibility
+Before the ledger is launched, the base EasyFL library can be extended (e.g., by Proxima) with additional functions. Requirements:
+* **No recursion**: New expressions must only use existing functions.
+* **Bytecode compatibility**: New opcodes must be greater than all existing ones in their category.
 
-Let's say we have library $L$ and want to extend it with the new function. This will result in new library $L'$. Requirements for such operation:
-- **no recursion**: if we are adding a new EasyFL formula with the new function name to the existing library, the expression can only use function names already present in the library
-- **backward compatibility of bytecodes**: function code (opcode) of the new function must be strictly larger that all the opcodes in its category (short embedded, long embedded and extended has different ranges of their opcodes). This will ensure, that any bytecode used in transaction created for the library $L$ will be valid with the library $L'$.
-
-This way, after we modify the library with several new functions, embedded and expressions, the old library $L$ will remain compatible with the new library $L'$ in a sense, that old valid transaction will remain valid with the upgraded library. 
-
-The hash of the upgraded library will change. Taking into account all of this, **we can ensure upgrades in the ledger (hard forks) without losing backward compatibility**. 
-
-### Evaluation of expressions
-Expressions are evaluated in the form of the internal evaluation tree, derived from the bytecode. So, the workflow is always like this:
+### Evaluation
+Expressions (formulas) are evaluated in the form of the internal evaluation tree, derived from the bytecode. So, the workflow is always like this:
 
 `<expression source> -> <bytecode> -> <evaluation tree> -> <evaluation>`.
 
-Each script/formula is evaluated in the context of the transaction, i.e. script expression should be able to access the (immutable) context. For this reason, EasyFL engine ensures means of providing evaluation context to the expression interpreted. The script of the expression accesses parts of the evaluation context (the transaction) via special embedded functions.
-
-Evaluation steps:
-- convert bytecode to a tree-like evaluation form
-- provide evaluation context, usually the _transaction context_.
-- run evaluation recursively along the tree down to the terminal data elements (embedded functions)
-
-The evaluation engine (function `EvalExpression` in Go implementation) is using **lazy evaluation**. It means argument expression is only evaluated when and if it is needed for the evaluation of the context where it is used as a parameter. For example, the expression:
-`if(concat, byte(0,1), 0x01)` will never panic even if `byte(0,1)` always panics (see [Exceptions](#exceptions) below). It is because `concat` always returns `false` and `if` function always evaluates only one of two branches.
+* Evaluation is **lazy**: expressions are only evaluated if needed.
+* Example: `if(concat, byte(0,1), 0x01)` doesn't panic even if `byte(0,1)` would, because the branch is not executed.
 
 ### Exceptions
-Evaluation of the expression may fail with the panic. For example, expression `byte(0,1)` will always panic, because it tries to take a byte with index `1` from the 1-byte array `[0]`.
+Some expressions may trigger panics, such as `byte(0,1)` accessing an out-of-bounds index.
 
-The embedded function `fail` always panics with its only argument interpreted as the error message/string. The `!!!<msg>` is a shortcut literal of the `fail` function call.
+`fail` is a built-in function that always panics with a message. Literal `!!!msg` is a shortcut.
 
-The evaluation engine (the Go function `EvalFromBinary` in Go implementation) does not process exceptions. The transaction validation context, which invokes the evaluation engine, must intercept panic and treat transaction as invalid.
+Evaluation engines like `EvalFromBinary` in Go must handle these exceptions and mark the transaction as invalid.
 
 ### Examples
-* `if($0,$2,$1)` will evaluate `$2` if `$0` will return true and will evaluate `$1` if `$0` is nil. It deserves the name `ifNot`.
-* `concat($0, $0, $0, $0)` will repeat argument by concatenating it 4 times.
+* `if($0, $2, $1)` → evaluates to `$2` if `$0` is `true`, else `$1`
+* `concat($0, $0, $0, $0)` repeats the only argument 4 times.
 
-In Go, the expressions can be evaluated the following way:
+In Go:
 
 ```go
 ret, err := easyfl.EvalFromSource(nil, "concat($1,$0)", []byte{222}, []byte{111})
