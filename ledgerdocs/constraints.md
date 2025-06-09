@@ -165,7 +165,7 @@ Chain locks are fundamental for:
 EasyFL source of the `chainLock` is provided [here](ledgerdocs/chain_lock.md).
 
 ## Sequencer constraint
-The _sequencer constraint_ `sequencer`, adds additional conditions to the `chain` constraint. Sequencer chain is a special kind of chain. Its purpose is to support cooperative consensus among sequencers, enables branches, baseline and other.  
+The _sequencer constraint_ `sequencer`, adds additional conditions to the `chain` constraint. Sequencer chain is a special kind of chain. Its purpose is to support cooperative consensus among sequencers, by enabling branches, baseline and other.  
 
 ## Inflation
 The inflation constraint ensures deterministic inflation based on:
@@ -174,5 +174,5 @@ The inflation constraint ensures deterministic inflation based on:
 
 At transaction level, the following invariant is enforced:
 ```
-Total Consumed Amlunt + Inflation == Total Produced Amount
+Total Consumed Amount + Inflation == Total Produced Amount
 ```
