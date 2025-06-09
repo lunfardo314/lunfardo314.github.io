@@ -134,26 +134,26 @@ Function returns bytecode of the argument with number specified in the 2nd argum
 
 ### parseInlineData
 
-Let's say,amount constraint at index 0 of some UTXO is bytecode of `amount(z64/1337)`.
+Let's say, amount constraint at index 0 of some UTXO is bytecode of `amount(z64/1337)`.
 
-Expression `selfSiblingConstraint(0)` will always return bytecode of the `amount` constraint, with actual amount data as the argument.
+Expression `selfSiblingConstraint(0)` will always return bytecode of the `amount` constraint.
 
-However, formula `parseArgumentBytecode(selfSiblingConstraint(0))` will not return bytes of number `1337`, but instead a literal formula, which, upon evaluation, returns `1337`. It is because bytecode of the literal `z64/1337` is also a formula, which return trat value, not the value itself. 
+Formula `parseArgumentBytecode(selfSiblingConstraint(0))` will not return bytes of number `1337`, but instead a literal formula, which, upon evaluation, returns `1337`. It is because bytecode of the literal `z64/1337` is also a formula, which returns that value upon evaluation, not the value itself. 
 
-To retrieve the value itself, we have function `parseInlineData`.
+Function `parseInlineData` evaluates literal and returns its formula.
 
-It treats its single argument as a formula bytecode, which is literal (aka inline data). It checks if it is indeed a data function. If it is, it returns the data by stripping the data call prefix. Otherwise, panics.  
+### Examples 
 
-So, expression `parseInlineData(parseArgumentBytecode(selfSiblingConstraint(0)))` will always return bytes of the amount, a big-endian bytes of an integer.
+Expression `parseInlineData(parseArgumentBytecode(selfSiblingConstraint(0)))` will always return bytes of the amount, a big-endian bytes of an integer.
 
-For example, `parseInlineDataArgument` retrieves inline data from the particular output
+`parseInlineDataArgument` retrieves inline data from the particular output:
 ```
 // in bytecode $0, 
 // function parses argument with index $2, treats it as inline data call, 
 // returns the inline data, Enforces call prefix is equal to $1
 func parseInlineDataArgument : parseInlineData(parseArgumentBytecode($0,$1,$2))
 ```
-Other functions helps to retrieve amount value from any UTXO: 
+Other functions help to retrieve amount value from any UTXO: 
 ```
 // $0 is a path to output
 // Returns amount value 8 bytes from the output at path given in $0
@@ -161,5 +161,4 @@ func amountValueByOutputPath :
     uint8Bytes(parseInlineDataArgument(atPath(concat($0, amountConstraintIndex)), #amount,0))
 
 func selfAmountValue: amountValueByOutputPath(selfOutputPath)
-
 ```
