@@ -102,8 +102,6 @@ Some valid expressions:
 * `or` and `or()` $\rightarrow$ empty slice (`false`)
 * `and` and `and()` $\rightarrow$ `true` (value undefined)
 
->>>>>  TODO here
-
 ### Parameters of the expression
 Expressions can include parameter references:  `$0`, `$1` ... `$15`.  These represent **open parameters** that will be instantiated during evaluation.
 Examples:
