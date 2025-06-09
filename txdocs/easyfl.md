@@ -103,7 +103,7 @@ Some valid expressions:
 * `and` and `and()` $\rightarrow$ `true` (value undefined)
 
 ### Parameters of the expression
-Expressions can include parameter references:  `$0`, `$1` ... `$15`.  These represent **open parameters** that will be instantiated during evaluation.
+Expressions (formulas) can include parameter references:  `$0`, `$1` ... `$15`.  These represent **open parameters** that will be instantiated during evaluation of the formula.
 Examples:
 * `concat($0,$1)` $\rightarrow$ concatenates two arguments
 * `concat(byte($0,1), byte($0,0), tail($0,2)))` $\rightarrow$ swaps first two bytes. 
@@ -175,6 +175,13 @@ Expressions (formulas) are evaluated in the form of the internal evaluation tree
 Some expressions may trigger panics, such as `byte(0,1)` accessing an out-of-bounds index.
 
 `fail` is a built-in function that always panics with a message. Literal `!!!msg` is a shortcut.
+
+Standard helper function `require` is often used to enforce certain conditions:
+```
+func require : or($0,$1)
+```
+
+For example: `require(lessThan(uint8Bytes($0), u64/1000), !!!argument_must_be_less_than_1000)`
 
 Evaluation engines like `EvalFromBinary` in Go must handle these exceptions and mark the transaction as invalid.
 
