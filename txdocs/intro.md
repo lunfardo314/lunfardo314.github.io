@@ -1,6 +1,6 @@
 # Introduction
 
-(_This is **version 1.0** of the document. The content and definitions presented here may be revised in future versions, with a strong effort to maintain backward compatibility with the core concepts._)
+(_This is **version 1.0** of the transaction model. The content and definitions presented here may be revised in future versions, with a strong effort to maintain backward compatibility with the core concepts._)
 
 This document delves into the technical details of Proxima. Its primary purpose is knowledge transfer. It aims to convey both the overarching philosophy and the precise definitions of Proxima’s core data structures. The intended audience includes core developers, other contributors, and anyone interested in studying Proxima and contributing to its evolution.
 
