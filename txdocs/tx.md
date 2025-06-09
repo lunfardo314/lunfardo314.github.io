@@ -1,130 +1,129 @@
 # Proxima transaction
 
 ## Tuple trees
-When composing a transaction, we aim to operate with the most generic data structures possible:
-* a *byte array*. *Byte array* may be empty, i.e. of zero length. Byte array can have any length (not exceeding practical limits set by the protocol);
-* a *tuple* $(e_0, \dots e_{n-1})$, where each $e_i$ is either a *byte array*, or a *tuple* again.
+When composing a transaction, we aim to use the most generic data structures possible:
 
-Nested *tuples* may represent a finite hierarchical data structure, a *tree*, which has byte arrays as terminal elements and tuples as interim vertices.
 
-Each Proxima transaction is represented as such a tree of tuples. Let's say $T$ is such a tree. Every element in the tree has unique *path* $(i_0, \dots i_{m-1})$ which uniquely specifies place of that element in the whole structure. Empty path $()$ points to the tip of the tree, the top tuple itself. Every part of the transaction has its *path*, a unique "address" in the transaction.
+* A **byte array**, which may be empty (i.e., of zero length). A byte array can have any length (subject to practical limits set by the protocol).
+* A **tuple** $(e_0, \dots, e_{n-1})$, where each $e_i$ is either a byte array or another tuple.
 
-For a tuple $T$, we will denote $T_i$ as it's i-th element. In the hierarchical case, element with the path $(i_0, \dots i_{m-1})$ we will denote:
+Nested tuples can represent a finite hierarchical data structure — a **tree** — where byte arrays are terminal elements and tuples are internal nodes.
+
+Each Proxima transaction is represented as such a tree of tuples. Let $T$ be such a tree. Every element in the tree has a unique **path** $(i_0, \dots, i_{m-1})$ that specifies its position within the structure. The empty path $()$ refers to the root of the tree — the top-level tuple. Every part of the transaction has its own path, which acts as a unique address within the transaction.
+
+For a tuple $T$, we denote its $i$-th element as $T_i$. In the hierarchical case, the element at path $(i_0, \dots, i_{m-1})$ is denoted:
 $$
 T_{i_0,\dots i_{m-1}} = ((T_{i_0})_{i_1}\dots)_{i_{m-1}}
 $$
 
-By $len(T)$ we will denote number of elements in the tuple:
+We use $len(T)$ to denote the number of elements in the tuple:
 $$
 T = (T_0, \dots T_{len(T)-1})
 $$
-Similarly, $len(b)$ is number if bytes in the byte array $b$.
+Similarly, $len(b)$ is number of bytes in the byte array $b$.
 
 ## Serialization
 
-Let's say $bytes(e)$ is a function which gives a serialized binary representation of the element $e$ as a byte array. The serialization rules are the simplest possible:
+Let $bytes(e)$ be a function that returns the serialized binary representation of element $e$ as a byte array. The serialization rules are minimal and straightforward:
 
-Serialized form of the byte array $b$ is itself: $bytes(b)=b$
-
-Serialized form of the tuple $T=(e_0, \dots e_{n-1})$ is 
+* The serialized form of a byte array $b$ is itself: $bytes(b) = b$.
+* The serialized form of a tuple $T = (e_0, \dots, e_{n-1})$ is:
 $$
 bytes(T) = header(n, l)||e'_0||\dots||e'_{n-1}
 $$ 
 where
-* $||$ is concatenation
-* $header(n,l)$ is 2 bytes which contain information about number of elements in the tuple $len(T)$ and $l$ is number of bytes reserved for the size prefix of elements. Parameter $l$ is selected the way, that size of any element  would fit $l$ bytes (e.g. $l=1$ for a tuple with elements are no longer than  255 bytes, or, otherwise, $l=2$ if elements are no longer than $2^{16}-1$);
-* $e'_{i} = sz^l_i||bytes(e_i)$, where $sz^l_i$ is $len(bytes(e_i))$ in the form of $l$ bytes (big-endian). In other words, $e'_{i}$ is $bytes(e_i)$ prefixed with few bytes of size information.
+  * $||$ denotes concatenation
+  * $header(n, l)$ is 2 bytes containing the number of elements in the tuple, and $l$ is the number of bytes reserved for size prefixes of elements. The parameter $l$ is selected such that each element size can fit in $l$ bytes (e.g., $l = 1$ for elements ≤ 255 bytes, or $l = 2$ for ≤ $2^{16} - 1$ bytes),
+  * $e'_i = sz^l_i || bytes(e_i)$, where $sz^l_i$ is $len(bytes(e_i))$ encoded in $l$ bytes (big-endian). That is, $e'_i$ is $bytes(e_i)$ prefixed with its length.
 
-Tuple serialization rule is applied recursively down to the terminal byte arrays. The serialized transaction is a nested blob of bytes.
+Tuple serialization rule is applied recursively down to the terminal byte arrays. The serialized transaction is a nested binary blob.
 
-Note, that in the serialized form, the element of the tuple tree does not contain information if it is terminal or not: a byte array may or may not be interpreted as a serialized tuple. It means that serialization assumes only **finite** tuple trees, i.e. the ones which has known structure in advance and does not need recursion nor loops to traverse it.
+Note that in the serialized form, an element does not carry information about whether it is terminal: a byte array may or may not represent a serialized tuple. This implies serialization is intended only for **finite** tuple trees — structures with a known layout that require no recursion or looping to traverse.
 
-This is intentional: the user of a serialized tuple tree must know if a certain path $(i_0, \dots i_{m-1})$ is a valid path or not. Attempt to access element with invalid path will lead to exception with immediate invalidation of the entire data structure. This trait enables *lazy deserialization*: we can delay deserialization of part of the tuple tree until we need them.
+This is intentional: the user of a serialized tuple tree must know in advance whether a particular path $(i_0, \dots, i_{m-1})$ is valid. Attempting to access an invalid path causes an exception and immediate invalidation of the structure. This trait enables **lazy deserialization** — parts of the tree can be deserialized only when needed.
 
-The data structures described above are low level binary bytes. Serialization uses only very basic primitives, are platform-independent and have no dependencies on language-specific data types, nor on particular mechanisms such as Protobuf. Go implementation of it can be found in [github.com/lunfardo314/easyfl/tree/develop/tuples](https://github.com/lunfardo314/easyfl/tree/develop/tuples).
+These data structures are low-level binary representations. Serialization relies only on basic primitives, is platform-independent, and has no dependency on language-specific types or mechanisms like Protobuf. A Go implementation is available at [github.com/lunfardo314/easyfl/tree/develop/tuples](https://github.com/lunfardo314/easyfl/tree/develop/tuples).
 
 ## Raw transaction
 
-We distinguish two forms of the same Proxima transaction:
-* **raw transaction**, aka *canonical transaction* or *transferable transaction*. It is the transaction which is persisted, exchanged between nodes and stored in the transaction store;
-* **transaction context**. It is the *raw transaction*, extended with the fragment of the ledger state it updates. This form is transient and is only used for transaction validation, never persisted.
+We distinguish two forms of a Proxima transaction:
 
-The *raw transaction* is a tuple, consisting of 11 data elements listed below. The following are the top level tuple elements of the raw transaction:
+* **Raw transaction**, also known as canonical or transferable transaction: the form exchanged between nodes, persisted, and stored.
+* **Transaction context**: the raw transaction extended with the fragment of the ledger state it modifies. This form is transient and used only for validation.
 
-| Index | Name | Description                                                                                                                                 |
-| -------- | -------- |---------------------------------------------------------------------------------------------------------------------------------------------|
-|0|Inputs| Non-empty tuple of up to 256 output IDs of consumed UTXOs (not the consumed UTXOs themselves)                                               |
-| 1     | Unlock data     | a tuple of *unlock parameters*. 1-to-1 correspondence with the tuple of inputs                                                              |
-|2|Produced outputs| Non-empty tuple of up to 256 produced outputs                                                                                               |
-|3|Signature| a terminal. It is ED25519-signed *transaction ID* with the public key                                                                       |
-|4|Sequencer and stem output indices| a terminal. 2 bytes with sequencer-related indices of produced outputs                                                                      |
-|5|Timestamp| a terminal. 5 bytes of transaction _ledger time_ value (see below)                                                                          |
-|6|Total produced amount| a terminal. `uint64` sum of token amounts of the produced outputs as _zero-trimmed big-endian bytes_(see below about encoding of integeres) |
-|7|Input commitment| a terminal. Hash of concatenated all consumed outputs (which are not part of the transaction): $hash(consumed(T))$ (see below)              |
-|8|Endorsements| a tuple of up to 8 transaction IDs                                                                                                          |
-|9|Explicit baseline| a terminal. Optional explicit transaction ID of a branch transaction                                                                        |
-|10|Local libraries| a tuple. Uninterpreted in the version 1, usually empty                                                                                      |
+The *raw transaction* is a tuple of 11 elements:
 
-For example, for a transaction $T$, element $T_0$ will be a tuple of inputs while $T_6$ will be total produced amount. The *i-th* produced output is $T_{2,i}$
+| Index | Name | Description                                                                                                                        |
+| -------- | -------- |------------------------------------------------------------------------------------------------------------------------------------|
+|0|Inputs| Non-empty tuple of up to 256 output IDs of consumed UTXOs (not the outputs themselves)                                             |
+| 1     | Unlock data     | Tuple of **unlock parameters**; one per input                                                                                      |
+|2|Produced outputs| Non-empty tuple of up to 256 newly created outputs                                                                                 |
+|3|Signature| Terminal element: ED25519 signature of the transaction ID, along with the public key                                               |
+|4|Sequencer and stem output indices| Terminal element: 2 bytes encoding sequencer-related indices                                                                       |
+|5|Timestamp| Terminal element: 5 bytes encoding _ledger time_                                        |
+|6|Total produced amount| Terminal element: `uint64` sum of token amounts in outputs, as zero-trimmed big-endian bytes |
+|7|Input commitment| Terminal element: hash of all consumed outputs (not part of the transaction itself)     |
+|8|Endorsements| Tuple of up to 8 transaction IDs                                                                                                 |
+|9|Explicit baseline| Terminal element: optional transaction ID indicating a branch                                                               |
+|10|Local libraries| Tuple; uninterpreted in version 1 (usually empty)                                                                             |
+
+For a transaction $T$, element $T_0$ is the tuple of inputs; $T_6$ is the total produced amount. The i-th produced output is $T_{2,i}$.
 
 <p style="text-align:center;"><img src="../static/img/utxo-tx.png">
 </p>
 
 ## Transaction context
 
-Let's denote $utxo(id)$ is the UTXO loaded from the ledger state by its ID $id$.
+Let $utxo(id)$ denote the UTXO loaded from the ledger state by its ID.
 
-Let's say $T=(T_0, \dots T_{10})$ is a raw transaction. Then
+Given $T = (T_0, \dots, T_{10})$, define:
 $$
 consumed(T) = (utxo(T_{0,0}), utxo(T_{0,1}) \dots utxo(T_{0,len(T_0)-1}))
 $$
-is a tuple of consumed outputs of the transaction $T$.
-By the *transaction context* $T^{ctx}$, we define the tuple:
+
+The **transaction context** $T^{ctx}$ is defined as:
 $$
 T^{ctx}=(T, (consumed(T)))
 $$
 
-**The transaction context $T^{ctx}$ contains all the information needed for the validation of the transaction $T$**. It is the transaction itself plus all consumed outputs, loaded from the ledger state, in one data structure with all elements uniformly accessible with their paths.
+The transaction context $T^{ctx}$ contains all the information required to validate transaction $T$. It includes the transaction itself and the consumed outputs, with all elements accessible by path.
 
-It is always true that $T^{ctx}_0 = T$ and $T_{path}=T^{ctx}_{0,path}$
-Path to the *i-th* input in the *transaction context* $T^{ctx}$ is $(0,0,i)$.
+It always holds that $T^{ctx}0 = T$ and $T{path} = T^{ctx}_{0,path}$.
+Path to the i-th input in the transaction context is $(0,0,i)$.
 
-From the path of the input, we can easily find all other data elements corresponding to it:
-* the ID of a consumed output is $T^{ctx}_{0,0,i}$
-* the corresponding consumed output is $T^{ctx}_{1,0,i}$
-* the corresponding unlock parameters are $T^{ctx}_{0,1,i}$
+From this, we can derive:
+* The ID of the consumed output: $T^{ctx}_{0,0,i}$
+* The corresponding consumed output: $T^{ctx}_{1,0,i}$
+* The corresponding unlock parameters: $T^{ctx}_{0,1,i}$
 
 <p style="text-align:center;"><img src="../static/img/utxo-tx-context.png">
 </p>
 
 ## Outputs (UTXOs). Validation scripts/formulas
-The node is using globally trusted rules to determine if transaction $T$ is valid or not. Invalid transaction is rejected immediately.
+Nodes apply globally trusted rules to determine if transaction $T$ is valid. Invalid transactions are rejected immediately.
 
-Transaction validity rules are applied to the transaction context $T^{ctx}$.
+Validation rules apply to the transaction context $T^{ctx}$.
 
-Ultimately, transaction validity rules are public and globally trusted. They are hardcoded in the node's software. 
-However, in order to increase flexibility, UTXO transaction models usually implement some kind of programmability of validity rules, such as [Bitcoin Script](https://en.bitcoin.it/wiki/Script). In that case, node has the interpreter of the scripts hardcoded in its software, and is only responsible for running the scripts, provided in the transaction.
+While rules are hardcoded in node software, the UTXO model often supports programmable validity, like [Bitcoin Script](https://en.bitcoin.it/wiki/Script). This allows the transaction producer to define custom unlock and validation logic, embedded in the UTXO, to be evaluated by the node.
 
-For example, instead of using hardcoded types of unlock conditions of UTXOs, producer of the transaction can compose a script with their own unlock rule and embed the script into the UTXO. When run in the context of the consuming transaction, the script checks if transaction meets certain unlock criteria, as intended by the producer.
+In Proxima, each UTXO is a tuple of terminal elements $(c_0, \dots, c_{k-1})$, where each $c_i$ is a script bytecode.
 
-In Proxima, we adopt this approach too: we treat each UTXO as tuple of terminal elements $(c_0, \dots c_{k-1})$ where each $c_i$ is a bytecode of a script.
+All transaction data — amounts, addresses, etc. — are wrapped in scripts. There are no standalone "data fields." Scripts can access any element in $T^{ctx}$ and enforce **logical relations** between them: within a single UTXO, across inputs and outputs, etc.
 
-All the data, such as amounts or addresses, are wrapped into those scripts too: there are no such thing as "data field" in the Proxima's UTXO, all is scripts. The scripts can access all elements in the transaction context $T^{ctx}$ and enforce **logical relations between any data elements of the transaction context**: inside one UTXO, between several of them, between inputs and outputs and so on.
+A simple functional language, [EasyFL](txdocs/easyfl.md), is used for scripting. Each script is a closed formula — a composition of function calls and data, serialized as bytecode.
 
-Further we will describe a simple functional language *EasyFL* which is used for the scripting. Here, the main point is that **each script is a closed formula, which represents a composition of function calls and data**, serialized as a bytecode.
+These formulas serve two roles:
+* As **validation constraints** over $T^{ctx}$,
+* As **serialization descriptors** for UTXO data.
 
-The formula plays two roles: as a validation script and as a serialization primitive for the UTXO data.
 
-Formula is a **validity constraint imposed on the transaction data elements**, specified by their paths in the $T^{ctx}$. For a transaction $T$ to be valid, all of its scripts must return *true* when evaluated in the context of $T^{ctx}$. The producer of the transaction, by placing those scripts into a UTXO, impose validity constraints on the transaction: both on the producing, and, later, on the consuming one;
+For a transaction $T$ to be valid, all its scripts must return true when evaluated in the context of $T^{ctx}$. Transaction producers embed these scripts into UTXOs to enforce desired behavior for both creation and later consumption.
 
-The **bytecode of the formula also serves as a data type descriptor** for the serialized form of data in UTXOs.
+Examples:
 
-Some examples:
+* `amount(100)` invokes the `amount` function with argument `100`. It wraps `100` with the amount descriptor. The function may checks if the UTXO meets a minimum amount requirement. The bytecode can be parsed to retrieve both the function and the data.
+* `addressED25519(0x3705...)` checks that the public key at $T_3$ matches the provided hash and that the transaction signature is valid. It acts as a **siglock**. The bytecode can also be inspected for function type and argument.
 
-* the formula `amount(100)` not only invokes library-defined function `amount` with argument `100`, which is expected to return `true`, but also wraps `100` with the descriptor `amount`. Such formula, can be recognized as `amount` and the wrapped data (`100` in this case) can be parsed-out from the bytecode by other scripts/formulas and by the node. Otherwise, the function `amount`, when evaluated, checks if the provided amount meets the minimum requirement for the particular UTXO;
-* the formula  `addressED25519(0x370563b1f08fcc06fa250c59034acfd4ab5a29b60640f751d644e9c3b84004d0)` invokes library-defined function `addressED25519` which verifies if the signature at $T_3$ is a valid signature of the transaction ID and if the hash of the public key is equal to the data `0x370563b1f08fcc06fa250c59034acfd4ab5a29b60640f751d644e9c3b84004d0` provided as the argument of the call. It is a siglock script.
-  From the other side, another script or user, can parse the bytecode and check if the script is indeed the `addressED215519` function and, say, check if the parameter is the public key it expects.
+All participants share a globally trusted **library of validation function definitions**. Some are hardcoded like opcodes; most are open formulas defined in EasyFL.
 
-All participants share a globally trusted **library of validation function definitions**. The most primitive of those functions are hardcoded (embedded), akin **opcodes** in other UTXO models. Majority of it is defined as open *EasyFL* formulas with parameters.
-
-Due to the fundamental reasons, we assume definitions of those functions composed in validation script formulas do not use loops nor recursion, i.e. do not form a Turing-complete set. 
+For fundamental reasons, these definitions avoid loops and recursion — they are **intentionally not Turing-complete**.
