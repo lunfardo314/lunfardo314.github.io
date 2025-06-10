@@ -127,3 +127,12 @@ Examples:
 All participants share a globally trusted **library of validation function definitions**. Some are hardcoded like opcodes; most are open formulas defined in EasyFL.
 
 For fundamental reasons, these definitions avoid loops and recursion — they are **intentionally not Turing-complete**.
+
+## Example of the transaction printout
+
+The following is an example of the transaction. It is a sequencer transaction, with two consumed outputs, chain predecessor and tag-along output, and one produced output, the successor of the chain. 
+
+The transaction consolidates tag-along fee and inflates its input tokens in its produced amount.
+
+<p style="text-align:center;"><img src="../static/img/tx_printout.png">
+</p>
