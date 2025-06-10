@@ -12,8 +12,6 @@ A classical UTXO transaction presents an update to the **ledger state**. A UTXO 
 
 More detailed description of the UTXO model can be found in [Proxima transaction model](https://lunfardo314.github.io/#/txdocs/intro). 
 
-The **ledger state** is a collection of outputs, also known as UTXOs. The ledger starts from the *genesis ledger sta
-
 ### Conflicts. DAG. Past cone
 
 Two transactions that directly or indirectly consume (spend) the same output in the ledger state are considered *conflicts* or *double-spends*. A valid ledger cannot contain conflicting transactions. The set of UTXO transactions as vertices with the relation of consumption of outputs between them as edges naturally forms a *directed acyclic graph* (DAG).
