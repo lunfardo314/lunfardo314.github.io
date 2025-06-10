@@ -6,23 +6,23 @@ In Proxima's narrative, we use the permissionless concept as follows: *Proxima i
 
 The importance of being permissionless is especially significant at the bootstrap stage of the network because it relates to the idea of the *fair launch*, a sensitive topic whenever the start of a new distributed ledger is considered.
 
-The general narrative is that PoW is permissionless and therefore fair at launch, while PoS is permissioned (or less permissionless) and therefore not very fair. There are strong arguments for this.
+The general narrative is that PoW is permissionless and therefore fair at launch, while PoS is permission-ed (or less permission-less) and therefore not very fair. There are strong arguments for this.
 
 Proxima is not PoS (no committees, no staking), nor is it PoW. Yet, its security is based on the ownership of the tokens on the same ledger, similar to PoS. So, what might be a fair launch in Proxima? We have to cover these legitimate and controversial questions.
 
-We will analyze idealized and simplified scenarious.
+We will analyze idealized and simplified scenarios.
 
 ## Bootstrap in PoW
 
 PoW networks (Bitcoin, Kaspa, Ethereum Classic, etc.) are commonly considered permissionless in all aspects: one does not need permission to participate in the network in any role. Anybody can start a mining operation and, of course, use the network for holding and moving tokens.
 
-This includes the bootstrap stage of the ledger. Initially, the ledger has zero tokens and no participants. If somebody wants to join, they must earn new tokens by mining. This means investing into computers, ASICs, and starting to earn tokens. That's it. Even block 0 can be mined in a decentralized way.
+This includes the bootstrap stage of the ledger. Initially, the ledger has zero tokens and no participants. If somebody wants to join at genesis, they must earn new tokens by mining. This means investing into computers, ASICs, and starting to earn tokens. That's it. Even block 0 can be mined in a decentralized way. 
 
 However, the very genesis of PoW is centralized and trust-based because:
 - the node software with the protocol code and ledger validity definitions must be distributed from one single (trusted) point;
 - the gossip network for the inception phase must be some kind of social consensus among participants before the start, i.e. all participants must have open and equal access.
 
-In other words, initial participants rely on centralized coordination by public trusted reference point. However their set is permissonless. How a participant decides to be in that set? By knowing and trusting the GitHub repository and by being able to join the bootstrap network. These are public constants, so, anybody informed can be join since the beginning by dowloading and running the node.
+In other words, initial participants rely on centralized coordination by public trusted reference point. How a participant decides to be in that set? By knowing and trusting the GitHub repository and by being able to join the bootstrap network. These are public constants, so, anybody informed can join since the beginning by downloading and running the node.
 
 They also must be motivated to invest in the mining equipment and start incurring CAPEX and mining costs, even if small at the beginning. By investing into the mining, initial miners to a certain extent commit to the network.
 
@@ -43,12 +43,12 @@ The difference with PoW is that in PoS the creator not only provides trusted pub
 
 The future of the network and its security develop together with the liquidity of the token. Validators require interest on their stakes to cover costs, so they need an open and liquid market for tokens. Looking from this perspective, the picture is not very different from PoW.
 
-However, if some validators decide to leave for any reason (even at great cost), or, for some reasons, the current committee fails to agree on the next one, the committee may fall apart and the ledger will stop.
+However, if some validators decide to leave for any reason (even at great cost), or, for some reason, the current committee fails to agree on the next one, the committee may fall apart and the ledger will stop.
 
 The essential aspect of PoS is that it remains only *conditionally decentralized* even after the bootstrap phase: the committee is a permissioned structure by its nature. Even with random rotation procedures, the committee must be proposed somehow by somebody, and then the committee itself must reach full consensus on its composition. This means another layer of trust assumptions in the system.
 
 ## Bootstrap of Proxima
-There is no committee in Proxima. Sequencers do not care about each other's state and opinions; they just follow the biggest ledger coverage rule. It is a Nakamoto consensus. Becoming a sequencer is as permissionless as the market of tokens is open, liquid, and permissionless. Afer somebody acquires  tokens, no need for any permission to be a sequencer or any other chosen role. Censoring someone's possession of tokens is not possible too.
+There is no committee in Proxima. Sequencers do not care about each other's state and opinions; they just follow the biggest ledger coverage rule. It is a Nakamoto consensus. Becoming a sequencer is as permissionless as the market of tokens is open, liquid, and permissionless. After somebody acquires  tokens, no need for any permission to be a sequencer or any other chosen role. Censoring someone's possession of tokens is not possible too.
 
 So, we need (permissionless) liquidity of the token for the existence of the distributed ledger: the same thing in PoW, PoS, and Proxima.
 
@@ -56,7 +56,7 @@ Proxima needs some tokens "pre-mined" in the initial supply. The creator of the 
 
 So, at the very inception, the situation in Proxima is strongly similar to PoS: it is trust-based and centralized coordination among initial participants of the future ledger, a community, which follow social consensus among them.
 
-Proxima explicitely emphasizes **social consensus** and **cooperation** (as opposed to competition) in the community of token holders as fundamental principle of the existence of the Proxima's ledger. The protocol provides technical means of coordinating that social consensus.
+Proxima explicitly emphasizes **social consensus** and **cooperation** (as opposed to competition) in the community of token holders as fundamental principle of the existence of the Proxima's ledger. The protocol provides technical means of coordinating that social consensus.
 
 At the inception it is trust-based and coordinated in centralized or conditionally decentralized manner. However, after inception, when the liquid market of tokens appear, the situation becomes radically different from PoS and becomes equivalent to PoW. The centralization is completely removed and system becomes fully permissionless. Anybody who can buy tokens (think ASICs) can run a sequencer (think miner) and earn inflation.
 
@@ -64,7 +64,7 @@ This is what we mean by *Proxima is as permissionless as Bitcoin*. At the incept
 
 One may see Proxima at inception as less permissionless and less fair than Bitcoin. We can live with that, given the significant differences in the underlying tech and its operating costs. Besides, inception is just a short moment in the long history of the ledger, so initial distribution does not matter in the long term, provided the distributed ledger survives until then.
 
-<p style="text-align:center;"><img src="//hackmd.io/_uploads/ByoZ1e3dA.png"  width="650">
+<p style="text-align:center;"><img src="../static/img/boot.png">
 
 ## Conlusions
 - The long-term development of the network is market-driven, permissionless and decentralized, equally for PoW and Proxima.

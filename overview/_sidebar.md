@@ -4,5 +4,5 @@ Overview of Proxima concepts
 - [Cooperative consensus](overview/consensus.md)
 - [Safety and liveness](overview/safety_liveness.md)
 - [Incentives](overview/incentives.md)
-- [Being permissionless. Bootstrap](overview/permissonless.md)
+- [Being permissionless. Bootstrap](overview/permissionless.md)
   
