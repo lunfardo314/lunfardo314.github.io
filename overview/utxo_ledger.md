@@ -1,33 +1,18 @@
 UTXO ledger
 ---
-Proxima uses UTXO (**U**nspent **T**ransa**X**tion **O**utput) as its ledger model. The UTXO ledger is a broad topic, so we will introduce here only the main concepts of Proxima's UTXO ledger. More detailed definitions can be found in the [Proxima whitepaper](https://github.com/lunfardo314/proxima/blob/master/docs/Proxima_WP.pdf) and also more general disucussion on the matter in the [Medium series on the constraint-based UTXO model](https://medium.com/@lunfardo/a-constraint-based-utxo-model-1-4-a61df1b0c724).
+Proxima uses UTXO (**U**nspent **T**ransa**X**tion **O**utput) as its ledger model. 
 
-Fundamentally, the Proxima's UTXO model is not very different from well known models used in Bitcoin, Cardano and IOTA (pre-pivot). In all of them transactions are deterministic ledger updates. It is a defining feature of UTXO. However, there are differences:
-- on Proxima, in addition *consuming* the output of another transaction, as usual, a transaction can also *endorse* another transaction;
-- Each output of the UTXO transaction is a vector of *validations scripts*. Each validation script is an executable bytecode of [*EasyFL*](https://github.com/lunfardo314/easyfl), a platform-independent pure functional language which plays the same role as Bitcoin Script in Bitcoin.
-
-### Classical UTXO
 A classical UTXO transaction presents an update to the **ledger state**. A UTXO transaction:
 1. **consumes** (**spends**) outputs on the ledger state,
 2. deletes them from there, and
 3. **produces** (creates)  new outputs on the next ledger state.
 
-<p style="text-align:center;"><img src="//hackmd.io/_uploads/HJjHApkPC.png"  width="250">
+<p style="text-align:center;"><img src="../static/img/utxo.png">
 </p>
 
-The **ledger state** is a collection of outputs, also known as UTXOs. The ledger starts from the *genesis ledger state* and evolves by updating it with UTXO transactions. The **ledger** itself is a collection of transactions that constructs the current ledger state starting from the genesis ledger state (or any other *baseline ledger state*).
+More detailed description of the UTXO model can be found in [Proxima transaction model](https://lunfardo314.github.io/#/txdocs/intro). 
 
-Outputs (UTXOs) on the ledger state efectively are *non-fungible assets*, each with unique ID. In the classical UTXO, UTXOs are one-time, transient assets, because the consuming transaction always destroys its inputs to create new ones.
-
-Each output contains certain amount of tokens. These are *fungible assets* that exists only as amounts in outputs.
-
-Transaction validity constraints (also known as ledger constraints) are enforced on each transaction. The simplest and most common example of the ledger constraint is: total number of fungible tokens in consumed outputs must equal to the total number of fungible tokens in produced outputs. Validity constraints ensure transactions, when applied to the ledger state, preserve important invariants of the ledger, such as the constant total supply of tokens.
-
-More advanced validity constraints are usually expressed as the validation scripts embedded in the output on the ledger. In Bitcoin they are written in *Bitcoin Script*, in Proxima they are *EasyFL* formulas.
-
-The example of a validation script is *signature lock*, a script which checks the transaction's signature and invalidates any transaction with an invalid signature. Once embedded into the output, it makes it impossible to spend tokens on it without knowing the private key which unlocks the output.
-
-Embedding validation scripts in outputs makes the ledger **programmable**.
+The **ledger state** is a collection of outputs, also known as UTXOs. The ledger starts from the *genesis ledger sta
 
 ### Conflicts. DAG. Past cone
 
@@ -47,8 +32,7 @@ By putting endorsement into transactions, users enforce the consistency of the l
 
 **UTXO tangle** is a DAG where UTXO transactions are vertices, and output consumption links and endorsements are edges. Each vertex (transaction) represents a consistent ledger state, i.e., its past cone cannot contain conflicts. However, two transactions on the UTXO tangle can be conflicting, meaning their corresponding ledger states cannot be consolidated into one by some transaction.
 
-<p style="text-align:center;"><img src="//hackmd.io/_uploads/rJGEExlD0.png"  width="500">
-</p>
+<p style="text-align:center;"><img src="../static/img/utxo_tangle.png"> </p>
 
 The UTXO tangle is the main data structure of Proxima: a **transaction DAG**. It combines two elements of traditional blockchains in one: transactions and blocks. One may see UTXO transactions in the UTXO tangle as analogs of blocks in a blockchain. The difference is that here both "the transaction" and "the block" are the same thing and are produced (and signed) by the same entity: the holder of the tokens on transaction inputs.
 

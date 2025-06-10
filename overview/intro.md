@@ -26,7 +26,7 @@ Proxima positions itself as a possible platform for a _digital gold_, a fundamen
 This document gives a general overview of the Proxima design. It omits most of technical details and aims to explain main concepts in simple terms.
 
 Links for further information:
-- [Proxima technical whitepaper](https://arxiv.org/abs/2411.16456) [target=_blank] (detailed description of the concept).
+- [Proxima technical whitepaper](https://arxiv.org/abs/2411.16456) (detailed description of the concept).
 - [Proxima GitHub repository](https://github.com/lunfardo314/proxima) (code of the Proxima node, readme, tutorials, links to video and other resources)
 - [Bitcoin forum topic](https://bitcointalk.org/index.php?topic=5499359.0)
 - [Discord server invite link](https://discord.com/invite/UfFcFDy38j)
