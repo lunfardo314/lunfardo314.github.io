@@ -23,11 +23,11 @@ Each chain represents a permanent *non-fungible* asset on the ledger with a uniq
 
 The state of the chain asset evolves along the chain. It is updated by the *chain controller* when they create a transaction with the produced *successor* chain output.
 
-Chain constraints are used to build [sequencer chains](https://hackmd.io/@Evaldas/Syd4uSp8R), for delegation outputs, NFTs, and other ledger constructs that represent a single (sub)state of the ledger state.
+Chain constraints are used to build [sequencer chains](overview/consensus.md), for delegation outputs, NFTs, and other ledger constructs that represent a single (sub)state of the ledger state.
 
 A unique feature of the chain asset in Proxima is that by updating its state, a token holder **can create new tokens out of thin air** (inflation) proportionally to the on-chain tokens in the predecessor.
 
-<p style="text-align:center;"><img src="//hackmd.io/_uploads/B19QDAjvA.png"  width="550">
+<p style="text-align:center;"><img src="../static/img/chain_succ_pred.png">
 
 ### Ledger time
 
@@ -51,7 +51,7 @@ Here $R$ is the **inflation rate**, an immutable constant on the ledger.
 
 This way, every token holder can inflate their holdings by building chains. There is no other way to create new tokens in Proxima.
 
-<p style="text-align:center;"><img src="//hackmd.io/_uploads/SJ32KCiDR.png"  width="500">
+<p style="text-align:center;"><img src="../static/img/inflation.png">
 
 Note that the maximum amount of inflation generated on the ledger per year is capped at $totalSupply \cdot R_{annual}$. Here, $R_{annual}$ is the annual inflation rate, while $totalSupply$ represents the total number of tokens on the ledger at the beginning of the year.
 
@@ -59,11 +59,11 @@ Token holders who do not build chains will incur an opportunity cost equivalent 
 
 To further incentivize continuous chain building, ledger constraints include an **inflation opportunity window** constant (spanning several or dozens of slots), which sets the upper bound for $\Delta T$, after which inflation $I$ will be zero. This forces token holders to issue chain outputs at least once every few slots. Lazy or slow token holders will miss the opportunity to generate income.
 
-In addition to the inflation $I$, a random branch inflation bonus is added at each slot boundary. This incentivizes the issuance of *branch transactions* on the chain, which are necessary for the cooperative consensus. More details on this can be found in the whitepaper and [Selecting a branch](https://hackmd.io/@Evaldas/Syd4uSp8R).
+In addition to the inflation $I$, a random branch inflation bonus is added at each slot boundary. This incentivizes the issuance of *branch transactions* on the chain, which are necessary for the cooperative consensus.
 
 The intentions behind these incentives are:
 
-- To incentivize token holders to contribute to the security of the ledger through chain building (*sequencing* and *delegation*). See [cooperative consensus](https://hackmd.io/@Evaldas/Syd4uSp8R).
+- To incentivize token holders to contribute to the security of the ledger through chain building (*sequencing* and *delegation*). See [cooperative consensus](overview/consensus.md).
 - To ensure *equity* and *financial fairness*. Each active token holder can expect a fair, proportional, and predictable return on their *skin-in-the-game* on the ledger.
 
 It is reasonable to expect that some token holders will keep a certain amount of their holdings in passive wallet addresses, similar to how we keep some cash in our wallets or stash it under the mattress. This is their right. However, those funds won't be return-generating capital, resulting in a financial cost for the owner. This, however, makes sense as a limited cash (liquidity) reserve on the ledger.
@@ -98,7 +98,7 @@ By taking tokens into custody on its chain on behalf of other token holders, a c
 
 The sequencer/custodian will pay interest on the deposit, potentially retaining a margin from the generated inflation. The specific charges and rates will be determined by competition in the custody market, similar to practices in the banking sector.
 
-<p style="text-align:center;"><img src="//hackmd.io/_uploads/SJz8Zknv0.png"  width="500">
+<p style="text-align:center;"><img src="../static/img/custody.png">
 
 Depositing funds with a sequencer is one of several strategies for ordinary (non-sequencer) token holders to protect their holdings from the diluting effects of on-ledger inflation.
 
@@ -117,12 +117,12 @@ The **revocation prescription** provided in the delegation output allows the del
 
 The sequencer will use the delegated funds in its sequencer transactions to generate inflation. Whether the sequencer takes a *delegation margin* from the generated inflation is a matter of competition among sequencers in the market.
 
-<p style="text-align:center;"><img src="//hackmd.io/_uploads/BJv6GJ2w0.png"  width="500">
+<p style="text-align:center;"><img src="../static/img/delegate.png">
 
 ### Branches
 Branches in the Proxima ledger refer to sequencer transactions occurring precisely on slot boundaries. Each branch transaction competes for inclusion in the consensus ledger state, adhering to the principle that only one branch per slot can be accepted into the ledger. This mechanism ensures the convergence of the distributed ledger system towards a global consensus.
 
-In a branch transaction, a **verifiably random inflation bonus** amount $B$ is enforced uniformly over a specific interval, distinct from the regular inflation rules described earlier. This random inflation bonus is crucial for determining which branch will be included in the consensus ledger state according to the biggest ledger coverage rule (refer to [Cooperative consensus](https://hackmd.io/@Evaldas/Syd4uSp8R) and the Proxima whitepaper for detailed explanations). Sequencers participate in a fair lottery for this branch inflation bonus on every slot boundary.
+In a branch transaction, a **verifiably random inflation bonus** amount $B$ is enforced uniformly over a specific interval, distinct from the regular inflation rules described earlier. This random inflation bonus is crucial for determining which branch will be included in the consensus ledger state according to the biggest ledger coverage rule (refer to [Cooperative consensus](overview/consensus.md) and the Proxima whitepaper for detailed explanations). Sequencers participate in a fair lottery for this branch inflation bonus on every slot boundary.
 
 Therefore, in each slot, a sequencer earns inflation of at least
 $$
