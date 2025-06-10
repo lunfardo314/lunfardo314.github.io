@@ -1,4 +1,4 @@
-# Proxima. Incentives
+# Incentives
 
 The only participants with a genuine interest in the security of any distributed ledger are its end-users, the token holders. The rest must be incentivized to participate.
 

@@ -1,4 +1,4 @@
-# Proxima. Being permissionless. Bootstrap
+# Being permissionless. Bootstrap
 
 The concepts of "being permissionless," "trustless," and "decentralized" are ubiquitous in the crypto space. For example, *being permissionless* means "no need to ask permission to do something" in a distributed ledger. However, these concepts are context-dependent and often lack precise, objective definitions.
 

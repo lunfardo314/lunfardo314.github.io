@@ -1,7 +1,7 @@
 
-# Proxima. Cooperative consensus
+# Cooperative consensus
 
-## Introduction
+## General
 
 In Proxima, users seek consensus on each individual transaction, unlike blockchains, where consensus is reached on an entire block of transactions. Proxima ledger is organized as *directed acyclic graph* (DAG), also known as [UTXO tangle](https://hackmd.io/@Evaldas/Hy4fe6kDR).
 

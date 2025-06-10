@@ -1,4 +1,4 @@
-# Proxima. Safety and liveness
+# Safety and liveness
 
 Proxima employs a cooperative consensus model akin to **Nakamoto consensus**.
 

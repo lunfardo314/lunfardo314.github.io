@@ -1,4 +1,3 @@
-
 UTXO ledger
 ---
 Proxima uses UTXO (**U**nspent **T**ransa**X**tion **O**utput) as its ledger model. The UTXO ledger is a broad topic, so we will introduce here only the main concepts of Proxima's UTXO ledger. More detailed definitions can be found in the [Proxima whitepaper](https://github.com/lunfardo314/proxima/blob/master/docs/Proxima_WP.pdf) and also more general disucussion on the matter in the [Medium series on the constraint-based UTXO model](https://medium.com/@lunfardo/a-constraint-based-utxo-model-1-4-a61df1b0c724).
