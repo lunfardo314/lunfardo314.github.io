@@ -17,9 +17,9 @@ Proxima takes a different approach: the end-users -- token holders -- themselves
 
 Tokens holders are free to choose the most profitable strategy of participation for them - given amount of their on-ledger capital and specific needs - as long as they satisfy purposefully designed ledger validity rules. The rest is market-driven.
 
-jewelryThe philosophy of Proxima is **social consensus**, **equity** and **cooperation** among stakeholders of the distributed ledger.
+The philosophy of Proxima is **social consensus**, **equity** and **cooperation** among stakeholders of the distributed ledger.
 
-Proxima positions itself as a possible platform for a _digital gold_, a fundamental enabling layer of scarce and secure resource for derived concepts such as _money_, _payments_ or even _jewelry_. 
+Proxima positions itself as a possible platform for a _digital gold_, a fundamental enabling layer of scarce, secure, cost-efficient and scalable resource for derived concepts such as _money_, _payments_ or even _jewelry_. 
 
 ---
 
