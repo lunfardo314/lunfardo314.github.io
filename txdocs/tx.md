@@ -130,7 +130,11 @@ For fundamental reasons, these definitions avoid loops and recursion — they ar
 
 ## Example of the transaction printout
 
-The following is an example of the transaction. It is a sequencer transaction, with two consumed outputs, chain predecessor and tag-along output, and one produced output, the successor of the chain. 
+The following is an example of the human-readable printout of the transaction context. 
+It is a sequencer transaction, with two consumed outputs, chain predecessor and tag-along output, and one produced output, the successor of the chain. 
+Each consumed and produced outputs is composed as a tuple of constraint formulas, here displayed in the decompiled form.
+
+The `GeneralScript` denotes arbitrary formula bytecode, placed in the UTXO. In this case, sequencer hardcoded `or` function (which always evaluates to `true`), to wrap arbitrary data, produced by the sequencer (sequencer name, chain height, etc.). The data can be parsed out from the transaction by using standard tools. 
 
 The transaction consolidates tag-along fee and inflates its input tokens in its produced amount.
 
