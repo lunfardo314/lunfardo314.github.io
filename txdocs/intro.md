@@ -33,7 +33,9 @@ This makes Proxima a unique and unorthodox entry in the crypto space. We claim t
 ## Transactions and the ledger
 At its core, Proxima’s transaction model follows the classical UTXO paradigm, retaining all the essential characteristics described in the original Bitcoin whitepaper.
 
-The hallmark of the UTXO model (and thus Proxima’s model) is that transactions are **deterministic** and **validation-oriented**. This contrasts with the **non-deterministic**, **execution-oriented** transactions of platforms like Ethereum (EVM) or SUI (MoveVM). (The deeper implications of this distinction are outside the scope of this document.) In Proxima, a transaction is either valid—according to globally trusted formal rules—or it is invalid and immediately rejected.
+The hallmark of the UTXO model (and thus Proxima’s model) is that transactions are **deterministic** and **validation-oriented**. This contrasts with the **non-deterministic**, **execution-oriented** transactions of platforms like Ethereum (EVM) or SUI (MoveVM). (_The deeper implications of this distinction are outside the scope of this document._) 
+
+In Proxima, a transaction is either valid—according to globally trusted formal rules—or it is invalid and immediately rejected.
 
 While preserving the classical UTXO model, Proxima introduces two key enhancements to support its _cooperative consensus_ mechanism:
 
