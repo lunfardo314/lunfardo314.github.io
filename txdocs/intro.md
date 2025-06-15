@@ -31,20 +31,19 @@ In this deterministic DAG, each vertex defines a fully ordered set of transactio
 This makes Proxima a unique and unorthodox entry in the crypto space. We claim that Proxima is significantly simpler than most other crypto ledgers (with the possible exception of Bitcoin), as it is built upon a smaller set of foundational concepts.
 
 ## Transactions and the ledger
-At its core, Proxima’s transaction model is a classical UTXO model, preserving all the essential traits described in the original Bitcoin whitepaper.
+At its core, Proxima’s transaction model follows the classical UTXO paradigm, retaining all the essential characteristics described in the original Bitcoin whitepaper.
 
-It is also conceptually similar to [EUTXO](https://docs.cardano.org/about-cardano/learn/eutxo-explainer) models. However, Proxima diverges from Cardano’s approach: while programmable, Proxima's model is not designed for smart contracts in the Ethereum, SUI, or other Turing-complete paradigms.
+The hallmark of the UTXO model (and thus Proxima’s model) is that transactions are **deterministic** and **validation-oriented**. This contrasts with the **non-deterministic**, **execution-oriented** transactions of platforms like Ethereum (EVM) or SUI (MoveVM). (The deeper implications of this distinction are outside the scope of this document.) In Proxima, a transaction is either valid—according to globally trusted formal rules—or it is invalid and immediately rejected.
 
-The hallmark of the UTXO model (and thus Proxima’s model) is that transactions are **deterministic** and **validation-oriented**. This contrasts with the **non-deterministic**, **execution-oriented** transactions of platforms like Ethereum. (The deeper implications of this distinction are outside the scope of this document.) In Proxima, a transaction is either valid—according to globally trusted formal rules—or it is invalid and immediately rejected.
-
-While remaining a classical UTXO model, Proxima introduces two key enhancements to support its _cooperative consensus_:
-
-
+While preserving the classical UTXO model, Proxima introduces two key enhancements to support its _cooperative consensus_ mechanism:
 
 * **Endorsements**: Each Proxima transaction can optionally endorse other transactions by referencing them with immutable links, signed by the transaction’s producer (the token holder). These endorsements, along with UTXO consumption links, allow the ledger to be interpreted as a DAG. Endorsements help consolidate different non-conflicting ledger states into a unified view.
 
 * **Programmability**: In Proxima, each transaction and individual output (UTXO) can be made programmable using validation scripts, which are an immutable part of the transaction. These scripts define enforced logical relationships between different parts of the transaction data. Instead of imperative, stack-based scripting (like Bitcoin Script), Proxima uses formulas from a simple functional language called [EasyFL](ledgerdocs/easfl.md). Despite differences in syntax and structure, Proxima’s UTXO programmability is computationally equivalent to Bitcoin’s — intentionally non-Turing complete and effectively a finite automaton. The purpose of these scripts is to enforce intended behavior on the ledger. A consumer of a UTXO can only create a valid transaction if it satisfies the immutably embedded validity constraints imposed by the UTXO’s creator.
 
+Proxima’s UTXO model can also be compared to [EUTXO](https://docs.cardano.org/about-cardano/learn/eutxo-explainer), as introduced by Cardano; however, Proxima’s approach may offer a broader generalization in some respects. For instance, in Proxima, any transaction data (including _unlock data_) can function similarly to what EUTXO refers to as a _redeemer_ or _datum_.
+
+That said, Proxima's view of UTXO programmability differs from Cardano’s. While Proxima supports programmability, it does not aim to enable smart contracts comparable to those in Ethereum, SUI, or other Turing-complete platforms.
 
 You can find further rationale for these design choices in the [Proxima whitepaper](https://arxiv.org/abs/2411.16456).
 
