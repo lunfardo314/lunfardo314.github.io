@@ -8,8 +8,8 @@ The Proxima ledger includes two special embedded functions that allow access to 
 ### Evaluation context path: `at`
 Each time a constraint script is evaluated, its path within the transaction context $T^{ctx}$  is provided. The path has one of the following forms:
 
-* $(0, 2, i, j)$ for the constraint _j_ of the **produced** UTXO _i_.
-* $(1, 0, i, j)$ for the constraint _j_ of the **consumed** UTXO _i_.
+- $(0, 2, i, j)$ for the constraint $j$ of the **produced** UTXO $i$.
+- $(1, 0, i, j)$ for the constraint $j$ of the **consumed** UTXO $i$.
 
 The `at` function (with no parameters) returns this evaluation context path, allowing a formula to determine where it is being evaluated—specifically, in which UTXO and at what index.
 
