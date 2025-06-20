@@ -109,7 +109,7 @@ The above would be some kind of competition between sequencers on who is the bes
 
 ## Branches
 
-The ledger coverage of any chain cannot expand indefinitely; it stops growing when its past cone encompasses the entire baseline ledger state. The total number of tokens on the ledger imposes a cap on ledger coverage. Consequently, the biggest ledger coverage rule will ultimately converge to an equal maximum value for all sequencer chains.
+The ledger coverage of any chain cannot expand indefinitely; it stops growing when its past cone encompasses the entire baseline ledger state. The total number of tokens on the ledger makes a hard cap on ledger coverage. Consequently, the biggest ledger coverage rule will ultimately converge to an equal maximum value for all sequencer chains.
 
 To address this issue, we introduce **branch transactions**, also known as **branches**, which periodically "reset" ledger coverage at each slot boundary.
 
