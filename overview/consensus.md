@@ -92,7 +92,7 @@ The smart strategy for the token holder **Blue** is not to limit its options for
 
 Sequencer **Blue** will revert its chain state to a point where it does not conflict with the latest state of another sequencer **Green**, which has the larger ledger coverage.
 
-There is always a guaranteed *revert point* in the **Blue** chain that meets these criteria. Each sequencer transaction represents a ledger state, and we identify the output with the **Blue** chain's chain ID in the ledger state of **Green**. This transaction, denoted as $R_{Blue}$, serves as the basis for the next **Blue** transaction that can endorse **Green** without conflict.
+There is always a guaranteed *revert point* in the **Blue** chain that meets these criteria (we skip details here). The **Blue** can continue from that transaction, denoted as $R_{Blue}$. It serves as the basis for the next **Blue** transaction that can endorse **Green** without conflict.
 
 <p style="text-align:center;"><img src="../static/img/conflict2.png">
 </p>
