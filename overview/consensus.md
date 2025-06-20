@@ -76,13 +76,13 @@ This way, the sequencer chain is always advancing by growing its ledger coverage
 </p>
 
 ### Conflict resolution
-Ledger cannot contain conflicting transactions of double-spends of any output. This rule is enforced by the node whenever it adds a new transaction to the UTXO tangle, ensuring that the past cone of every vertex in the UTXO tangle DAG remains conflict-free.
+Tl;dr: double-spend (conflict) in the UTXO ledger effectively means fork of the ledger state, two conflicting ledger states. 
+Cooperative consensus resolves conflicts by choosing preferred ledger state while orphaning conflicting ones.
 
-However, transactions on the UTXO tangle can conflict for various reasons. Sequencer transactions that conflict cannot be integrated into the past cone of new transactions, which is a common occurrence on the UTXO tangle.
-
-Double-spending effectively forks the ledger into incompatible versions.
-
-How does the *biggest ledger coverage rule* handles these situations? We cannot allow situations where a sequencer **Blue** cannot proceed with increased ledger coverage simply because both **Blue** and another sequencer, **Green**, accidentally spent the same output in their past cones. This scenario would make the system vulnerable to attacks.
+Transactions in the distributed UTXO tangle can conflict for various reasons and it is a common occurrence on the UTXO tangle. 
+Ledger cannot contain conflicting transactions of double-spends of any output. Conflicts cannot be consolidated int the past cone of a vertex, each past cone in the UTXO tangle is  conflict-free.
+ 
+How does the *biggest ledger coverage rule* handles conflict situations? E.g. we cannot allow situations where sequencer **Blue** (see picture) cannot proceed with increased ledger coverage simply because both **Blue** and another sequencer, **Green**, accidentally spent the same output in their past cones. This scenario would make the system vulnerable to attacks.
 
 <p style="text-align:center;"><img src="../static/img/conflict1.png">
 </p>
