@@ -22,7 +22,7 @@ The philosophy of Proxima is **social consensus**, **equity** and **cooperation*
 
 Following the Bitcoin, we see Proxima as **peer-to-peer gold**.
 
-We envision it as a potential verifiable, trust-less and fully decentralized  platform for a _digital gold_: a fundamental enabling layer of scarce, secure, cost-efficient and scalable resource for derived concepts such as _money_, _cash_, _payments_ or even _jewelry_. 
+We envision it as a verifiable, trust-less and fully decentralized platform for a _digital gold_: a fundamental enabling layer of scarce, secure, cost-efficient and scalable resource for derived concepts such as _money_, _cash_, _payments_ or even _jewelry_. 
 
 For scalability and other reasons, those derived concepts can be implemented as layer 2 solutions, that maintain trust-less and (zk)-proven equivalence with the base asset. 
 
