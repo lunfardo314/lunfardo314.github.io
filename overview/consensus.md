@@ -3,26 +3,24 @@
 
 ## General
 
-In Proxima, users seek consensus on each individual transaction, unlike blockchains, where consensus is reached on an entire block of transactions. Proxima ledger is organized as *directed acyclic graph* (DAG), also known as [UTXO tangle](overview/utxo_ledger.md).
+Proxima ledger is organized as a *directed acyclic graph* (DAG), also known as [UTXO tangle](overview/utxo_ledger.md) or **transaction DAG**. Each vertex of the DAG is a plain UTXO transaction. Raw transaction bytes are the only message type participants need to exchange in order to build the _UTXO tangle_.
 
-UTXO tangle is a *transaction DAG*, unlike the block-DAGs used by Kaspa and IOTA (pre-Sui fork). The *UTXO tangle* is build by transaction producers (token holders) themselves rather than by block producers, who are third parties. The removal of third parties and related trust assumptions from the consensus is the whole point of the transaction DAG.
+The *UTXO tangle* is built by token holders themselves rather than by block producers, who are incentivized third parties. The removal of third parties and related trust assumptions from the consensus is the whole point of the transaction DAG.
 
-In the *UTXO tangle* each vertex is a plain UTXO transaction. Raw transaction bytes are the only message type participants exchange.
+Each vertex $T$ of the UTXO tangle represents an individual ledger state $S_T$ (a set of outputs or UTXOs), which is the result of updating the genesis ledger state with the transactions from the past cone of $T$. 
 
-Each vertex $T$ of the UTXO tangle represents an individual ledger state $S_T$ (a set of outputs or UTXOs), which is the result of updating the genesis ledger state with the transactions from the past cone of $T$. The UTXO tangle keeps track of multiple versions of the ledger state in one data structure, one ledger state for each vertex. Some of them will be conflicting, while others not. The UTXO tangle is a *multi-ledger* data structure.
+The UTXO tangle keeps track of multiple versions of the ledger state in one data structure. One ledger state for each vertex. Some of them will be conflicting, while others not. The UTXO tangle is a *multi-ledger* data structure.
 
-The whole point of consensus among participants is eventually agree on one single version of the ledger state, which is **will be present in the history of any possible future transactions**.
+The goal of consensus among players is eventually agree on one single version of the ledger state, which **will be present in the history of any possible future transactions**. 
 
 To reach this goal, Proxima uses a novel mechanism called **cooperative consensus**, which is optimized for the parallel nature of the transaction DAG.
 
-Cooperative consensus does not need "marshaling" transactions into blocks therefore avoids related global bottlenecks. It also avoids mining races of PoW and is energy-efficient. It is completely permissionless and does not require any BFT committee setup or other complexities and tradeoffs with decentralization, unlike most PoS systems. The system's Sybil protection is ensured similarly to PoS: by tokens on the ledger.
-
-The cooperative consensus provides efficient protocol for coordinating the common interest (social consensus) of multiple token holders in a **multi-leader** way on a shared ledger that records their assets.
+Cooperative consensus does not need "marshaling" transactions into blocks therefore it avoids related global bottlenecks. It also avoids mining races of PoW and is energy-efficient. It is completely permissionless and does not require any BFT committee setup or other complexities and tradeoffs with decentralization. The system's Sybil protection is ensured similarly to PoS: by tokens on the ledger.
 
 ## Consensus on the transaction DAG
-The main principle of the cooperative consensus was proposed in the original paper about [the tangle](https://assets.ctfassets.net/r1dr6vzfxhev/2t4uxvsIqk0EUau6g2sw0g/45eae33637ca92f85dd9f4a3a218e1ec/iota1_4_3.pdf). Cooperative consensus employs the main principle of the tangle - "each transaction approves two others" - in the UTXO tangle and develops the concept even further.
+The main principle of the cooperative consensus was proposed in the original paper about [the tangle](https://assets.ctfassets.net/r1dr6vzfxhev/2t4uxvsIqk0EUau6g2sw0g/45eae33637ca92f85dd9f4a3a218e1ec/iota1_4_3.pdf). Cooperative consensus employs the main principle of the tangle - "each transaction approves two others" - and develops the concept even further.
 
-The UTXO tangle grows by adding (attaching) new transactions to it, driven by the decisions and preferences of the end-user of the system, the token holder. Each new transaction references other transactions, already existing on the UTXO tangle by consuming their outputs and *endorsing* them. Each new transaction $T$, once attached to the UTXO tangle, immediately becomes a **tip** of the DAG. At any moment, the UTXO tangle has a set of tips, which is constantly change as new tips arrive.
+The UTXO tangle grows by adding new transactions to it. It is driven by the decisions and preferences of the end-user of the system, the token holder. Each new transaction references other transactions, already existing on the UTXO tangle by consuming their outputs and *endorsing* them. Each new transaction $T$, once attached to the UTXO tangle, immediately becomes a **tip** of the DAG. At any moment, the UTXO tangle has a set of tips, which is constantly change as new tips arrive.
 
 Participants exchange transactions, each maintaining own copy of the UTXO tangle, therefore perception of the tip set will always differ for each participant due to communication latency.
 

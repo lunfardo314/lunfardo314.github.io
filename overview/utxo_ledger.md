@@ -50,7 +50,7 @@ This makes it fundamentally different from non-deterministic account-based trans
 
 The UTXO tangle is the main data structure of Proxima: a **transaction DAG**. It contains **all** the information for calculation of all possible versions of the ledger state.
 
-In this approach, there's no need for blocks, which must be sequenced before calculating final ledger state, like in blockchains and blockDAGs.
+In this approach, there's no need for blocks that must be sequenced before calculating the final ledger state, like in blockchains and blockDAGs.
 
 The purpose of the consensus in Proxima is to choose one ledger state by orphaning other conflicting ones from the history of the chosen ledger.
 
