@@ -18,20 +18,20 @@ To reach this goal, Proxima uses a novel mechanism called **cooperative consensu
 Cooperative consensus does not need "marshaling" transactions into blocks. It avoids related global bottlenecks. It also avoids PoW mining races and is energy-efficient. It is completely permissionless and does not require any BFT committee setup or other complexities and tradeoffs with decentralization. The system's Sybil protection is ensured similarly to PoS: by tokens on the ledger.
 
 ## Consensus on the transaction DAG
-The main principle of the cooperative consensus was proposed in the original paper about [the tangle](https://assets.ctfassets.net/r1dr6vzfxhev/2t4uxvsIqk0EUau6g2sw0g/45eae33637ca92f85dd9f4a3a218e1ec/iota1_4_3.pdf). Cooperative consensus employs the main principle of the tangle - "each transaction approves two others" - and develops the concept even further.
+The main principle of the cooperative consensus - "each transaction approves two others" - was proposed in the original paper about [the tangle](https://assets.ctfassets.net/r1dr6vzfxhev/2t4uxvsIqk0EUau6g2sw0g/45eae33637ca92f85dd9f4a3a218e1ec/iota1_4_3.pdf). Proxima uses this concept and develops it even further.
 
-The UTXO tangle grows by adding new transactions to it. It is driven by the decisions and preferences of the end-user of the system, the token holder. Each new transaction references other transactions, already existing on the UTXO tangle by consuming their outputs and *endorsing* them. Each new transaction $T$, once attached to the UTXO tangle, immediately becomes a **tip** of the DAG. At any moment, the UTXO tangle has a set of tips, which is constantly change as new tips arrive.
+The UTXO tangle grows by adding new transactions to it. It is driven by the decisions and preferences of the end-user of the system, the token holder. Each new transaction references other transactions, already existing on the UTXO tangle by consuming their outputs and *endorsing* them. Each new transaction $T$, once attached to the UTXO tangle, immediately becomes a **tip** of the DAG. At any moment, the UTXO tangle has a set of tips, which is constantly changing as new tips arrive.
 
-Participants exchange transactions and each builds own copy of the UTXO tangle. Perception of the tip set will always differ for each participant due to communication latency. However, the completed past cone of any transaction will be exactly the same for each participant. .
+Participants exchange transactions and each builds own copy of the UTXO tangle. Perception of the tip set will always be different for each participant due to the communication latency. However, the completed past cone of any transaction will be exactly the same for each participant.
 
 Consensus on a particular transaction $T$ (and the corresponding ledger state $S_T$) is reached when there is a substantial guarantee for every participant in the network that transaction $T$ will be included in the past cone (history) of any future tip on the UTXO tangle. 
 
 If transaction $T$ has no chance of making it to all future ledger states, it is considered **orphaned**.
 
-The producer of transaction $T$, analyzes UTXO tangle and **assumes certain behavior of other producers of transactions**. 
+The producer of transaction $T$, analyzes UTXO tangle and assumes certain behavior of other producers of transactions. 
 When she convinces herself that chances of it to be orphaned become negligible, she considers transaction $T$ confirmed.
 
-The consensus criterion above is _probabilistic and subjective_ by its very nature, User can only estimate the *chances* of how exactly UTXO tangle will develop in the future. Similarly, in the PoW blockchain, user estimates if the block with their transaction won't be orphaned by checking if it is deep enough in the longest known chain, based on the assumption the miners will follow the longest chain rule.
+The consensus criterion above is _probabilistic and subjective_ by its very nature. User can only estimate the *chances* of how exactly UTXO tangle will develop in the future. Similarly, in the PoW blockchain, user estimates if the block with their transaction won't be orphaned by checking if it is deep enough (6 bocks) in the longest known chain, based on the assumption that miners will follow the longest chain rule.
 
 In the cooperative consensus, it is assumed that all token holders follow the **biggest ledger coverage rule**.
 
@@ -43,7 +43,7 @@ After sufficient amount of time, a user can be overwhelmingly convinced that onc
 
 Token holder produces their transaction $T$ by consolidating chosen non-conflicting ledger states  proposed by other users in their transactions into an even "broader" ledger. This also acts as a cooperation mechanism, helping other transactions to be included in the bigger ledger state of $T$.
 
-Next, token holders will be looking for the "broadest" coverage of the past ledger by some transaction and will build upon $T$. Each token holder will want their transaction $T$ to represent the "broadest" ledger state.
+Next, each token holder will want their transaction $T$ to represent the "broadest" ledger state, therefore will search for the one to build $T$ on it.
 
 <p style="text-align:center;"><img src="../static/img/blc.png">
 
@@ -58,18 +58,19 @@ The **ledger coverage** of transaction $T$, denoted as $coverage(T)$, is the met
 <p style="text-align:center;"><img src="../static/img/blc1.png">
 </p>
 
-Each token holder produces their transaction with the biggest ledger coverage possible in the constantly changing DAG at any given moment. This is the **biggest ledger coverage** rule.
+Each token holder produces their transaction with the biggest ledger coverage it is able to find in the constantly changing DAG at any given moment. This is the **biggest ledger coverage** rule.
 
 The *biggest ledger coverage rule* is analogous to the *longest chain rule* in Bitcoin and other PoW blockchains. In Proxima, each token holder produces transaction that covers the maximum tokens in the baseline ledger state with their past cone.
 
-However, the *ledger coverage* as defined above cannot grow forever: it will stop growing when it covers all outputs on the baseline state. So, the vanilla DAG does not suite the *biggest ledger coverage rule*. To overcome this and other problems, Proxima enforces additional constrains and incentives which make the *biggest ledger coverage rule* an optimal strategy on the UTXO tangle.
+The *ledger coverage* as defined above cannot grow forever. It will reach maximum when it will cover all outputs on the baseline state. So, the vanilla DAG does not suite the *biggest ledger coverage rule*. To overcome this and other challenges, Proxima enforces additional rules and incentives that make the *biggest ledger coverage rule* an optimal strategy on the UTXO tangle.
 
-*Chains*, *sequencers* and *branches* are the main ledger constraints in the UTXO tangle, guiding participants towards eventual consensus.
+*Chains*, *sequencers*, *branches*, *inflation* are the ledger constraints enforced on the ledger (validity rules), that guides participants towards eventual consensus.
 
 ## Sequencers
 *Sequencers* build chains of transactions called *sequencer transactions*. By design, only sequencer transactions are allowed to consolidate several ledger states by endorsing other sequencer transactions. For more about chains and sequencers, see the [incentives](overview/incentives.md).
 
-The above makes the cooperative consensus in Proxima a cooperation among sequencers. Each sequencer issues its transaction with as big a ledger coverage as possible in the dynamic context. Note that "consolidation" of the ledger states means consuming and endorsing other non-conflicting transactions in the past cone. By endorsing other sequencer chain transactions, the sequencer transaction can achieve bigger ledger coverage than the predecessor in the chain. This way, the sequencer chain is always advancing by growing its ledger coverage. This is only possible when sequencers cooperate by consolidating others into their own ledger state.
+The above makes the cooperative consensus in Proxima a cooperation among sequencers. Each sequencer issues its transaction with as big ledger coverage as possible in the dynamic context. "Consolidation" of the ledger states means consuming and endorsing other non-conflicting transactions in the past cone. By endorsing transactions produced by other token holders, a sequencer transaction can achieve bigger ledger coverage than its predecessor in the own chain. 
+This way, the sequencer chain is always advancing by growing its ledger coverage. This is only possible when sequencers cooperate by consolidating others into their own ledger state.
 
 <p style="text-align:center;"><img src="../static/img/sequencers.png">
 </p>
