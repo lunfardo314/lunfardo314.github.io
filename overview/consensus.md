@@ -13,34 +13,37 @@ The UTXO tangle keeps track of multiple versions of the ledger state in one data
 
 The goal of consensus among players is eventually agree on one single version of the ledger state, which **will be present in the history of any possible future transactions**. 
 
-To reach this goal, Proxima uses a novel mechanism called **cooperative consensus**, which is optimized for the parallel nature of the transaction DAG.
+To reach this goal, Proxima uses a novel mechanism called **cooperative consensus**.
 
-Cooperative consensus does not need "marshaling" transactions into blocks therefore it avoids related global bottlenecks. It also avoids mining races of PoW and is energy-efficient. It is completely permissionless and does not require any BFT committee setup or other complexities and tradeoffs with decentralization. The system's Sybil protection is ensured similarly to PoS: by tokens on the ledger.
+Cooperative consensus does not need "marshaling" transactions into blocks. It avoids related global bottlenecks. It also avoids PoW mining races and is energy-efficient. It is completely permissionless and does not require any BFT committee setup or other complexities and tradeoffs with decentralization. The system's Sybil protection is ensured similarly to PoS: by tokens on the ledger.
 
 ## Consensus on the transaction DAG
 The main principle of the cooperative consensus was proposed in the original paper about [the tangle](https://assets.ctfassets.net/r1dr6vzfxhev/2t4uxvsIqk0EUau6g2sw0g/45eae33637ca92f85dd9f4a3a218e1ec/iota1_4_3.pdf). Cooperative consensus employs the main principle of the tangle - "each transaction approves two others" - and develops the concept even further.
 
 The UTXO tangle grows by adding new transactions to it. It is driven by the decisions and preferences of the end-user of the system, the token holder. Each new transaction references other transactions, already existing on the UTXO tangle by consuming their outputs and *endorsing* them. Each new transaction $T$, once attached to the UTXO tangle, immediately becomes a **tip** of the DAG. At any moment, the UTXO tangle has a set of tips, which is constantly change as new tips arrive.
 
-Participants exchange transactions, each maintaining own copy of the UTXO tangle, therefore perception of the tip set will always differ for each participant due to communication latency.
+Participants exchange transactions and each builds own copy of the UTXO tangle. Perception of the tip set will always differ for each participant due to communication latency. However, the completed past cone of any transaction will be exactly the same for each participant. .
 
-Consensus on a particular transaction $T$ (and the corresponding ledger state $S_T$) is reached when there is a substantial guarantee for every participant in the network that transaction $T$ will be included in the past cone (history) of any future tip on the UTXO tangle. If transaction $T$ has no chance of making it to future tips, it is considered **orphaned**.
+Consensus on a particular transaction $T$ (and the corresponding ledger state $S_T$) is reached when there is a substantial guarantee for every participant in the network that transaction $T$ will be included in the past cone (history) of any future tip on the UTXO tangle. 
 
-The producer of the transaction $T$, by analyzing UTXO tangle and **assuming the behavior of other token holders**, must convince herself, that the UTXO tangle won't develop in a way that would orphan transaction $T$. That would mean the network has consensus on the inclusion of the transaction $T$ into the ledger. Consensus on transaction $T$ is "reached" when chances of it to be orphaned become negligible.
+If transaction $T$ has no chance of making it to all future ledger states, it is considered **orphaned**.
 
-The consensus criterion above is probabilistic by its very nature (i.e., no 100% guarantees), because user can only estimate he *chances* of how exactly UTXO tangle will develop in the future. Similarly, in the PoW blockchain, user estimates if the block with their transaction won't be orphaned by checking if it is deep enough in the longest known chain, based on the assumption the miners will follow the longest chain.
+The producer of transaction $T$, analyzes UTXO tangle and **assumes certain behavior of other producers of transactions**. 
+When she convinces herself that chances of it to be orphaned become negligible, she considers transaction $T$ confirmed.
 
-In the cooperative consensus, it is assumed that all token holders follow the **biggest ledger coverage rule** as the optimal strategy for all profit-seeking token holders. It is the **behavioral assumption** of the cooperative consensus.
+The consensus criterion above is _probabilistic and subjective_ by its very nature, User can only estimate the *chances* of how exactly UTXO tangle will develop in the future. Similarly, in the PoW blockchain, user estimates if the block with their transaction won't be orphaned by checking if it is deep enough in the longest known chain, based on the assumption the miners will follow the longest chain rule.
 
-In game theory, *optimal strategy* means, that, by deviating from it, participant will incur significant costs compared to sticking to it. (An everyday example of this kind of strategy -- Nash equilibrium -- is driving the right (or left) side of the road. We are quite comfortable when passing a car on the other side of the road because we know that for the other driver not to drive on the correct side may cost then their life)
+In the cooperative consensus, it is assumed that all token holders follow the **biggest ledger coverage rule**.
+
+In the game theory, an *optimal strategy* means, that, by deviating from it, participant will incur significant costs compared to sticking to it. (An everyday example of this kind of phenomenon -- Nash equilibrium -- is driving the right (or left) side of the road. We are quite comfortable when passing a car on the other side of the road because we know that for the other driver not to drive on the correct side may cost then their life)
 
 In Proxima, we can assume that the absolute majority of the token holders will follow the biggest ledger coverage rule because it is the most profitable strategy, as per enforced validity constraints and [incentives](overview/incentives.md) on the ledger. So, new *tips* of the UTXO tangle will be appearing according to that rule with very high probability.
 
-After sufficient amount of time, a user can be overwhelmingly convinced that once their transaction $T$ is included into the past cone of every tip of the UTXO tangle, it will remain that way in the future. That will be the moment when user will start considering their transaction *confirmed*.
+After sufficient amount of time, a user can be overwhelmingly convinced that once their transaction $T$ is included into the past cone of every tip of the UTXO tangle, it will remain that way in the future: their transaction become *confirmed*.
 
-Token holder produces their transaction $T$ by consolidating chosen non-conflicting ledger states proposed by other users in their transactions. This way, each transaction consolidates past cones of $T$'s' inputs into an even "broader" ledger. This also acts as a cooperation mechanism, helping other transactions to be included in the bigger ledger state of $T$.
+Token holder produces their transaction $T$ by consolidating chosen non-conflicting ledger states  proposed by other users in their transactions into an even "broader" ledger. This also acts as a cooperation mechanism, helping other transactions to be included in the bigger ledger state of $T$.
 
-Next, token holders will be looking for the "broadest" coverage of the past ledger by some transaction and will build upon $T$ if it happens to cover the most. Therefore, each token holder will want their transaction $T$  to represent the "broadest" ledger state. Ultimately, the ever-enlarging ledger coverage through cooperation among token holders will make it a stable strategy favorable for everyone.
+Next, token holders will be looking for the "broadest" coverage of the past ledger by some transaction and will build upon $T$. Each token holder will want their transaction $T$ to represent the "broadest" ledger state.
 
 <p style="text-align:center;"><img src="../static/img/blc.png">
 
