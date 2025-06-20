@@ -19,8 +19,10 @@ Tokens holders are free to choose the most profitable strategy of participation 
 
 The philosophy of Proxima is **social consensus**, **equity** and **cooperation** among stakeholders of the distributed ledger.
 
-Proxima positions itself as a **peer-to-peer gold**: a possible platform for a _digital gold_. 
-We envision Proxima a fundamental enabling layer of scarce, secure, cost-efficient and scalable resource for derived concepts such as _money_, _cash_, _payments_ or even _jewelry_. For Scalability and other reasons, those derived concepts can be implemented as layer 2 solutions, while establishing trust-less, (zk)-proven equivalence with the base asset, the trust-less and fully decentralized _digital gold_. 
+Proxima positions itself as a **peer-to-peer gold**. 
+We envision Proxima as a potential platform for a _digital gold_: a fundamental enabling layer of scarce, secure, cost-efficient and scalable resource for derived concepts such as _money_, _cash_, _payments_ or even _jewelry_. 
+
+For scalability and other reasons, those derived concepts can be implemented as layer 2 solutions, that maintain trust-less, (zk)-proven equivalence with the base asset: the verifiable, trust-less and fully decentralized _digital gold_. 
 
 ---
 
