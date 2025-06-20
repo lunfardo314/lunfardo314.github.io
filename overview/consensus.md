@@ -76,18 +76,19 @@ This way, the sequencer chain is always advancing by growing its ledger coverage
 </p>
 
 ### Conflict resolution
-Tl;dr: double-spend (conflict) in the UTXO ledger effectively means fork of the ledger state, two conflicting ledger states. 
-Cooperative consensus resolves conflicts by choosing preferred ledger state while orphaning conflicting ones.
+**Tl;dr**: double-spend (conflict) in the UTXO ledger effectively means fork of the ledger state, two conflicting ledger states. 
+There's no special mechanism for conflict resolution: cooperative consensus naturally resolves conflicts by preferring ledger state with bigger 
+coverage. The conflicting ones (with smaller coverage) becomes orphaned.
 
-Transactions in the distributed UTXO tangle can conflict for various reasons and it is a common occurrence on the UTXO tangle. 
-Ledger cannot contain conflicting transactions of double-spends of any output. Conflicts cannot be consolidated int the past cone of a vertex, each past cone in the UTXO tangle is  conflict-free.
+Transactions in the distributed UTXO tangle can conflict for various reasons. It is a common occurrence on the UTXO tangle. 
+Ledger cannot contain conflicting transactions. Conflicts cannot be consolidated int the past cone of a vertex, each past cone in the UTXO tangle is enforced to be conflict-free.
  
-How does the *biggest ledger coverage rule* handles conflict situations? E.g. we cannot allow situations where sequencer **Blue** (see picture) cannot proceed with increased ledger coverage simply because both **Blue** and another sequencer, **Green**, accidentally spent the same output in their past cones. This scenario would make the system vulnerable to attacks.
+How does the *biggest ledger coverage rule* handles conflict situations? For example, we cannot allow situations where sequencer **Blue** (see picture) cannot proceed with increased ledger coverage simply because both **Blue** and another sequencer, **Green**, accidentally spent the same output in their past cones. This scenario would make the system vulnerable to attacks.
 
 <p style="text-align:center;"><img src="../static/img/conflict1.png">
 </p>
 
-The smart strategy for the token holder **Blue** is not to limit its options for the next chain transaction solely to the latest one. **Blue** can consider legitimate alternative fork points in the chain's past as long as they guarantee an increase in the current ledger coverage of the chain.
+The smart strategy for the token holder **Blue** is not to limit its options for the next chain transaction solely continuing the latest one. **Blue** may consider legitimate alternatives: fork points in the chain's past as long as they guarantee an increase in the current ledger coverage of the chain.
 
 Sequencer **Blue** will revert its chain state to a point where it does not conflict with the latest state of another sequencer **Green**, which has the larger ledger coverage.
 
