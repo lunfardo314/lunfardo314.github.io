@@ -99,13 +99,13 @@ There is always a guaranteed *revert point* in the **Blue** chain that meets the
 
 This demonstrates how sequencers avoid conflicts and construct chains with growing ledger coverage.
 
-The above diagram presents somehow simplified process, of course. Sequencers expand their coverage not only by endorsing transactions on other sequencers but also by consuming *tag-along* and *delegation* outputs. When reverting their state, sequencers may lose the latest transactions in their state, necessitating their "re-consumption" in the new chain fork, provided they do not conflict.
+The above diagram presents somehow simplified process. Sequencers expand their coverage not only by endorsing transactions on other sequencers but also by consuming *tag-along* and *delegation* outputs. When reverting their state, sequencers may lose their latest "achievements", however they will revert them in order to increase their ledger coverage.
 
-Moreover, conflicts are common on the UTXO tangle, turning the selection of the next transaction with the largest ledger coverage into an optimization problem for sequencer **Blue**. **Blue** must traverse all possible endorsement targets on the **Green** chain ($G_1, \dots, G_n$) and all potential revert points $R_{Blue}$ to identify the transaction with the maximum coverage.
+Conflicts are common on the UTXO tangle. This turns the selection of the next transaction with the largest ledger coverage into an optimization problem for sequencer **Blue**. **Blue** must traverse all possible endorsement targets on the **Green** chain ($G_1, \dots, G_n$) and all potential revert points $R_{Blue}$ to identify the transaction with the maximum coverage.
 
-Each sequencer chain can advance with growing ledger coverage through mutual cooperation. As sequencers endorse each other, conflicting transactions are naturally orphaned from the main stream of chain transactions.
+Each sequencer chain can advance with growing ledger coverage through mutual cooperation. As sequencers endorse each other, while conflicting transactions are naturally orphaned from the main stream of chain transactions.
 
-The above would be some kind of competition between sequencers on who  is the best in cooperation. If sequencer does not cooperate by endorsing others, its transactions will likely be orphaned.
+The above would be some kind of competition between sequencers on who is the best in cooperation. If sequencer does not cooperate by endorsing others, its transactions will likely be orphaned.
 
 ## Branches
 
