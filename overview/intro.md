@@ -4,14 +4,14 @@ Introduction
 Proxima presents a novel architecture for a distributed ledger, commonly referred to as a *blockchain*.
 
 - Proxima is as decentralized and permissionless as Bitcoin (*proof-of-work*, PoW).
-- Proxima is similar to *proof-of stake* (PoS) due to its approach to the Sybil-protection with tokens, its cost-and-energy-efficiency and high throughput.
+- Proxima is similar to *proof-of stake* (PoS) due to its approach to the Sybil-resistance with tokens, its cost-and-energy-efficiency and high throughput.
 
-Yet it is neither PoW, nor a BFT-based PoS system. It is based on **cooperative consensus**, which is _probabilistic_ and _multi-leader_. 
-It uses _transaction DAG_ (a _directed acyclic graph_) also known as the _tangle_. In contrast to blockchains and blockDAGs, **Proxima has no blocks**. We see the _cooperative consensus_ as a _Nakamoto consensus_ without PoW.
+Yet it is neither PoW, nor a PBFT-based PoS system. It is based on **cooperative consensus**, which is _probabilistic_ and _multi-leader_. 
+It uses _transaction DAG_ (a _directed acyclic graph_) also known as the _tangle_. In contrast to blockchains and blockDAGs, **Proxima has no blocks**. We see the _cooperative consensus_ as a _Nakamoto consensus_ without PoW (see motivation in [On definition of Nakamoto consensus](https://medium.com/@lunfardo/on-definition-of-nakamoto-consensus-be8f4b84c899)).
 
-In short, the *cooperative consensus* is a convergent behavior among token holders, issuing valid transactions while seeking profit in a form of inflation rewards and fees collected from peers. Similarly to the *longest chain rule* of PoW blockchains, in Proxima token holders follows rule, called **biggest ledger coverage** rule. The latter is an optimal profit-seeking strategy for them in the game-theoretical sense. It leads to Nash equilibrium among token holders, just like the *longest chain rule* is optimal for Bitcoin miners.
+In short, the *cooperative consensus* is a convergent profit-seeking behavior among token holders, issuing valid transactions while seeking inflation rewards and fees collected from peers. Similarly to the *longest chain rule* of PoW blockchains, in Proxima token holders follows rule, called **biggest ledger coverage** rule. The latter is an optimal profit-seeking strategy for them in the game-theoretical sense. It leads to Nash equilibrium among token holders, just like the *longest chain rule* is optimal for Bitcoin miners.
 
-Token holders are the only category of users which has genuine and vested interest in any distributed ledger. In blockchains, a special category of participants, 3rd parties such as miners or validators, must be incentivized to maintain consensus of the ledger state on behalf of the users. The extent of decentralization and security of the blockchain strictly depends on how decentralized its miners/validators are.
+in general, token holders are the only category of participants that has genuine and vested interest in any distributed ledger. In blockchains, a special category of participants, 3rd parties such as miners or validators, must be incentivized to maintain consensus of the ledger state on behalf of the users. The extent of decentralization and security of the blockchain strictly depends on how decentralized its miners or validators are.
 
 Proxima takes a different approach: the end-users -- token holders -- themselves maintain consensus on the ledger state by cooperating permissionless-ly with each other, only driven by self-interest in the environment defined by the ledger validity constraints. It removes the need for special incentivized categories of participants with their specific interests and behaviors. 
 
@@ -19,11 +19,12 @@ Tokens holders are free to choose the most profitable strategy of participation 
 
 The philosophy of Proxima is **social consensus**, **equity** and **cooperation** among stakeholders of the distributed ledger.
 
-Proxima positions itself as a possible platform for a _digital gold_, a fundamental enabling layer of scarce, secure, cost-efficient and scalable resource for derived concepts such as _money_, _payments_ or even _jewelry_. 
+Proxima positions itself as a **peer-to-peer gold**: a possible platform for a _digital gold_. 
+We envision Proxima a fundamental enabling layer of scarce, secure, cost-efficient and scalable resource for derived concepts such as _money_, _cash_, _payments_ or even _jewelry_. For Scalability and other reasons, those derived concepts can be implemented as layer 2 solutions, while establishing trust-less, (zk)-proven equivalence with the base asset, the trust-less and fully decentralized _digital gold_. 
 
 ---
 
-This document gives a general overview of the Proxima design. It omits most of technical details and aims to explain main concepts in simple terms.
+This document gives a general overview of the Proxima design. It omits most of technical details and aims to explain main concepts in simple, general terms.
 
 Links for the further information:
 - [Proxima technical whitepaper](https://arxiv.org/abs/2411.16456) (detailed description of the concept).
