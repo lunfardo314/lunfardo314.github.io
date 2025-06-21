@@ -57,6 +57,6 @@ In that case *Eve* would need to control $1/3$ of the total token supply to disr
 
 Analogous to why 2 or 3 dominant Bitcoin mining pools do not collude to alter rules like halving, Proxima's ledger security hinges on significant token holder commitment, emphasizing the importance of "skin-in-the-game" among stakeholders.
 
-Our stance with this regard is that security of any public permissionless ledger, including PoW, ultimately depends on _skin-in-the-game_ of the dominant stakeholders, i.e. fundamentally rely on game-theoretical equilibrium. 
+Our observation is that **security of any public permissionless ledger**, including PoW, ultimately depends on _skin-in-the-game_ of its dominant stakeholders, i.e. fundamentally rely on game-theoretical equilibrium. 
 
 In summary, Proxima's cooperative consensus model merges aspects of PoW's robustness with novel mechanisms for managing safety and liveness during network partitions, incorporating economic incentives to maintain network integrity.
