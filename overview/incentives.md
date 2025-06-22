@@ -88,13 +88,13 @@ This condition allows for the distribution of newly created tokens among multipl
 ## Sequencers
 *Sequencers* are "professional" token holders who consistently build *sequencer chains* to earn inflation. By design, only sequencer chains can consolidate multiple ledger states, thus contributing to the consensus. Additionally, only sequencers are eligible to win the *branch inflation bonus*. 
 
-Sequencers are critical for the security of the ledger. Sequencers will be running at least one node and other infra, so they and will incur direct costs. Our intention is:
+Sequencers are critical for the security of the ledger. Sequencers will be running at least one node and other infra, so they will incur direct costs. 
 Becoming a sequencer is a voluntary decision for each token holder and represents one of several possible strategies for participating in the ledger.
-
-- provide incentives to run a sequencer 
-- enable sequencers to earn additional income to offset. _Branch inflation bonus_ and the [tag-along mechanism](#tag-along-mechanism) serves that
-- prevent very small sequencers. Minimum token balance on the sequencer chain serves that 
-- prevent big concentration of capital by few sequencers. Inflation rate on sequencers diminishes with sequencer balance, so huge sequencers will suffer smaller ROI  
+Our intention is:
+- to provide incentives to run a sequencer 
+- to enable sequencers to earn additional income to offset costs. _Branch inflation bonus_ and the [tag-along mechanism](#tag-along-mechanism) serves that
+- to prevent very small sequencers. Minimum token balance on the sequencer chain serves that 
+- to prevent big concentration of capital by few sequencers. Inflation rate on sequencers diminishes with sequencer balance, so huge sequencers will suffer smaller ROI  
 
 ### Deposits and custody
 What are *sequencers* beyond being token holders with significant assets?
@@ -118,9 +118,7 @@ On the other hand, the sequencer may also be a decentralized or zk-proven system
 ### Delegation
 A **trustless** alternative to depositing funds with a sequencer is **delegation**, which does not require additional trust. Token holders can delegate their funds to a sequencer to generate inflation on their behalf without giving the sequencer control over their tokens.
 
-_Delegation_ is similar to the _staking_ in the PoS ledgers.   
-
-It is enshrined into the immutable logic of the ledger. 
+_Delegation_ is similar to the _staking_ in the PoS ledgers. It is enshrined into the immutable logic of the ledger. 
 
 To delegate, a token holder places a certain amount of tokens into a chain output. The special **delegation lock** grants the chosen sequencer the right to consume the delegated output in the sequencer transaction by producing a chain successor in the same transaction *without the ability to remove tokens from the delegated chain*. Thus, the sequencer can generate inflation from the delegated tokens but cannot "steal" those tokens.
 
