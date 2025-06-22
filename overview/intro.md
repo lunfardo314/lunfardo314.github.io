@@ -27,7 +27,7 @@ The goal is to be fundamental enabling layer of scarce, secure, cost-efficient a
 For scalability and other reasons, those derived concepts can be implemented as layer 2 solutions, that maintain trust-less and (zk)-proven equivalence with the base asset. 
 
 * Cost-efficiency (low transaction cost) is how Proxima differentiates itself from PoW protocols.
-* Permissionless-ness and architectural simplicity is how Proxima is different from mainstream PoS protocols
+* Permissionlessness and architectural simplicity is how Proxima is different from PoS protocols
 
 ---
 
