@@ -69,4 +69,4 @@ So, a slightly modified version of the definition:
 
 > The Nakamoto protocol is a system that is permissionless in the sense of settings 1 and 2, where players seek profit by interacting with assets according to an optimal strategy (a Nash equilibrium) emerging from the ledger's validity constraints.
 
-We want to emphasize that in our definition of the _Nakamoto consensus_, the behavioral assumption of profit-seeking (the incentives) is essential. In our opinion, the _Nakamoto consensus_ has no meaning outside the real socio-economic environment.
+We want to emphasize that in our definition of the _Nakamoto consensus_, the behavioral assumption of the profit-seeking (the incentives) is essential. In our opinion, the _Nakamoto consensus_ has no meaning outside the real socio-economic environment.
