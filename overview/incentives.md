@@ -13,15 +13,20 @@ The philosophy behind Proxima's incentives for participants (token holders) is *
 The main element of incentives in Proxima is _inflation on the chain_. Each token holder is entitled to build chains of transactions on the ledger and earn *inflation income* by creating tokens out of thin air proportionally to their holdings and time.
 
 ### Chain asset
-The **chain** (also known as the *UTXO chain*) is a sequence of chain outputs (UTXOs) constrained by a special type of validation script attached to the output and called a *chain constraint*. The chain constraint on the output, known as the *predecessor*, invalidates any transaction that does not produce the single next output in the chain, called the *successor*. This enforces chain building, preventing the chain from forking into multiple chains on the ledger.
+Proxima introduces a novel concept of the UTXO ledger: a _chains_ and _chains assets_. Every permanent identity, which "lives" on the ledger while mutating its state is represented as a chain:  sequencers, delegations, accounts and NFTs.
+
+The **chain** (also known as the *UTXO chain*) is a sequence of chain outputs (UTXOs) constrained by a special type of validation script (covenant) attached to the output and called a *chain constraint*. The chain constraint on the output, known as the *predecessor*, invalidates any transaction that does not produce the single next output in the transaction, called the *successor*. This enforces chain building, preventing the chain from forking into multiple chains on the ledger.
 
 Each chain output in the chain bears a unique 32 byte-long ID called the *chain ID*. Thus, chain outputs form a non-forkable chain of transactions on the ledger, all marked with the same *chain ID*.
 
-There is always exactly one chain output for a particular *chain ID* on the ledger state. One can always retrieve that chain output by its *chain ID* from the ledger state.
+Looking from the perspective of the ledger state (also known as the _UTXO set_) it is not a chain, but the tip of it. 
+There is always **exactly one chain output for a particular *chain ID* on the ledger state**. One can always retrieve that chain output by its *chain ID* from the ledger state.
 
-So, each chain effectively represents a permanent *non-fungible* asset, a _chain asset_, on the ledger with a unique ID. Contrary to an ordinary UTXO, the _chain ID_ remains on the ledger while UTXOs carrying it keeps being consumed and deleted from the ledger state. 
+Each chain effectively represents a permanent *non-fungible* asset, on the ledger with a unique ID. We call it **chain asset**. 
+An ordinary UTXO is a temporary, transient asset recorded on the ledger. It disappears when consumed by a transaction. 
+Contrary to an ordinary UTXO, the _chain ID_ remains on the ledger permanently, while UTXOs carrying it keeps being consumed and deleted from the ledger state. 
 
-The *chain asset* has a state consisting of fungible tokens on the output, known as *on-chain tokens* or the *on-chain balance*, plus any other data and/or constraints. It is a *mutable state* of the chain asset. The chain output is always locked by a mandatory lock constraint called the *chain controller*, which usually is ordinary ED25519 account or *delegation lock*. *Chan controller* defines who, how and when can consume the chain output, mutate its state and produce next state with same _chain ID_ (successor).
+The *chain asset* has a state consisting of fungible tokens on the output, known as *on-chain tokens* or the *on-chain balance*, plus any other data and/or constraints. It is a *mutable state* of the chain asset. The chain output is always locked by a mandatory lock constraint called the *chain controller*, which usually is ordinary ED25519 account or *delegation lock*. *Chan controller* defines who, how and when can consume the chain output, mutate its state and produce next state with same _chain ID_ (successor). It is also called _state transition_ of the chain.
 
 Chain constraints are used to build [sequencer chains](overview/consensus.md), for delegation outputs, NFTs, and other ledger constructs that represent a single (sub)state of the ledger state.
 

@@ -21,13 +21,13 @@ That removes the need for special incentivized categories of participants with t
 Tokens holders are free to choose the most profitable strategy of participation for them - given amount of their on-ledger capital and specific needs - as long as they satisfy purposefully designed ledger and transaction validity rules. The rest is market-driven.
 
 ## Vision
-The philosophy of Proxima is **social consensus**, **equity** and **cooperation** among stakeholders of the distributed ledger.
+The philosophy of Proxima is **social agreement**, **equity** and **cooperation** among stakeholders of the distributed ledger.
 
 Following example of Bitcoin, we see Proxima as **peer-to-peer gold**. We envision it as a verifiable, trust-less and fully decentralized platform for a _digital scarcity_ or _digital gold_. 
 
 The goal is to be fundamental enabling layer of scarce, secure, cost-efficient and scalable resource for derived digital concepts such as _money_, _cash_, _payments_ or even _jewelry_.
 
-For scalability and other reasons, those derived concepts can be implemented as layer 2 solutions, that maintain trust-less and (zk)-proven equivalence with the base asset. 
+For scalability and other reasons, those derived concepts can be implemented as layer 2 solutions, that maintain trust-less and (zk)-proven equivalence with the base asset, as a universal collateral. 
 
 * Cost-efficiency, low and bounded costs per asset and per transaction, is how Proxima differentiates itself from PoW protocols.
 * Permissionlessness and architectural simplicity is how Proxima is different from PoS protocols
