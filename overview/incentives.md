@@ -44,9 +44,44 @@ The ledger time of genesis outputs is $0$ ticks. $128$ ticks make a **slot**. Th
 Timestamps of outputs and transactions are subject to *pace constraints*, such as a minimum number of ticks between successor and predecessor transactions. For example, if an output has a timestamp of $1000$ ticks, the consuming transaction must have a timestamp of at least $1005$.
 
 ### Inflation
-Let's say chain with ID *chainID* is represented by chain output $A$. It has $amount(A)$ balance of tokens on it. This balance is controlled by the chain, which, in turn, is controlled by the private key of the chain controller.
+Let's say some chain output $O_t$ is an UTXO on the slot $t$ and it has a balance of $A$ tokens on it. This balance is controlled by the private key of the chain controller.
 
-Let's say *successor* of output $A$ is output $A'$. According to the hardcoded chain constraint, the token holder can create up to $I$ new tokens on the successor output, representing the inflation on the chain.
+According to the chain constraint (covenant), the token holder can create up to $I_t$ new tokens on the successor output, representing the inflation on the chain.
+Let's say $A$ and $A'$ is an amount of tokens on predecessor and successor outputs respectively. Then:
+
+$$
+A' = A + I_t
+$$
+
+The validity constraints enforces that if successor output is on the same slot, $I_t = 0$, i.e. no inflation on the same slot.
+
+Otherwise, 
+$$ 
+I_t = A \cdot R_t
+$$
+where $R_t$ is an inflation rate. The inflation rate $R_t$ is variable. It depends on the slot and declines with the ledger time. It is defined as follows:
+$$
+R_t = \frac{1}{C+t}
+$$
+
+The ledger constant $C$ defines how steep the decline is. 
+
+Note that number of new tokens $I_t$ does not depend on how far (in terms of ledger time) the successor output is: $I_t$ will be the same if successor will be in the next slot $t+1$ or in $t+1000$. That is by intention: we want to incentivize building chains non-stop: producing new successor output each slot is the only way to inflate you token holdings constantly. This is the behavior of token holders we want to incentivize: constantly moving tokens and this way contributing to the security of the ledger. 
+
+In the testnet, $C=30,303,030$. Assuming 1 slot corresponds to 10 sec of the real time and tokens are moved every slot, maximum achievable yearly inflation rate for first 5 years will be as follows:
+
+| year | YoY inflation rate |
+|------|--------------------|
+| 1    | 10.41%             |
+| 2    | 9.43%              |
+| 3    | 8.61%              |
+| 4    | 7.93%              |   
+| 5    | 7.35%              |
+
+Note that the actual inflation will be somewhat lower because not all token will move all the time (more on it below).
+
+**TBD >>>>>>>>>>>>>>>>>>>>>>>>>>**
+
 
 The amount $I$ is proportional to the $amount(A)$ and to the ledger time in ticks between outputs $A$ and $A'$. Let's denote the ledger time duration in ticks between transactions as $\Delta T$.
 
