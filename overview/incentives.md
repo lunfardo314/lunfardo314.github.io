@@ -76,7 +76,12 @@ The intentions behind these incentives are:
 - To incentivize token holders to contribute to the security of the ledger through constant movement of funds. See [cooperative consensus](overview/consensus.md).
 - To ensure *equity* and *financial fairness*. Each active token holder can expect a permissionless, fair, proportional, and predictable return on their *skin-in-the-game* on the ledger.
 
-Assuming 1 slot corresponds to 10 seconds of the real time, and $C=30,303,030$ and tokens are moved every slot, maximum achievable annual inflation rate for the first 5 years will be as follows:
+Assuming that:
+* 1 slot corresponds to 10 seconds of the real time
+* $C=30,303,030$
+* tokens are moved every slot 
+
+* the maximum achievable annual inflation rate for the first 5 years will be as follows:
 
 | year | YoY inflation rate |
 |------|--------------------|
@@ -86,11 +91,11 @@ Assuming 1 slot corresponds to 10 seconds of the real time, and $C=30,303,030$ a
 | 4    | 7.93%              |   
 | 5    | 7.35%              |
 
-The actual inflation will be somewhat lower because not all token will move all the time.
+The actual inflation will be somewhat lower because not all tokens will move all the time.
 
 It is reasonable to expect that some token holders will keep a certain amount of their holdings in passive wallet addresses, similar to how we keep some cash in our wallets or stash it under the mattress. This is their right. However, those funds won't be return-generating capital. This makes sense as a limited cash (liquidity) reserve on the ledger.
 
-More on inflation and related scalability aspects we will elaborate in the chapter on [delegation](delegation.md).  
+More on inflation and related scalability aspects we will elaborate in the chapter on [delegation](overview/delegation.md).  
 
 ## Sequencers
 *Sequencers* are "professional" token holders who chose proactively and constantly build *sequencer chains* to earn inflation.
@@ -102,7 +107,7 @@ Meanwhile, Proxima is multi-leader, it has no leader selection nor block product
 The main hardcoded part of the sequencing is _sequencer covenant (constraint)_, a set of formally verifiable UTXO validity rules, which, if present, grants certain privileges to the transaction containing it: 
 * only sequencer transactions can consolidate multiple ledger states (endorse other transactions), thus contributing to the consensus
 * in addition to inflation, only sequencer transaction are eligible for the *branch inflation bonus*
-* only sequencer transaction can freeze [delegation](delegation.md) outputs
+* only sequencer transaction can freeze [delegation](overview/delegation.md) outputs
 
 Another hardcoded part of the sequencing is that node commits ledger state (UTXO set) of each sequencer transaction on the slot edge (called _branch transactions_) to the multi-root trie, a multi-state database. Those committed UTXO sets will serve as a baseline states in the UTXO DAG. Sequencers are incentivized to issue _branch transactions_ by opportunity to earn branch inflation bonus. 
 
@@ -140,7 +145,7 @@ On the other hand, the sequencer may also be a decentralized or zk-proven system
 
 ### Delegation
 
-The delegation is a **trustless** alternative to depositing funds with a sequencer is **delegation**, which does not require additional trust. Token holders can delegate their funds to a sequencer to generate inflation on their behalf without giving the sequencer control over their tokens. See [delegation](delegation.md) for more.
+The delegation is a **trustless** alternative to depositing funds with a sequencer is **delegation**, which does not require additional trust. Token holders can delegate their funds to a sequencer to generate inflation on their behalf without giving the sequencer control over their tokens. See [delegation](overview/delegation.md) for more.
 
 <p style="text-align:center;"><img src="../static/img/delegate.png">
 
