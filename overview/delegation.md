@@ -7,8 +7,9 @@ This fact presents a unique scalability challenge for the Proxima protocol, whic
 To address this challenge, we introduce the trustless ledger primitives of **frozen coverage** and **delegation**. 
 The ledger primitives present special ledger validity constraints (also known as **covenants**), and are closely related to the concept of chains.
 
-
 ## Delegation
+
+<p style="text-align:center;"><img src="../static/img/delegate.png">
 
 The main idea of the delegation is allowing sequencer, chosen by a _delegator_, to _freeze_ funds for a certain and capped period of time. During that period nobody can move frozen funds, but the frozen funds will be included into the ledger coverage of the sequencer chain. Sequencer will be able to use frozen token to generate inflation. After the freeze period is over, delegation covenant enforces _safe revocation slots_ during which owner of funds can move them as usually. This ensures liquidity of the delegated funds. 
 For the frozen period of time, only the sequencer can consume the frozen output and only with the purpose of unfreezing it. 
