@@ -1,6 +1,8 @@
 # On digital gold
 _Revisiting PoW fundamentals_
 
+([link to the Medium post](https://medium.com/@lunfardo/on-digital-gold-d1020984570b))
+
 <p style="text-align:center;"><img src="../static/img/gold_btc.png"> </p>
 
 ## Introduction
