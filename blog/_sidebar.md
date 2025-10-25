@@ -1,1 +1,2 @@
 - [On definition of Nakamoto consensus](blog/nakamoto.md)
+- [On digital gold](blog/digital_gold.md)
