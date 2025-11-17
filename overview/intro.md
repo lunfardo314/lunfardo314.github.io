@@ -41,3 +41,4 @@ Links for the further information:
 - [Proxima GitHub repository](https://github.com/lunfardo314/proxima) (code of the Proxima node, readme, tutorials, links to video and other resources)
 - [Bitcoin forum topic](https://bitcointalk.org/index.php?topic=5499359.0)
 - [Discord server invite link](https://discord.com/invite/UfFcFDy38j)
+- [Video introduction to the cooperative consensus](https://youtu.be/XT6GBSLCbZo)
