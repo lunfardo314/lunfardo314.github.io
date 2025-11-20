@@ -4,6 +4,7 @@ It also contains [blog](blog/blog.md) with articles on general topics which may 
 
 Currently available sub-sites:
 
+- [Proxima Manifesto](overview/manifesto.md)
 - [Overview of Proxima concepts](overview/intro.md)
 - [Transaction model](txdocs/intro.md)
 - [UTXO scripting](ledgerdocs/library.md)
