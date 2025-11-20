@@ -11,9 +11,9 @@ Money is a social construct. Value emerges from shared beliefs and collective ag
 Satoshi introduced an open, permissionless competition among block proposers. Over time this model evolved into specialized authority roles — miners, validators, proposers, builders — actors who gained discretionary power over ordering, inclusion, and control of the ledger.
 
 Proxima exists to correct this drift.  
-**It asserts that decentralization means write access: writers — those who can append valid transactions to the canonical ledger — hold the power. In a truly decentralized system, every user must be a writer — not through representatives, but directly through the protocol’s rules.**
+**It asserts that decentralization means write access: writers — those who can append valid transactions to the canonical ledger — hold the power.** In a truly decentralized system, every user must be a writer — not through representatives, but directly through the protocol’s rules.
 True decentralization therefore requires returning this power to users, the only participants with a genuine and permanent interest in the ledger.
-**Decentralization is not a voting structure or a validator set — it is the unconditional ability of every participant to directly extend the canonical ledger.** 
+Decentralization is not a voting structure or a validator set — it is the unconditional ability of every participant to directly extend the canonical ledger. 
 
 Authority is fragility; **only universal write access and the elimination of discretionary roles provides lasting decentralization**. 
 Minimalism is essential because only simple systems can be proven correct. Formal verification replaces governance; correctness becomes a theorem, not a vote. Incentives must align without creating operator classes. Fairness must persist for decades, not merely at launch.
