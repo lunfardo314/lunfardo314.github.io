@@ -9,6 +9,8 @@ Currently available sub-sites:
 - [UTXO scripting](ledgerdocs/library.md)
 - [Multi-state database](multistate/multistate.md) (WIP)
 
+-------------------------------
+
 # PROXIMA MANIFESTO
 
 ## Beliefs and Philosophy
