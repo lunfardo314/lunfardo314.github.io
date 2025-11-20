@@ -23,27 +23,27 @@ Minimalism is essential because only simple systems can be proven correct. Forma
 Proxima is a **Nakamoto-permissionless, multi-leader, block-less, governance-less UTXO-DAG–based distributed ledger**.  
 Its core innovation is **cooperative consensus**.
 
-There are no blocks, no proposers, no validators, and no global mempool. Every token holder writes the ledger through deterministic validity constraints. **This restores write access as a universal right rather than a privilege gated by miners, committees, leader elections, or validator roles.** The protocol is largely defined by transaction validity rules alone.
+There are no blocks, no proposers, no validators, and no global mempool. Every token holder writes the ledger through deterministic validity constraints. This restores write access as a universal right rather than a privilege gated by miners, committees, leader elections, or validator roles. The protocol is largely defined by transaction validity rules alone.
 
-**Consensus resolves conflicting ledger updates — double-spends. It arises through selfish yet cooperative DAG building, where nodes extend a shared UTXO graph and collectively gravitate toward the branch whose coverage dominates the DAG.**  
+Consensus resolves conflicting ledger updates — double-spends. It arises through selfish yet cooperative DAG building, where nodes extend a shared UTXO graph and collectively gravitate toward the branch whose coverage dominates the DAG.  
 Inflation incentives ensure continuous participation: every transaction generates new tokens proportional to the funds moved.
 
 Sequencers are token holders with voluntary, permissionless responsibilities: propagating and endorsing transactions, issuing branch transactions representing interim ledger states, and participating in VRF-driven branch inflation bonuses. Their discretion is never exclusive — users may target multiple sequencers, and multiple sequencers may pull the same external transactions. Because past cones overlap heavily, no sequencer controls ordering.
-**Sequencers do not write on behalf of users; they assist propagation. Users retain full write authority through their own transactions.**
+Sequencers do not write on behalf of users; they assist propagation. Users retain full write authority through their own transactions.
 
-**UTXO determinism eliminates MEV at the base layer.**
+UTXO determinism eliminates MEV at the base layer.
 
 Sybil resistance is built directly into the ledger. Influence emerges from token ownership rather than proof-of-cost or privileged roles. Total system cost remains bounded and independent of market cap. Fairness is driven by ongoing token-holder participation.
 
-**The protocol is verifiable: its properties can be formally proven (e.g., with TLA+) directly from the ledger’s immutable constraint layer, within clearly stated system-wide assumptions. Governance is not part of the protocol: only backward-compatible, formally proven refinements are allowed.**
+The protocol is verifiable: its properties can be formally proven (e.g., with TLA+) directly from the ledger’s immutable constraint layer, within clearly stated system-wide assumptions. Governance is not part of the protocol: only backward-compatible, formally proven refinements are allowed.
 
 ## Paradigm & Vision
 
 Traditional blockchains rely on single-leader steps, authority roles, global mempools, and competitive races. They incur escalating costs, centralization pressures, and execution-heavy complexity. Proxima replaces all of this with cooperative consensus, multi-leader DAG structure, deterministic validity, and constraint-level simplicity. It is a fundamentally different architecture, not a refinement of existing ones.
-**At its core, Proxima re-centers the ledger around writers rather than operators: every user extends the DAG directly.**
+At its core, **Proxima re-centers the ledger around writers rather than operators: every user extends the DAG directly.**
 
 Built on this paradigm, Proxima becomes a possible foundation for a **global Digital Gold Standard** — a neutral, incorruptible reserve asset usable by centralized and decentralized entities, humans and AI agents alike.  
-**These participants operate on layer 2, can trustlessly transact over the base layer, and are synchronously and asynchronously composable into sophisticated dApps and full ecosystems.**
+These participants operate on layer 2, can trustlessly transact over the base layer, and are synchronously and asynchronously composable into sophisticated dApps and full ecosystems.
 
 Its aims are sustainable security cost, enduring fairness, deterministic ordering, no MEV, no operator classes, and universal write access.
 
