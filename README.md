@@ -45,7 +45,7 @@ Sequencers do not write on behalf of users; they assist propagation. Users retai
 
 UTXO determinism eliminates MEV at the base layer.
 
-Sybil resistance is built directly into the ledger. Influence emerges from token ownership rather than proof-of-cost or privileged roles. Total system cost remains bounded and independent of market cap. Fairness is driven by ongoing token-holder participation.
+Sybil resistance is built directly into the ledger. Influence emerges from token ownership rather than proof-of-cost or privileged roles. Total system cost remains bounded and independent of market cap. Fairness is driven by the permissionless liquidity of the token and by ongoing token-holder participation.
 
 The protocol is verifiable: its properties can be formally proven (e.g., with TLA+) directly from the ledger’s immutable constraint layer, within clearly stated system-wide assumptions. Governance is not part of the protocol: only backward-compatible, formally proven refinements are allowed.
 
