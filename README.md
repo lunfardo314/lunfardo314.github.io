@@ -16,7 +16,7 @@ Currently available sub-sites:
 ## Beliefs and Philosophy
 
 We believe the core use case of crypto is **Nakamoto-decentralized digital scarcity — digital gold — and our first priority must be to implement it.**  
-Other layers of the digital financial system — fast payments, DeFi, RWAs, and similar applications — should be built on solid foundations, just as a sound financial system must be anchored in a Gold Standard. These layers either do not require Nakamoto-grade decentralization or are fundamentally at odds with both decentralization and scalability if placed at the base layer.
+Other layers of the digital financial system — fast payments, stablecoins, DeFi, RWAs, and similar applications — should be built on solid foundations, just as a sound financial system must be anchored in a Gold Standard. These layers either do not require Nakamoto-grade decentralization or are fundamentally at odds with both decentralization and scalability if placed at the base layer.
 
 Money is a social construct. Value emerges from shared beliefs and collective agreement on ownership of assets, and these beliefs must be continuously coordinated among peers. A system for digital gold must therefore be shaped around cooperation rather than authority or industrial competition. Proxima’s **cooperative consensus** follows this principle.
 
