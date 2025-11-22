@@ -35,7 +35,7 @@ Minimalism is essential because only simple systems can be proven correct. Forma
 Proxima is a **Nakamoto-permissionless, multi-leader, block-less, governance-less UTXO-DAG–based distributed ledger**.  
 Its core innovation is **cooperative consensus**.
 
-There are no blocks, no proposers, no validators, and no global mempool. Every token holder writes the ledger through deterministic validity constraints. This restores write access as a universal right rather than a privilege gated by miners, committees, leader elections, or validator roles. The protocol is largely defined by transaction validity rules alone.
+There are no blocks, no proposers, no validators, and no global mempool. Every token holder writes the ledger through deterministic validity constraints. This restores write access as a universal right rather than a privilege gated by miners, committees, leader elections, or validator roles. The protocol is largely defined by transaction validity rules alone. Raw transaction is the only type of message exchanged between peers while seeking consensus. 
 
 Consensus resolves conflicting ledger updates — double-spends. It arises through selfish yet cooperative DAG building, where users through nodes extend a shared UTXO graph and collectively gravitate toward the branch whose coverage dominates the DAG.  
 Inflation incentives ensure continuous participation: every transaction generates new tokens proportional to the funds moved.
