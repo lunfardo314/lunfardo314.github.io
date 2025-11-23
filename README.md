@@ -32,7 +32,7 @@ Minimalism is essential because only simple systems can be proven correct. Forma
 
 ## Architectural Principles
 
-Proxima is a **Nakamoto-permissionless, multi-leader, block-less, governance-less UTXO-DAG–based distributed ledger**.  
+Proxima is a **Nakamoto-style permissionless, multi-leader, block-less, governance-less UTXO-DAG–based distributed ledger** with PoS-style Sybil resistance.  
 Its core innovation is **cooperative consensus**.
 
 There are no blocks, no proposers, no validators, and no global mempool. Every token holder writes the ledger through deterministic validity constraints. This restores write access as a universal right rather than a privilege gated by miners, committees, leader elections, or validator roles. The protocol is largely defined by transaction validity rules alone. Raw transaction is the only type of message exchanged between peers while seeking consensus. 
