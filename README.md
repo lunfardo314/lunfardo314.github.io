@@ -40,8 +40,8 @@ There are no blocks, no proposers, no validators, and no global mempool. Every t
 Consensus resolves conflicting ledger updates — double-spends. It arises through selfish yet cooperative DAG building, where users through nodes extend a shared UTXO graph and collectively gravitate toward the branch whose coverage dominates the DAG.  
 Inflation incentives ensure continuous participation: every transaction generates new tokens proportional to the funds moved.
 
-**Sequencers** are token holders with voluntary, permissionless responsibilities: propagating and endorsing transactions of peers with their transactions, issuing branch transactions representing interim ledger states, and participating in VRF-driven branch inflation bonuses. Their discretion is never exclusive — users may target multiple sequencers, and multiple sequencers may pull the same external transactions. Because past cones overlap heavily, no sequencer controls ordering.
-Sequencers do not write on behalf of users; they assist propagation. Users retain full write authority through their own transactions.
+**Sequencers** are token holders with voluntary, permissionless responsibilities: endorsing transactions of peers with their transactions, issuing branch transactions representing interim ledger states, and participating in VRF-driven branch inflation bonuses. Their discretion is never exclusive — users may target multiple sequencers, and multiple sequencers may pull the same external transactions. Because past cones overlap heavily, no sequencer controls ordering.
+Sequencers do not write on behalf of users; they assist propagation and cooperation. Users retain full write authority through their own transactions.
 
 UTXO determinism eliminates MEV at the base layer.
 
