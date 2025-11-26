@@ -20,7 +20,7 @@ Other layers of the digital financial system — fast payments, stablecoins, tok
 
 Money is a social construct. Value emerges from shared beliefs and collective agreement on ownership of assets, and these beliefs must be continuously coordinated among peers. A system for digital gold must therefore be shaped around cooperation rather than authority or industrial competition. Proxima’s **cooperative consensus** follows this principle.
 
-Satoshi introduced an open, permissionless competition among block proposers. Over time this model evolved into specialized authority roles — miners, validators, proposers, builders — actors who gained discretionary power over ordering, inclusion, and control of the ledger.
+Satoshi Nakamoto introduced an open, permissionless competition among block proposers. Over time this model evolved into specialized authority roles — miners, validators, proposers, builders — actors who gained discretionary power over ordering, inclusion, and control of the ledger.
 
 Proxima exists to correct this drift.  
 It asserts that **decentralization means write access: writers — those who can append valid transactions to the canonical ledger — hold the power.** In a truly decentralized system, every user must be a writer — not through representatives, but directly through the protocol’s rules.
