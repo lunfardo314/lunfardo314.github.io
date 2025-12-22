@@ -8,6 +8,10 @@ Currently available sub-sites:
 - [Transaction model](txdocs/intro.md)
 - [UTXO scripting](ledgerdocs/library.md)
 - [Multi-state database](multistate/multistate.md) (WIP)
+- Videos:
+  - [Introduction to the cooperative consensus](https://youtu.be/XT6GBSLCbZo)
+
+
 
 -------------------------------
 
