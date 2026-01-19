@@ -53,19 +53,18 @@ We distinguish two forms of a Proxima transaction:
 
 The *raw transaction* is a tuple of 11 elements:
 
-| Index | Name | Description                                                                                                                        |
-| -------- | -------- |------------------------------------------------------------------------------------------------------------------------------------|
-|0|Inputs| Non-empty tuple of up to 256 output IDs of consumed UTXOs (not the outputs themselves)                                             |
-| 1     | Unlock data     | Tuple of **unlock parameters**; one per input                                                                                      |
-|2|Produced outputs| Non-empty tuple of up to 256 newly created outputs                                                                                 |
-|3|Signature| Terminal element: ED25519 signature of the transaction ID, along with the public key                                               |
-|4|Sequencer and stem output indices| Terminal element: 2 bytes encoding sequencer-related indices                                                                       |
-|5|Timestamp| Terminal element: 5 bytes encoding _ledger time_                                        |
-|6|Total produced amount| Terminal element: `uint64` sum of token amounts in outputs, as zero-trimmed big-endian bytes |
-|7|Input commitment| Terminal element: hash of all consumed outputs (not part of the transaction itself)     |
-|8|Endorsements| Tuple of up to 8 transaction IDs                                                                                                 |
-|9|Explicit baseline| Terminal element: optional transaction ID indicating a branch                                                               |
-|10|Local libraries| Tuple; uninterpreted in version 1 (usually empty)                                                                             |
+| Index | Name                              | Description                                                                                 |
+|-------|-----------------------------------|---------------------------------------------------------------------------------------------|
+| 0     | Inputs                            | Non-empty tuple of up to 256 output IDs of consumed UTXOs (not the outputs themselves)      |
+| 1     | Unlock data                       | Tuple of **unlock parameters**; one per input                                               |
+| 2     | Produced outputs                  | Non-empty tuple of up to 256 newly created outputs                                          |
+| 3     | Endorsements                      | Tuple of up to 8 transaction IDs                                                            |
+| 4     | Sequencer and stem output indices | Terminal element: 2 bytes encoding sequencer-related indices                                |
+| 5     | Timestamp                         | Terminal element: 5 bytes encoding _ledger time_                                            |
+| 6     | Signature                         | Terminal element: ED25519 signature of the transaction ID, along with the public key        |
+| 7     | Input commitment                  | Terminal element: hash of all consumed outputs (not part of the transaction itself)         |
+| 8     | Explicit baseline                 | Terminal element: optional transaction ID indicating a branch                               |
+| 9     | Other data                        | Tuple; any other data, a tuple of byte arrays (usually empty)                               |
 
 For a transaction $T$, element $T_0$ is the tuple of inputs; $T_6$ is the total produced amount. The i-th produced output is $T_{2,i}$.
 
