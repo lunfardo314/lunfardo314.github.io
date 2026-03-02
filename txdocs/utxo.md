@@ -12,7 +12,7 @@ The simple illustration of what later became known as a UTXO transaction—taken
 
 A UTXO transaction, among other elements, includes at least inputs and outputs, which we refer to as **consumed UTXOs** and **produced UTXOs**, respectively. It must satisfy a globally trusted set of validity rules, also known as **validity constraints** or **ledger constraints**. The most basic rule is that the total number of fungible tokens in the inputs must equal the total in the outputs.
 
-UTXO transaction represents a deterministic update to the ledger state. It updates a bounded part of the ledger state, which is unbounded, in general.
+UTXO transaction represents a deterministic update to the ledger state. Its effect on the ledger state is known in advance and is interpreted equally by all participants in the system. It updates a **bounded part** of the ledger state, which is unbounded, in general.
 
 Here is a more detailed diagram, which still conveys the same core concept:
 
@@ -22,7 +22,7 @@ Here is a more detailed diagram, which still conveys the same core concept:
 In Proxima, a transaction is a data structure that, at its core, is equivalent to a classical UTXO transaction. However, its role within Proxima goes far beyond a simple ledger update.
 
 ## Ledger state
-Each UTXO has a unique **output ID**, which is assigned at the moment the output is created. Output IDs are guaranteed to be unique (though UTXOs themselves can be duplicated in structure).
+Each UTXO has a unique **output ID** (or **UTXO ID**), which is assigned at the moment the output is created. Output IDs are guaranteed to be unique (though UTXOs themselves can be duplicated in structure).
 
 The ledger state is a key-value database consisting of pairs _(output ID, output)_. UTXOs can be retrieved by referencing their _output IDs_.
 

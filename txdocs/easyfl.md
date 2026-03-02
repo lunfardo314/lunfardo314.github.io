@@ -2,25 +2,27 @@
 
 ## Introduction
 
-**EasyFL** stands for **E**asy **F**unctional **L**anguage. It is a very simple, LISP-like functional programming language without recursion or an eval function. It is extendable and based on platform-independent bytecode.
+**EasyFL** stands for **E**asy **F**unctional **L**anguage. It is a very simple, functional programming language with LISP-like syntax and without recursion and `eval` function. It is extendable and based on platform-independent bytecode.
 
 > Note: EasyFL is neither a rich programming environment nor a universal programming language, nor even a smart contract language. It is a low-level tool intended for scripting validity constraints of UTXO transactions at the lowest byte level. You may think of it as the assembly language for Proxima UTXO transactions. EasyFL is equivalent to stack-based VMs used in Bitcoin and elsewhere; however, it offers pure functional syntax and semantics, which we find more convenient and verifiable.
 
-The EasyFL compiler, core library, and runtime engine are available at the [EasyFL repository](https://github.com/lunfardo314/easyfl). EasyFL is the scripting language used in Proxima UTXO transactions.
+The EasyFL compiler, core library, and runtime engine are available at the [EasyFL repository](https://github.com/lunfardo314/easyfl). 
+EasyFL is the scripting language used in Proxima UTXO transactions and covenants.
 
-The requirements for such a language and engine are:
+Such a language meets the following set of requirements:
 
 * Minimalism and maximum simplicity of the language and runtime semantics
-* Easy formal verifiability and potential for efficient zk-proof generation
+* Platform-independence
 * Extremely compact bytecode
 * Determinism of compilation and interpretation
 * Human-readable source code
 * Minimal set of hardcoded primitives (_op-codes_)
 * Extensibility with higher-level concepts through the language itself 
 * Standard library of concepts
-* Bounded computational model with no need for gas budgeting, non-Turing complete and verification-oriented. This relates closely to simplicity and the above requirements.
-
-Models like _Bitcoin Script_ and _Algorand VM_ meet most requirements except perhaps verifiability, understandability, and minimalism. To improve understandability, verifiability, and minimalism, we chose a purely functional style over stack-base VM.
+* Bounded computational model with no need for gas budgeting, non-Turing complete and verification-oriented
+* Formal verifiability with systems like TLA+
+* Easiness for reasoning and validity verification by AI agents
+* Low difficulty converting to circuits for zk-based validity proofs
 
 Example: The following EasyFL expression, interpreted in the context of a transaction, states that the length of the unlock block for the consumed output must be exactly 96 bytes long:
 
@@ -30,7 +32,7 @@ equal(len(selfUnlockBlock), u64/96)
 
 Here we assume:
 * The expression is evaluated for a particular consumed UTXO
-* The function selfUnlockBlock returns the bytes of the unlock block corresponding to the consumed UTXO. If it does not exist, evaluation panics.
+* The function `selfUnlockBlock` returns the bytes of the unlock block corresponding to the consumed UTXO. If it does not exist, evaluation panics.
 
 ## The language
 
@@ -59,35 +61,33 @@ The grammar for an expression is:
 
 Meta-symbols `[]` denote optional parts. `<call args>` is a comma-delimited list of `<expression>` elements, which may be omitted.
 
-`<funcName>` refers to a function name either from the library or defined as a literal.
+`<funcName>` refers to a function name from the library.
 Literals are distinguishable from function names by their syntax (described below).
 
-Each function in the library specifies its `arity` — the number of parameters it takes, ranging from 0 to 7. Embedded library functions may also accept a variable number of arguments within that range.
+Each function in the library either specifies its `arity` — the number of parameters it takes, ranging from 0 to 15, or is variadic: having variable number of arguments within that range.
 
-If a function `fun` takes 0 arguments, the expressions `fun` and `fun()` are equivalent. For example, `selfUnlockParameters` is equivalent to `selfUnlockParameters()` and evaluates to a byte array.
+If a function `fun` takes 0 arguments, the expressions `fun` and `fun()` are equivalent. For example, `selfUnlockParameters` is equivalent to `selfUnlockParameters()`..
 
 ### Literals
-_Zero-prefix-trimmed_ integers are big-endian byte representations of integers with all leading zero bytes removed. For example:
+By definition, a _zero-prefix-trimmed_ integers are big-endian byte representations of integers with all leading zero bytes removed. Examples:
 * integer `1025` $\rightarrow$ `0x0201`
 * $2^{16}+3$ $\rightarrow$ `0x010003`. 
 * `0` $\rightarrow$ empty byte array.
 
 Literals are constants, meaning they always evaluate to the same value. Supported literal types include:
 * Decimal numbers from `0` to `255`: Represented as a single byte. E.g., `0`, `42`. Values like `1337` are invalid.
-* Hexadecimal literals with prefix 0x: Represent byte arrays up to `127` bytes. E.g., `0xff0102` (3 bytes); `0x123` is invalid.
+* Hexadecimal literals with prefix `0x`: Represent byte arrays up to $2^16-1$ bytes. E.g., `0xff0102` (3 bytes); `0x123` is invalid. Note that very long data normally are subject to much smaller protocol constraints.  
 * Prefixed integers:
    * `u16/` → 2-byte big-endian
    * `u32/` → 4-byte big-endian
    * `u64/` → 8-byte big-endian
    * `z16/`, `z32/`, `z64/` → zero-trimmed versions of the above
 
-* Panic literals: `!!!message_text` $\rightarrow$ calls embedded fail function with the message (underscores replaced by spaces).
+* Panic literals: `!!!message_text` $\rightarrow$ calls embedded `fail` function with the message. Underscores are replaced by spaces in the output.
 * Bytecode literals: `x/<hex>` $\rightarrow$ inline EasyFL formulas in bytecode form.
 * Function code literals: `#function_name` $\rightarrow$ returns byte-encoded representation of the function code, the _call prefix_.
 
 ### Examples of closed expressions
-We will later introduce open expressions with parameters, but for now, here are examples of closed expressions—those that evaluate to a fixed value: 
-
 The standard library includes embedded functions such as  `fail`, `concat`, `slice`, `byte`, `tail`, `equal`, `if`, `and`, `or`, `not`, `len8`. 
 
 Some valid expressions:
@@ -109,6 +109,8 @@ Examples:
 * `concat(byte($0,1), byte($0,0), tail($0,2)))` $\rightarrow$ swaps first two bytes. 
 * `not(not(not(not($0))))` requires one argument.
 * `or($3)` returns 4th argument; all 4 must be supplied
+
+For variadic functions the literal `$$` evaluates to the number of actual arguments in the call.
 
 ## Library of definition. Compilation. Execution
 The EasyFL library maps function names to opcodes and descriptors. Function codes are 1–2 bytes.
@@ -135,25 +137,28 @@ Function descriptor in the library include:
       sym: <function name>
       description: <free description of the purpose>
       funCode: <function code>
-      numArgs: <number of parameters. -1 mean vararg>
-      embedded: <true for embeded (hardcoded) functions, false for EasyFL expressions>
+      numArgs: <number of parameters. -1 mean variadic function>
+      embedded_as: <reference to the hardcoded function>
       short: <true for short code (up to 63), long  >
       bytecode: <if embedded=false, hex-encoded bytecode of the expression>
       source: <if embedded=false, source of the expression>
+      immutable: <true/false to prevent modification of the function in library upgrades> 
 ```
 
-The library is immutable in the ledger and must:
-
-* Be sorted by function code
-* Include a hash of all descriptor fields except `description` and `source` (blake2b-256)
-* Ensure source and bytecode match if `embedded=false`
-
-### Compilation
+### Compilation/ decompilation
 Compilation serializes source code into bytecode using the library:
 $$
 code(E) = callPrefix(fn)||code(e_0)||\dots ||code(e_{n-1})
 $$
 The $callPrefix(fn)$ encodes the function's ID and arity (1–3 bytes).
+
+Compilation of the source code into bytecode serves as serialization primitive. 
+Compilation to bytecode only depends on the function name and number of its arguments. 
+This makes **serialization of scripts independent of the function implementation and is backward compatible**. 
+
+EasyFL toolset provides _decompilation_ of bytecode to it source form. While source for of the formula is not unique, the decompilation with subsequent compilation of the bytecode will always produce original bytecode. 
+
+Decompilation is also a deserialization primitive.
 
 ### Bytecode
 Bytecode represents expressions as nested arrays of compiled calls. Literals are also calls, which returns constant value.
@@ -163,13 +168,20 @@ Before the ledger is launched, the base EasyFL library can be extended (e.g., by
 * **No recursion**: New expressions must only use existing functions.
 * **Bytecode compatibility**: New opcodes must be greater than all existing ones in their category.
 
+### Library upgradability
+Library normally is immutable. However, `EasyFL` toolset supports backward compatible upgrades of the library by producing new versions of the library while keeping previous ones. 
+
+Selected functions in the clone of the library can be modified (as long as it does not change number of arguments) and new functions can be added. Function cannot be deleted for backward compatibility of serialization.  
+
 ### Evaluation
 Expressions (formulas) are evaluated in the form of the internal evaluation tree, derived from the bytecode. So, the workflow is always like this:
 
 `<expression source> -> <bytecode> -> <evaluation tree> -> <evaluation>`.
 
 * Evaluation is **lazy**: expressions are only evaluated if needed.
-* Example: `if(concat, byte(0,1), 0x01)` doesn't panic even if `byte(0,1)` would, because the branch is not executed.
+* Example: `if(concat, byte(0,1), 0x01)` will always return `0x01` and will not panic despite the fact that `byte(0,1)` if evaluated will panic.
+
+Lazy evaluation is important in functions like `or` and `and`: arguments are evaluated one by one and evaluation stops when value is concluded. 
 
 ### Exceptions
 Some expressions may trigger panics, such as `byte(0,1)` accessing an out-of-bounds index.
@@ -198,3 +210,7 @@ will compile the source to the bytecode form, will evaluate it with provided arg
 ```go
 []byte{111,222}
 ```
+## Platform independence
+EasyFL compiler, interpreter and other tools can be implemented on any language and run on any platform.
+
+This equips EasyFL-constrained data structures with fully platform-independent serialization/deserialization and semantical validation layer. 
