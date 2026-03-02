@@ -179,5 +179,5 @@ For fundamental reasons, these definitions avoid loops and recursion — they ar
 The following is an example of the human-readable printout of the transaction context. 
 It is a sequencer transaction, with two consumed chained outputs and two produced chained outputs, the successors of the tow chains.
 
-<p style="text-align:center;"><img src="../static/img/tx_printout.png" width="800">
+<p style="text-align:center;"><img src="../static/img/tx_printout.png" width="1000">
 </p>
