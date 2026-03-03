@@ -1,0 +1,1 @@
+- [Join Proxima](participate/participate.md)
