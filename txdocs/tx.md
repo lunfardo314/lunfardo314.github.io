@@ -68,7 +68,7 @@ The *raw transaction* is a tuple of 11 elements (indices 0–10):
 
 E.g. for a transaction $T$, element $T_6$ is the tuple of inputs; $T_9$ is the tuple of endorsements. The i-th produced output is $T_{8,i}$.
 
-<p style="text-align:center;"><img src="../static/img/utxo-tx.png">
+<p style="text-align:center;"><img src="../static/img/tx-raw.svg" width="100%">
 </p>
 
 ## Full transaction context
@@ -95,7 +95,7 @@ From this, we can derive:
 * The corresponding consumed output: $T^{ctx}_{1,0,i}$
 * The corresponding unlock-parameters: $T^{ctx}_{0,7,i}$
 
-<p style="text-align:center;"><img src="../static/img/utxo-tx-context.png">
+<p style="text-align:center;"><img src="../static/img/tx-context.svg" width="100%">
 </p>
 
 ## Validation scripts
@@ -174,8 +174,12 @@ For fundamental reasons, these definitions avoid loops and recursion — they ar
 
 ## Example of the transaction printout
 
-The following is an example of the human-readable printout of the transaction context. 
-It is a sequencer transaction, with two consumed chained outputs and two produced chained outputs, the successors of the tow chains.
+The following is an example of the human-readable printout of a transaction context.
+It is a native-token **mint**: a foundry chained output is consumed (input `#0`) together
+with a plain base-token input, and the transaction produces the foundry's successor (with the
+chain ID and an increased `foundry(supply=…)`), a freshly minted `tokenAmount(...)` output, and
+a base-token remainder. A transaction-level `token(...)` constraint enforces the token balance.
+Long hashes, signatures and raw byte dumps are abbreviated for readability.
 
-<p style="text-align:center;"><img src="../static/img/tx_printout.png" width="800">
+<p style="text-align:center;"><img src="../static/img/tx-printout.png" width="800">
 </p>
