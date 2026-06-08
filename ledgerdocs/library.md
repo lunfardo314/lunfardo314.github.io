@@ -1,6 +1,6 @@
 # Ledger definition library
 
-The Proxima ledger definition library is contained in the ledger definition file, also known as the _ledger ID_. This file is typically written in YAML and is used to initialize the genesis ledger state for the first node in the network.
+The Proxima ledger definition library is contained in the ledger definition file, also known as the _ledger ID_. This file is written in JSON and is used to initialize the genesis ledger state for the first node in the network.
 
 The ledger definition library includes:
 
