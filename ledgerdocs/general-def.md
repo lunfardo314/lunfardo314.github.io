@@ -34,7 +34,7 @@ func self : atPath(at)
 ```
 
 ## Ledger constants
-At genesis, several fixed values must be set — such as the initial token supply and the genesis public key. These immutable values are known as ledger constants and are encoded directly into the ledger definitions (the JSON ledger-ID file).
+At genesis, several fixed values must be set — such as the initial token supply and the genesis public key. These immutable values are known as ledger constants and are encoded directly into the JSON ledger definitions file.
 
 Each constant is a parameterless EasyFL function whose name is prefixed with `const`. Some are hard-coded; others are filled in from the genesis configuration when the ledger is created. Examples:
 

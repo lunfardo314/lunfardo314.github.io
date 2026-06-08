@@ -1,13 +1,13 @@
 # Ledger definition library
 
-The Proxima ledger definition library is contained in the ledger definition file, also known as the _ledger ID_. This file is written in JSON and is used to initialize the genesis ledger state for the first node in the network.
+The Proxima ledger definition library is contained in a single file, the _ledger definitions_. This file is written in JSON and is used to initialize the genesis ledger state for the first node in the network.
 
 The ledger definition library includes:
 
 * A list of embedded (hardcoded) functions
 * A list of functions defined as [EasyFL](txdocs/easyfl.md) formulas
 
-The full ledger-ID file is generated when the genesis ledger state is created; its current hash can be inspected on a running node (for example with `proxi db info`).
+The full ledger definitions file is generated when the genesis ledger state is created; its current hash can be inspected on a running node (for example with `proxi db info`).
 
 The Proxima ledger definition extends the base EasyFL function library. It is crucial that all nodes in the network share the exact same version of the ledger definitions—identified by the hash of the library.
 
