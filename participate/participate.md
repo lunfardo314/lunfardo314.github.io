@@ -1,3 +1,5 @@
+**THIS PAGE IS WORK IN PROGRESS**
+
 # Join Proxima
 
 Proxima is **permissionless**: the only participants are token holders, and anyone holding tokens can write to the ledger and take part in the consensus. There is no separate class of miners or validators to apply to. This page summarizes the ways to participate; the operational guides for each are part of this section.
