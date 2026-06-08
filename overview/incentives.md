@@ -17,7 +17,7 @@ Proxima introduces a novel concept of the UTXO ledger: a _chains_ and _chains as
 
 The **chain** (also known as the *UTXO chain*) is a sequence of chain outputs (UTXOs) constrained by a special type of validation script (covenant) attached to the output and called a *chain constraint*. The chain constraint on the output, known as the *predecessor*, invalidates any transaction that does not produce the single next output in the transaction, called the *successor*. This enforces chain building, preventing the chain from forking into multiple chains on the ledger.
 
-Each chain output in the chain bears a unique 32 byte-long ID called the *chain ID*. Thus, chain outputs form a non-forkable chain of transactions on the ledger, all marked with the same *chain ID*.
+Each chain output in the chain bears a unique 24 byte-long ID called the *chain ID*. Thus, chain outputs form a non-forkable chain of transactions on the ledger, all marked with the same *chain ID*.
 
 Looking from the perspective of the ledger state (also known as the _UTXO set_) it is not a chain, but the tip of it. 
 There is always **exactly one chain output for a particular *chain ID* on the ledger state**. One can always retrieve that chain output by its *chain ID* from the ledger state.
@@ -39,7 +39,7 @@ A unique feature of the chain asset in Proxima is that, by updating its state, a
 The *ledger time* is an ever-growing integer number of time **ticks** assigned to each transaction and each output. It is also called *timestamp*. 
 The ledger time of genesis outputs is $0$ ticks. $128$ ticks make a **slot**. The transaction timestamp is enforced to be strictly greater than the timestamps of its inputs. When $128$ divides the timestamp with a residual 0, the transaction is on the *slot boundary*.
 
-Timestamps of outputs and transactions are subject to *pace constraints*, such as a minimum number of ticks between successor and predecessor transactions. For example, if an output has a timestamp of $1000$ ticks, the consuming transaction must have a timestamp of at least $1005$.
+Timestamps of outputs and transactions are subject to *pace constraints*, such as a minimum number of ticks between successor and predecessor transactions. For example, with a transaction pace of $12$ ticks, if an output has a timestamp of $1000$ ticks, the consuming transaction must have a timestamp of at least $1012$. (Sequencer transactions use a tighter pace.)
 
 ### Inflation
 
@@ -76,12 +76,13 @@ The intentions behind these incentives are:
 - To incentivize token holders to contribute to the security of the ledger through constant movement of funds. See [cooperative consensus](overview/consensus.md).
 - To ensure *equity* and *financial fairness*. Each active token holder can expect a permissionless, fair, proportional, and predictable return on their *skin-in-the-game* on the ledger.
 
-Assuming that:
-* 1 slot corresponds to 10 seconds of the real time
-* $C=30,303,030$
-* tokens are moved every slot 
+The figures below are **illustrative**: they depend on ledger constants — chiefly the inflation constant $C$ and the tick/slot duration — which are fixed at genesis and may differ on a given network. With the example assumptions:
 
-* the maximum achievable annual inflation rate for the first 5 years will be as follows:
+* 1 slot corresponds to about 10 seconds of real time
+* $C=30{,}303{,}030$
+* tokens are moved every slot
+
+the maximum achievable annual inflation rate for the first 5 years would be:
 
 | year | YoY inflation rate |
 |------|--------------------|
