@@ -1,1 +1,1 @@
-- [Multi-state database](mulltistate/multistate.md)
+- [Multi-state database](multistate/multistate.md)
