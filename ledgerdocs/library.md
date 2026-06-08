@@ -7,7 +7,7 @@ The ledger definition library includes:
 * A list of embedded (hardcoded) functions
 * A list of functions defined as [EasyFL](txdocs/easyfl.md) formulas
 
-As an example, we provide the complete [proxima.genesis.id](ledgerdocs/genesis.id.md) file, which represents a full ledger definition library.
+The full ledger-ID file is generated when the genesis ledger state is created; its current hash can be inspected on a running node (for example with `proxi db info`).
 
 The Proxima ledger definition extends the base EasyFL function library. It is crucial that all nodes in the network share the exact same version of the ledger definitions—identified by the hash of the library.
 
