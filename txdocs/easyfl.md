@@ -7,7 +7,8 @@
 > Note: EasyFL is neither a rich programming environment nor a universal programming language, nor even a smart contract language. It is a low-level tool intended for scripting validity constraints of UTXO transactions at the lowest byte level. You may think of it as the assembly language for Proxima UTXO transactions. EasyFL is equivalent to stack-based VMs used in Bitcoin and elsewhere; however, it offers pure functional syntax and semantics, which we find more convenient and verifiable.
 
 The EasyFL compiler, core library, and runtime engine are available at the [EasyFL repository](https://github.com/lunfardo314/easyfl). 
-EasyFL is the scripting language used in Proxima UTXO transactions and covenants.
+
+EasyFL is the scripting language used to express trustless, finite, and verifiable constraints in UTXO transactions that produce or spend UTXOs. These constraints form what are often called **covenants**. They enforce certain properties of transactions and, therefore, certain behavior of transaction producers.
 
 Such a language meets the following set of requirements:
 
@@ -74,9 +75,9 @@ By definition, a _zero-prefix-trimmed_ integers are big-endian byte representati
 * $2^{16}+3$ $\rightarrow$ `0x010003`. 
 * `0` $\rightarrow$ empty byte array.
 
-Literals are constants, meaning they always evaluate to the same value. Supported literal types include:
+Literals are constants, meaning they always evaluate to the same value independently on the context. Supported literal types include:
 * Decimal numbers from `0` to `255`: Represented as a single byte. E.g., `0`, `42`. Values like `1337` are invalid.
-* Hexadecimal literals with prefix `0x`: Represent byte arrays up to $2^16-1$ bytes. E.g., `0xff0102` (3 bytes); `0x123` is invalid. Note that very long data normally are subject to much smaller protocol constraints.  
+* Hexadecimal literals with prefix `0x`: Represent byte arrays up to $2^16-1$ bytes. E.g., `0xff0102` (3 bytes); `0x123` is invalid. Note that very long data normally are subject to much smaller protocol constraints. 
 * Prefixed integers:
    * `u16/` → 2-byte big-endian
    * `u32/` → 4-byte big-endian
@@ -100,7 +101,7 @@ Some valid expressions:
 * `equal(concat(1, 5), 0x01ff)` $\rightarrow$ empty slice (`false`)
 * `if(0, u16/31415, u32/271828)` $\rightarrow$ `u16/31415`
 * `or` and `or()` $\rightarrow$ empty slice (`false`)
-* `and` and `and()` $\rightarrow$ `true` (value undefined)
+* `and` and `and()` $\rightarrow$ `true` (specific value undefined)
 
 ### Parameters of the expression
 Expressions (formulas) can include parameter references:  `$0`, `$1` ... `$14`.  These represent **open parameters** that will be instantiated during evaluation of the formula.
@@ -127,26 +128,38 @@ func <function name> : <expression>
 ```
 Example:
 ```
-func lessOrEqualTo : or(lessThan($0, $1), equalUint($0,$1))
+func lessOrEqualThan : or(lessThan($0,$1), equal($0,$1))
 ```
 This defines a two-parameter function for the $\le$ relation.
 
-In the library, definition of the function takes form of a _function descriptor_.
-Function descriptor in the library include:
-```yaml
-      sym: <function name>
-      description: <free description of the purpose>
-      funCode: <function code>
-      numArgs: <number of parameters. -1 mean variadic function>
-      embedded_as: <reference to the hardcoded function>
-      short: <true for short code (up to 63), long  >
-      bytecode: <if embedded=false, hex-encoded bytecode of the expression>
-      source: <if embedded=false, source of the expression>
-      immutable: <true/false to prevent modification of the function in library upgrades> 
+In the library, the definition of a function takes the form of a _function descriptor_, serialized as JSON. A descriptor includes:
+```json
+{
+  "sym":        "<function name>",
+  "description":"<free description of the purpose>",
+  "funCode":    "<function code (numeric ID)>",
+  "numArgs":    "<number of parameters; -1 means a variadic function>",
+  "embeddedAs": "<name of the hardcoded function — embedded functions only>",
+  "short":      "<true for a short call code (funCode up to 63)>",
+  "source":     "<source of the expression — extended (non-embedded) functions>",
+  "bytecode":   "<hex-encoded compiled bytecode — extended functions>",
+  "immutable":  "<true to prevent modification of the function in library upgrades>"
+}
+```
+For example, the descriptor of the `lessOrEqualThan` function above is:
+```json
+{
+  "sym": "lessOrEqualThan",
+  "description": "returns $0<=$1. Requires operands of equal length",
+  "funCode": 322,
+  "numArgs": 2,
+  "source": "or(lessThan($0,$1),equal($0,$1))",
+  "bytecode": "48421f0001130001"
+}
 ```
 
 ### Compilation/ decompilation
-Compilation serializes source code into bytecode using the library:
+Compilation **serializes** source code into bytecode using the library:
 $$
 code(E) = callPrefix(fn)||code(e_0)||\dots ||code(e_{n-1})
 $$
@@ -156,22 +169,22 @@ Compilation of the source code into bytecode serves as serialization primitive.
 Compilation to bytecode only depends on the function name and number of its arguments. 
 This makes **serialization of scripts independent of the function implementation and is backward compatible**. 
 
-EasyFL toolset provides _decompilation_ of bytecode to it source form. While source for of the formula is not unique, the decompilation with subsequent compilation of the bytecode will always produce original bytecode. 
+EasyFL toolset provides _decompilation_ of bytecode to it source form. While source of the formula is not unique, the decompilation with subsequent compilation of the bytecode will always produce original bytecode. 
 
-Decompilation is also a deserialization primitive.
+Decompilation is also a **deserialization** primitive.
 
 ### Bytecode
 Bytecode represents expressions as nested arrays of compiled calls. Literals are also calls, which returns constant value.
 
-### Library extensibility
-Before the ledger is launched, the base EasyFL library can be extended (e.g., by Proxima) with additional functions. Requirements:
-* **No recursion**: New expressions must only use existing functions.
-* **Bytecode compatibility**: New opcodes must be greater than all existing ones in their category.
+### No recursion
+The library of function definitions is enforced to be without call loops. 
+That makes each evaluation to be bounded by the size of the bytecode.
 
 ### Library upgradability
-Library normally is immutable. However, `EasyFL` toolset supports backward compatible upgrades of the library by producing new versions of the library while keeping previous ones. 
+Library normally is fixed and immutable. However, `EasyFL` toolset supports backward compatible upgrades of the library by producing new versions of the library while keeping previous ones. 
 
 Selected functions in the clone of the library can be modified (as long as it does not change number of arguments) and new functions can be added. Function cannot be deleted for backward compatibility of serialization.  
+
 
 ### Evaluation
 Expressions (formulas) are evaluated in the form of the internal evaluation tree, derived from the bytecode. So, the workflow is always like this:
@@ -179,7 +192,7 @@ Expressions (formulas) are evaluated in the form of the internal evaluation tree
 `<expression source> -> <bytecode> -> <evaluation tree> -> <evaluation>`.
 
 * Evaluation is **lazy**: expressions are only evaluated if needed.
-* Example: `if(concat, byte(0,1), 0x01)` will always return `0x01` and will not panic despite the fact that `byte(0,1)` if evaluated will panic.
+* Example: `if(concat, byte(0,1), 0x01)` will always return `0x01` and will not panic despite the fact that `byte(0,1)` will panic if evaluated in isolation.
 
 Lazy evaluation is important in functions like `or` and `and`: arguments are evaluated one by one and evaluation stops when value is concluded. 
 
@@ -210,6 +223,7 @@ will compile the source to the bytecode form, will evaluate it with provided arg
 ```go
 []byte{111,222}
 ```
+
 ## Platform independence
 EasyFL compiler, interpreter and other tools can be implemented on any language and run on any platform.
 

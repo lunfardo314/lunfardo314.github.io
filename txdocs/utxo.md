@@ -2,7 +2,7 @@
 
 _UTXO_ is a widely recognized term in the crypto world. It stands for **U**nspent **T**ransa**X**tion **O**utput.
 
-Throughout this document, we will use _UTXO_ and _output_ interchangeably. [UTXO](https://en.wikipedia.org/wiki/Unspent_transaction_output) also refers to the ledger model popularized by Bitcoin.
+**Throughout this document, we will use _UTXO_ and _output_ interchangeably, as synonyms**. [UTXO](https://en.wikipedia.org/wiki/Unspent_transaction_output) also refers to the ledger model popularized by Bitcoin.
 
 ## UTXO transaction
 
@@ -12,7 +12,7 @@ The simple illustration of what later became known as a UTXO transaction—taken
 
 A UTXO transaction, among other elements, includes at least inputs and outputs, which we refer to as **consumed UTXOs** and **produced UTXOs**, respectively. It must satisfy a globally trusted set of validity rules, also known as **validity constraints** or **ledger constraints**. The most basic rule is that the total number of fungible tokens in the inputs must equal the total in the outputs.
 
-UTXO transaction represents a deterministic update to the ledger state. Its effect on the ledger state is known in advance and is interpreted equally by all participants in the system. It updates a **bounded part** of the ledger state, which is unbounded, in general.
+UTXO transaction represents a deterministic update to the ledger state. Its effect on the ledger state is known in advance and is interpreted equally by all participants in the system. It updates a **bounded part** of the ledger state (which, in general, is unbounded).
 
 Here is a more detailed diagram, which still conveys the same core concept:
 
@@ -26,7 +26,7 @@ Each UTXO has a unique **output ID** (or **UTXO ID**), which is assigned at the 
 
 The ledger state is a key-value database consisting of pairs _(output ID, output)_. UTXOs can be retrieved by referencing their _output IDs_.
 
-The history of the ledger begins with a _genesis ledger state_, which initially contains two UTXOs (explained further below).
+The history of the ledger begins with a _genesis ledger state_, which initially contains three UTXOs: the genesis sequencer output, the genesis stem output and the genesis controller output (see [Base data elements](base.md)).
 
 A transaction does not include the full consumed outputs. Instead, it contains _inputs_, which are simply the IDs of the consumed outputs.
 
