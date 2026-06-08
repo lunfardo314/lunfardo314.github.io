@@ -11,35 +11,32 @@ The ledger primitives present special ledger validity constraints (also known as
 
 <p style="text-align:center;"><img src="../static/img/delegate.png">
 
-The main idea of the delegation is allowing sequencer, chosen by a _delegator_, to _freeze_ funds for a certain and capped period of time. During that period nobody can move frozen funds, but the frozen funds will be included into the ledger coverage of the sequencer chain. Sequencer will be able to use frozen token to generate inflation. After the freeze period is over, delegation covenant enforces _safe revocation slots_ during which owner of funds can move them as usually. This ensures liquidity of the delegated funds. 
-For the frozen period of time, only the sequencer can consume the frozen output and only with the purpose of unfreezing it. 
+The main idea of delegation is to allow a sequencer, chosen by a _delegator_, to _freeze_ funds for a certain, capped period of time. During that period nobody can move the frozen funds, but they are still included in the ledger coverage of the sequencer chain, so the sequencer can use them to generate inflation. When the freeze period is over, the delegation covenant enforces a window of _safe revocation slots_ during which the owner can move the funds as usual. This guarantees the liquidity of the delegated funds. While frozen, only the sequencer can consume the output, and only to unfreeze it.
 
-The token owner wraps their tokens in the chain output, called the **delegation output**, and locks it with the **delegation lock**. 
+The token owner wraps their tokens in a chain output, called the **delegation output**, and locks it with the **delegation lock**.
 
-The frozen funds in the delegation output do not move during the freeze period. In the testnet, the maximum freeze period is set by the delegator and can be between 1 and 12 hours. The safe revocation window is around 10 min.
+The frozen funds do not move during the freeze period. The length of the freeze is measured in **delegation epochs**: each sequencer sets its own epoch length and its own ceiling on how many epochs it may freeze for, so the exact limit depends on the chosen sequencer. As a rough guide, an epoch is on the order of a couple of hours and a sequencer typically allows freezing for up to a day or so. After the freeze period, a short **safe revocation window** (60 slots, about 10 minutes) is enforced, during which only the owner can act on the funds.
 
-The above means that funds are participating in the consensus and are generating inflation permanently, yet they are move once per 1 to 12 hours. That makes it possible massive participation of the capital in the security of the ledger for millions of accounts without overwhelming the network.
+This means the funds participate in the consensus and generate inflation continuously, yet they are only moved once per freeze period. That makes massive participation of capital in the security of the ledger possible — for millions of accounts — without overwhelming the network.
 
-To compensate the delegator for the loan capital, the sequencer must deposit an **inflation advance** to the delegation output upon freezing it. This guaranteed the delegator will receive her inflation 
-rewards after the freeze period even if the sequencer goes down. 
+To compensate the delegator for lending their capital, the sequencer deposits an **advance** into the delegation output when it freezes it. This is the delegator's projected share of the inflation, paid up front, so the delegator receives the reward after the freeze period even if the sequencer goes down. The sequencer then earns that money back, plus its margin, from the inflation the frozen funds generate.
 
-The exact proportions how inflation rewards are shared between the delegator and the sequencer are enforced according to the parameters set by the delegator and the sequencer, as two negotiating sides. In general, the whole process is market driven: for example, if the delegator considers the inflation margin required by the sequencer too high, she moves to the cheaper sequencer (or with better reputation score).
+How the inflation is split between the delegator and the sequencer is set by the **inflation cut** — the share that goes to the delegator, expressed in _promille_ (parts per thousand, so `1000` is 100%). The delegator chooses the cut they require; a sequencer can accept the delegation only if the requested cut still leaves it at least its advertised **profit margin**. The whole process is market-driven: if a delegator considers a sequencer's margin too high, they move to a cheaper sequencer (or one with a better reputation).
 
-The guarantee that the sequencer cannot steal funds loaned to it is encoded in the delegation covenant (constraint script) in the form of enforced**safe revocation slots** during which only the delegator can consume the output. So, the delegator is guaranteed full control over her funds after the freeze period.
+The guarantee that the sequencer cannot steal the loaned funds is encoded in the delegation covenant as the enforced **safe revocation slots**, during which only the delegator can consume the output. So the delegator is guaranteed full control over their funds after the freeze period.
 
-The safe revocation window is just an enforced guarantee for the delegator so that she could always take her funds back. In an absolute majority of cases though, the sequencer will return funds immediately upon request from the delegator. Note that in theory the sequencer may ignore the unfreeze request (sequencer is a token holder, a centralized and selfish entity). 
-However, that is expected to be a rare even because by misbehaving, the sequencer will gain small amount short-term, yet it will suffer reputation costs and will lose income long-term.
+The safe revocation window is just a backstop that lets the delegator always take their funds back. In the vast majority of cases the sequencer returns the funds immediately upon request. In theory a sequencer (a token holder — a centralized, selfish entity) could ignore an unfreeze request, but that is expected to be rare: by misbehaving it gains a small amount short-term while suffering reputation costs and losing income long-term.
 
-With the inflation and the delegation mechanism, we achieve the following.
-* each token holder is incentivized to delegate their holdings to sequencers of their choice, while enjoying full _liquidity of the delegated funds_. This is similar to the _liquid staking_ in PoS.
-* sequencer is including the coverage of the frozen tokens in each slot without moving the UTXO. That results in _high liveness_ and high scalability (with respect to the number of accounts) of the protocol.
+With the inflation and the delegation mechanism, we achieve the following:
+* each token holder is incentivized to delegate their holdings to sequencers of their choice while enjoying full _liquidity of the delegated funds_. This is similar to _liquid staking_ in PoS.
+* a sequencer includes the coverage of the frozen tokens in each slot without moving the UTXO. That results in _high liveness_ and high scalability (with respect to the number of accounts).
 
-## Compulsory freezing of unused funds
+## Compulsory freezing of unused funds (planned)
 
 Participation in the consensus is crucial for the safety and liveness of the system. For this reason, all participants in the Proxima ledger are incentivized to participate in the consensus by design.
 
-However, there is no guarantee that all token holders will follow rational behavior for many reasons: neglecting the dilution costs, lost private keys, etc.
+However, there is no guarantee that all token holders will follow rational behavior, for many reasons: neglecting the dilution costs, lost private keys, and so on.
 
-To address this problem, we introduce special ledger rules that enable and incentivize any sequencer to freeze any UTXO that has not been moved for more than a certain number of slots (say 24 or 48 hours). The **compulsory freezing** follows the usual delegation rules with the trusted revocation, a maximum of 12 hours of freezing, and the safe revocation window. This guarantees that the owner will never lose her funds, yet the funds will participate in the consensus.
+To address this, we plan to introduce ledger rules that would let any sequencer freeze a UTXO that has not been moved for a long time (say, more than 24 or 48 hours). This **compulsory freezing** would follow the usual delegation rules — trusted revocation, a capped freeze period, and the safe revocation window — so the owner would never lose their funds, yet the funds would participate in the consensus.
 
-In this way, we ensure high liveness of the system and high participation of the capital in the safety of the ledger without compromising scalability.
+In this way, we ensure high liveness of the system and high participation of capital in the safety of the ledger without compromising scalability.

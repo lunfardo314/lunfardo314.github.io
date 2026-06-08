@@ -1,22 +1,22 @@
 # General purpose ledger definitions
 
 ## Embedded functions
-We already introduced the transaction [validation process](txdocs/validation.md): all formulas are evaluated within each of the consumed and produced UTXOs. A transaction is valid if all evaluations return true.
+We already introduced the transaction [validation process](txdocs/validation.md): constraint formulas are evaluated within each consumed and produced UTXO (and at the transaction level). A transaction is valid if all evaluations succeed.
 
-The Proxima ledger includes two special embedded functions that allow access to the evaluation and transaction context from within EasyFL formulas:
+The Proxima ledger includes special embedded functions that give EasyFL formulas access to the evaluation and transaction context.
 
 ### Evaluation context path: `at`
-Each time a constraint script is evaluated, its path within the transaction context $T^{ctx}$  is provided. The path has one of the following forms:
+Each time a constraint script is evaluated, its path within the transaction context $T^{ctx}$ is provided. The path has one of the following forms:
 
-- $(0, 2, i, j)$ for the constraint $j$ of the **produced** UTXO $i$.
-- $(1, 0, i, j)$ for the constraint $j$ of the **consumed** UTXO $i$.
+- $(0, 8, i, j)$ — constraint $j$ of the **produced** UTXO $i$ (produced outputs are element 8 of the transaction).
+- $(1, 0, i, j)$ — constraint $j$ of the **consumed** UTXO $i$.
 
-The `at` function (with no parameters) returns this evaluation context path, allowing a formula to determine where it is being evaluated—specifically, in which UTXO and at what index.
+The `at` function (with no parameters) returns this evaluation-context path, allowing a formula to determine where it is being evaluated — specifically, in which UTXO and at which constraint index.
 
-A formula can identify whether it is in the "consumed" or "produced" context using helper functions defined in the library:
-```yaml
+A formula can identify whether it is in the consumed or produced context using helper functions defined in the library:
+```
 func pathToConsumedOutputs : 0x0100
-func pathToProducedOutputs : 0x0002
+func pathToProducedOutputs : 0x0008
 func isPathToConsumedOutput : hasPrefix($0, pathToConsumedOutputs)
 func isPathToProducedOutput : hasPrefix($0, pathToProducedOutputs)
 func selfIsConsumedOutput : isPathToConsumedOutput(at)
@@ -26,89 +26,60 @@ Here, `hasPrefix` is a standard EasyFL predicate that checks if a value starts w
 
 ### Access to the transaction context: `atPath`
 
-The `atPath` function takes a single argument interpreted as a path in the transaction context $T^{ctx}$, and returns the corresponding byte value. It will panic if the path is invalid.
+The `atPath` function takes a single argument interpreted as a path in the transaction context $T^{ctx}$, and returns the corresponding byte value. It panics if the path is invalid.
 
-For example, to retrieve its own bytecode, a script can use the following helper function `self`:
-```go
+For example, to retrieve its own bytecode, a script can use the helper function `self`:
+```
 func self : atPath(at)
 ```
 
 ## Ledger constants
-At genesis, several fixed values must be set — such as the initial token supply and the genesis public key. These immutable values are known as ledger constants and are encoded directly into the ledger definitions.
+At genesis, several fixed values must be set — such as the initial token supply and the genesis public key. These immutable values are known as ledger constants and are encoded directly into the JSON ledger definitions file.
 
-Each constant is represented as a parameterless EasyFL function with a name prefixed by `const`. Here are some typical examples from the [proxima.genesis.id](ledgerdocs/genesis.id.md) YAML file:
+Each constant is a parameterless EasyFL function whose name is prefixed with `const`. Some are hard-coded; others are filled in from the genesis configuration when the ledger is created. Examples:
 
-```yaml
+```
 func constInitialSupply : u64/1000000000000000
-func constGenesisControllerPublicKey : 0x9ad4caddd2356a7853eb038a5b4fd3197522af51af4073584260c53bbfaf1816
-func constGenesisTimeUnix : u64/1749146740
-func constTickDuration : u64/80000000
-func constMaxTickValuePerSlot : u64/127
-func ticksPerSlot64 : add(constMaxTickValuePerSlot, u64/1)
-func constSlotInflationBase : u64/33000000
-func constLinearInflationSlots : u64/3
-func constBranchInflationBonusBase : u64/5000000
-func constMinimumAmountOnSequencer : u64/1000000000000
 func constMaxNumberOfEndorsements : u64/8
 func constPreBranchConsolidationTicks : u64/25
-func constPostBranchConsolidationTicks : u64/12
-func constTransactionPace : u64/64
-func constTransactionPaceSequencer : u64/2
-func constVBCost16 : u16/1
+func constMaxTickValuePerSlot : u64/127
+func ticksPerSlot64 : add(constMaxTickValuePerSlot, u64/1)
+func constTransactionPace : u64/...                  // ticks, from genesis config
+func constTransactionPaceSequencer : u64/...         // ticks, from genesis config
+func constTickDuration : u64/...                     // nanoseconds per tick, from genesis config
+func constGenesisTimeUnix : u64/...                  // Unix reference time, from genesis config
+func constGenesisControllerPublicKey : 0x...         // genesis token holder public key
 ```
-* `constInitialSupply` defined initial token supply. 
-* `constGenesisTimeUnix` sets the Unix time reference for the ledger time axis.
-* `constTickDuration` (in nanoseconds), defined correspondence between ledger time duration and clock duration.
+Other constants include `constAttachmentCostBudget`, `constTxIDStateTTLSlots`, `constBootstrapChainID`, `constHealthyCoverageNumerator` / `constHealthyCoverageDenominator` and `constDescription`.
 
-While the ledger is agnostic about real clock, sharing the correspondence between ledger time and real-world clock between nodes is critical to cooperative consensus: token holders must coordinate under roughly the same clock assumptions to interact effectively.
+* `constInitialSupply` defines the initial token supply.
+* `constGenesisTimeUnix` sets the Unix-time reference for the ledger-time axis.
+* `constTickDuration` (in nanoseconds) defines the correspondence between ledger-time duration and clock duration.
 
-The `constGenesisControllerPublicKey` represents the public key of the genesis token holder. This key is embedded in the genesis output's lock script and remains on the ledger for a lifetime of the ledger, even after token ownership changes.
+While the ledger is agnostic about the real clock, sharing the correspondence between ledger time and the real-world clock between nodes is critical to cooperative consensus: token holders must coordinate under roughly the same clock assumptions to interact effectively.
+
+The `constGenesisControllerPublicKey` is the public key of the genesis token holder. This key is embedded in the genesis output's lock and remains on the ledger for the lifetime of the ledger, even after token ownership changes.
 
 ## Helper functions
-Besides embedded functions and ledger constraints, the Proxima ledger includes many helper functions defined in EasyFL. These can be found in the [proxima.genesis.id](ledgerdocs/genesis.id.md) file. A few examples are provided here:
+Besides embedded functions and ledger constraints, the Proxima ledger includes many helper functions defined in EasyFL. A few examples are provided here.
 
-Functions with the names starting with `path` define paths of various parts of the $T^{ctx}$. For example:
-```go
-func pathToTimestamp : 0x0005
+Functions whose names start with `pathTo` define paths to various parts of $T^{ctx}$. For example:
 ```
-Function `mustSize` enforces certain size of the data:
-```go
+func pathToTimestamp : 0x0001
+```
+The function `mustSize` enforces a certain size of the data:
+```
 func mustSize : if(equalUint(len($0), $1), $0, !!!wrong_data_size)
 ```
 
-Transaction ID calculation (needed for checking the signature) is defined the following way:
-```
-func txTimestampBytes : atPath(pathToTimestamp)
-	
-func txEssenceBytes :
-     concat(
-        atPath(pathToInputIDs), 
-        atPath(pathToUnlockParams),
-        atPath(pathToProducedOutputs), 
-        atPath(pathToSeqAndStemOutputIndices),
-        atPath(pathToTimestamp),
-        atPath(pathToTotalProducedAmount),
-        atPath(pathToInputCommitment), 
-        atPath(pathToEndorsements),
-        atPath(pathToExplicitBaseline),
-        atPath(pathToLocalLibraries)
-     )
+The **transaction ID** is no longer assembled by an EasyFL formula — `txID` is now an **embedded** function. It returns the 32-byte ID: the transaction-ID prefix (the timestamp with the sequencer flag in its last byte), the produced-output-count byte, and the last 26 bytes of `blake2b` of the transaction essence (all transaction elements except the signature). See [Base data elements](txdocs/base.md) and [Validation of transaction](txdocs/validation.md).
 
-func txIDPrefix : if(isSequencerTransaction, bitwiseOR(txTimestampBytes, 0x0000000001), txTimestampBytes)
-
-func txID : 
-    concat(
-        txIDPrefix, 
-        byte(sub(numProducedOutputs,1), 7), 
-        slice(blake2b(txEssenceBytes),6,31)
-    )
+Other examples are `selfOutputPath` and `selfSiblingConstraint`:
 ```
-Another examples would be `selfOutputPath` and `selfSiblingConstraint`:
-```
-// selfOutputPath returns first 3 bytes of 4 byte-long current evaluation context path
+// selfOutputPath returns the first 3 bytes of the 4-byte current evaluation-context path
 func selfOutputPath : slice(at,0,2)
 
-// selfSiblingConstraint returns bytecode of the constraint script on the current UTXO with the index $0
+// selfSiblingConstraint returns the bytecode of the constraint at index $0 on the current UTXO
 func selfSiblingConstraint : atPath(concat(selfOutputPath, $0))
 ```
 These allow scripts to access other constraints within the same UTXO.
@@ -117,48 +88,26 @@ These allow scripts to access other constraints within the same UTXO.
 
 Bytecode manipulation functions allow constraint scripts to inspect other scripts' structure, enabling rich programmable behavior.
 
-### parsePrefixBytecode
-Extracts the function call prefix (like an encoded function name):
-This checks whether the 3rd constraint is a `chain` constraint:
+### parseBytecode
+`parseBytecode($0, $1 [, $2 …])` treats $0 as a bytecode. The second argument $1 is either a 1-byte index selecting an argument of the call, or `0x` to select the **call prefix** (the encoded function identity). Any further arguments are expected call prefixes that the bytecode must match — otherwise the call panics.
+
+For example, this checks whether the chain constraint (at index 3 of the current UTXO) really is a `chain` call:
 ```
-equal(parsePrefixBytecode(selfSiblingConstraint, 3), #chain)
+equal(parseBytecode(selfSiblingConstraint(3), 0x), #chain)
 ```
 
-### parseArgumentBytecode
-Function `parseArgumentBytecode` takes 3 arguments. 1st argument is treated as a bytecode of the formula. 2nd argument interpreted as index of the formula argument.
-3rd argument is treated as a function call prefix.
+### parseInlineData and parseInlineDataArgument
+A literal such as `z64/1337` does not compile to the raw value — it compiles to a small **formula** that returns that value when evaluated. To recover the underlying bytes:
 
-It is enforced, that call prefixes in the 1st and 3rd argument should be equal, otherwise call panics. 
+* `parseInlineData($0)` strips the call prefix of such an inline-data bytecode and returns the data.
+* `parseInlineDataArgument($0, $1, $2)` combines the two steps: it parses argument $1 of bytecode $0, enforces that the argument is inline data with call prefix $2, and returns the data.
 
-Function returns bytecode of the argument with number specified in the 2nd argument.  
-
-### parseInlineData
-
-Let's say, amount constraint at index 0 of some UTXO is bytecode of `amount(z64/1337)`.
-
-Expression `selfSiblingConstraint(0)` will always return bytecode of the `amount` constraint.
-
-Formula `parseArgumentBytecode(selfSiblingConstraint(0))` will not return bytes of number `1337`, but instead a literal formula, which, upon evaluation, returns `1337`. It is because bytecode of the literal `z64/1337` is also a formula, which returns that value upon evaluation, not the value itself. 
-
-Function `parseInlineData` evaluates literal and returns its formula.
-
-### Bytecode manipulation examples 
-
-Expression `parseInlineData(parseArgumentBytecode(selfSiblingConstraint(0)))` will always return bytes of the amount, a big-endian bytes of an integer.
-
-`parseInlineDataArgument` retrieves inline data from the particular output:
+### Reading the token balance of an output
+The **amounts vector** lives at index 0 of every output (token balance, inflation, frozen coverage). The function `amountAt(vector, i)` returns element $i$ of that vector. Helper functions read the token balance (element 0) of any output:
 ```
-// in bytecode $0, 
-// function parses argument with index $2, treats it as inline data call, 
-// returns the inline data, Enforces call prefix is equal to $1
-func parseInlineDataArgument : parseInlineData(parseArgumentBytecode($0,$1,$2))
-```
-Other functions help to retrieve amount value from any UTXO: 
-```
-// $0 is a path to output
-// Returns amount value 8 bytes from the output at path given in $0
-func amountValueByOutputPath : 
-    uint8Bytes(parseInlineDataArgument(atPath(concat($0, amountConstraintIndex)), #amount,0))
+// $0 - path to an output. Returns its 8-byte token balance.
+func tokenBalanceByOutputPath : amountAt(atPath(concat($0, amountsConstraintIndex)), 0)
 
-func selfAmountValue: amountValueByOutputPath(selfOutputPath)
+func selfTokenBalanceValue : amountAt(selfSiblingConstraint(amountsConstraintIndex), 0)
 ```
+Here `amountsConstraintIndex` is `0` — the fixed position of the amounts vector in the output tuple.

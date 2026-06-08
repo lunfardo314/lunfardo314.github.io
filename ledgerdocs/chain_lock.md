@@ -1,53 +1,65 @@
 # Chain lock source
 
+The verbatim EasyFL source of the `chainLock` lock, from `ledger/def/lock_chain.easyfl`
+in the Proxima repository. It is the argument-less (0-arg) lock: the `chainID` lives in
+the index-value tuple (output element 1) and is read via `selfIndexValue(0)`.
+
 ```
-func selfReferencedChainData : 
+// chainLock unlocks an output to the controller of the chain whose chainID
+// equals the value at position 0 of the index-value tuple (output element
+// index 1).
+//
+// The public lock symbol `chainLock` is a 0-arg constraint — its bytecode at
+// the lock element carries no data. The chainID lives only in the
+// index-value tuple and is read via `selfIndexValue(0)` by the wrapper. The
+// underscored primitive `_chainLock` keeps the original validation logic
+// and takes the chainID as $0.
+
+// $0 - 1-byte input index (from unlock parameters)
+func _selfReferencedChainID :
 	parseInlineDataArgument(
-		consumedConstraintByIndex(selfUnlockParameters),
-		#chain,
-		0
+		consumedConstraintByIndex($0, chainConstraintIndex),
+        0,
+		#chain
 	)
 
-// $0 - parsed referenced chain constraint
-func selfReferencedChainIDAdjusted : if(
-	isZero($0),
-	blake2b(inputIDByIndex(byte(selfUnlockParameters, 0))),
-	$0
+// $0 - 1-byte input index
+func _selfReferencedChainIDAdjusted : if(
+	isZero(_selfReferencedChainID($0)),
+	slice(blake2b(inputIDByIndex($0)), 0, 23),
+	_selfReferencedChainID($0)
 )
 
+// $0 selfUnlockParameters. Returns 1-byte input index or 0x if too short
+func _chainLockUnlock : if( lessThan(len($0), u64/1), 0x, byte($0, 0) )
+
 // $0 - chainID
-// $1 - self unlock parameters
-func validChainUnlock : and(
-    equal(len($1), u64/2),                          // prevent panic in compound locks
-	equal($0, selfReferencedChainIDAdjusted(slice(selfReferencedChainData,0,31))), // chain id must be equal to the referenced chain id 
-	equal(
-		// the chain must be unlocked for state transition (mode = 0) 
-		byte(unlockParamsByConstraintIndex($1),2),
-		0
+func _validChainUnlock :
+       // chain id must be equal to the referenced chain id
+   equal($0, _selfReferencedChainIDAdjusted(_chainLockUnlock(selfUnlockParameters)))
+
+
+// $0 - chainID, supplied by the public 0-arg `chainLock` wrapper from the
+// index-value tuple at position 0.
+// Unlock parameters: 1 byte [unlocked chain output index]
+func _chainLock :
+or(
+	and(
+		selfIsProducedOutput,
+		require(equal(selfBlockIndex, lockConstraintIndex), !!!locks_must_be_at_lockConstraintIndex),
+		require(equal(len($0),u64/24), !!!24-byte_long_argument_expected),
+		require(not(isZero($0)), !!!non_zero_argument_expected),   // to prevent common error
+		selfEnforceZeroAmountsInNonChainedOutput
+	),
+	and(
+		selfIsConsumedOutput,
+        greaterOrEqualThan(len(selfUnlockParameters), u64/1),
+		not(equal(byte(selfUnlockParameters,0), 0xff)),  // filter out signature unlock marker
+		not(equal(selfOutputIndex, byte(selfUnlockParameters,0))), // prevent self referencing
+		_validChainUnlock($0)
 	)
 )
 
-// $0 - chainID
-// Unlock parameters 2 bytes: [unlocked chain output index, chain constraint index]
-func chainLock : and(
-	require(equal(selfBlockIndex,1), !!!locks_must_be_at_block_1), 
-	enforceMinimumStorageDeposit,
-	or(
-		and(
-			selfIsProducedOutput, 
-			require(equal(len($0),u64/32), !!!32-byte_long_argument_expected),
-            require(not(isZero($0)), !!!non_zero_argument_expected)   // to prevent common error
-		),
-		and(
-			selfIsConsumedOutput,
-			not(equal(selfOutputIndex, byte(selfUnlockParameters,0))), // prevent self referencing 
-			validChainUnlock($0, selfUnlockParameters)
-		)
-	)
-)
-
-// short version of chainLock
-// $0 - chainID
-// Unlock parameters 2 bytes: [unlocked chain output index, chain constraint index]
-func c : chainLock($0)
+// public 0-arg lock — chainID comes from the index-value tuple.
+func chainLock : _chainLock(selfIndexValue(0))
 ```

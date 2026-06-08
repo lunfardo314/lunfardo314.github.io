@@ -1,8 +1,6 @@
 # Introduction
 
-(_This is **version 2** of the transaction model. The content and definitions presented here may be revised in future versions, with a strong effort to maintain backward compatibility with the core concepts._)
-
-Proxima uses an advanced UTXO model akin to those used by Bitcoin, Cardano and Kaspa. It differs from others because it is built on top of just few foundational concepts, that includes programmability and serialization primives.   
+Proxima uses an advanced UTXO model akin to those used by Bitcoin, Cardano and Kaspa. Proxima builds it on top of just few foundational concepts, that includes programmability and serialization primives.   
 
 This document delves into the technical details of Proxima. It aims to convey both the overarching philosophy and the precise definitions of Proxima’s core data structures. The intended audience includes core developers, other contributors, and anyone interested in studying Proxima and contributing to its evolution.
 
@@ -43,7 +41,7 @@ While preserving the classical UTXO model, Proxima introduces two key enhancemen
 
 * **Endorsements**: Each Proxima transaction can optionally endorse other transactions by referencing them with immutable links, signed by the transaction’s producer (the token holder). These endorsements, along with UTXO consumption links, allow the ledger to be interpreted as a DAG. Endorsements help consolidate different non-conflicting ledger states into a unified view.
 
-* **Programmability**: In Proxima, each transaction and individual output (UTXO) can be made programmable using validation scripts, which are an immutable part of the transaction. These scripts define enforced logical relationships (constraints) between different parts of the transaction data. Instead of imperative, stack-based scripting (like Bitcoin Script), Proxima uses formulas from a simple functional language called [EasyFL](ledgerdocs/easfl.md). Despite differences in syntax and structure, Proxima’s UTXO programmability is computationally equivalent to Bitcoin’s — intentionally non-Turing complete and effectively a finite automaton. The purpose of these scripts is to enforce intended behavior on the ledger. A consumer of a UTXO can only create a valid transaction if it satisfies the immutably embedded validity constraints imposed by the UTXO’s creator.
+* **Programmability**: In Proxima, each transaction and individual output (UTXO) can be made programmable using validation scripts, which are an immutable part of the transaction. These scripts define enforced logical relationships (constraints) between different parts of the transaction data. Instead of imperative, stack-based scripting (like Bitcoin Script), Proxima uses formulas from a simple functional language called [EasyFL](txdocs/easyfl.md). Despite differences in syntax and structure, Proxima’s UTXO programmability is computationally equivalent to Bitcoin’s — intentionally non-Turing complete and effectively a finite automaton. The purpose of these scripts is to enforce intended behavior on the ledger. A consumer of a UTXO can only create a valid transaction if it satisfies the immutably embedded validity constraints imposed by the UTXO’s creator.
 
 Proxima’s UTXO model can also be compared to [EUTXO](https://docs.cardano.org/about-cardano/learn/eutxo-explainer), as introduced by Cardano; however, Proxima’s approach may offer a broader generalization in some respects. For instance, in Proxima, any transaction data (including _unlock data_) can function similarly to what EUTXO refers to as a _redeemer_ or _datum_.
 

@@ -1,0 +1,101 @@
+digraph TxRaw {
+  graph [rankdir=TB, fontname="Helvetica", nodesep=0.35, ranksep=0.6, ordering=out, bgcolor="white"];
+  node  [fontname="Helvetica", fontsize=11, shape=box, margin="0.10,0.06"];
+  edge  [fontname="Helvetica-Bold", fontsize=11, fontcolor="#1F5FCC", color="#555555", arrowsize=0.7];
+
+  // ---- root ----
+  root [label="Raw transaction", style="rounded,filled", fillcolor="#FCE6A8", color="#C9A227"];
+
+  // ---- compact legend, same rank as the root (top) ----
+  legend [shape=none, margin=0, label=<
+    <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="3" CELLPADDING="2">
+      <TR>
+        <TD BGCOLOR="#FCE6A8" WIDTH="13"> </TD><TD ALIGN="LEFT"><FONT POINT-SIZE="9">tuple</FONT></TD>
+        <TD BGCOLOR="#DEDEDE" WIDTH="13"> </TD><TD ALIGN="LEFT"><FONT POINT-SIZE="9">terminal (byte array)</FONT></TD>
+      </TR>
+    </TABLE>>];
+  { rank=same; root; legend; }
+
+  // ====== scalar terminal fields 0..5 : one vertical column (a row per field) ======
+  terminals [shape=plaintext, margin=0, label=<
+    <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="7" CELLPADDING="5" COLOR="#808080">
+      <TR><TD PORT="p0" BGCOLOR="#DEDEDE">Version (2 bytes)</TD></TR>
+      <TR><TD PORT="p1" BGCOLOR="#DEDEDE">Timestamp (5 bytes)</TD></TR>
+      <TR><TD PORT="p2" BGCOLOR="#DEDEDE">Sequencer data (0 or 2 bytes)</TD></TR>
+      <TR><TD PORT="p3" BGCOLOR="#DEDEDE">Signature</TD></TR>
+      <TR><TD PORT="p4" BGCOLOR="#DEDEDE">Input commitment (32 bytes)</TD></TR>
+      <TR><TD PORT="p5" BGCOLOR="#DEDEDE">Explicit baseline (opt. tx ID)</TD></TR>
+    </TABLE>>];
+
+  // ---- tuple fields 6..10 ----
+  node [style="rounded,filled", fillcolor="#FCE6A8", color="#C9A227"];
+  inputs   [label="Inputs"];
+  unlock   [label="Unlock params"];
+  outputs  [label="Produced outputs"];
+  endorse  [label="Endorsements"];
+  txcons   [label="Tx-level constraints"];
+
+  // expanded tuple children (the horizontal spread), then the terminal column at the right
+  root -> inputs  [label="6"];
+  root -> unlock  [label="7"];
+  root -> outputs [label="8"];
+  root -> endorse [label="9"];
+  root -> txcons  [label="10"];
+  root -> terminals:p0:w [label="0"];
+  root -> terminals:p1:w [label="1"];
+  root -> terminals:p2:w [label="2"];
+  root -> terminals:p3:w [label="3"];
+  root -> terminals:p4:w [label="4"];
+  root -> terminals:p5:w [label="5"];
+
+  // ---- inputs -> output IDs ----
+  node [style="filled", shape=box, fillcolor="#DEDEDE", color="#808080"];
+  in0 [label="Output ID"];
+  in1 [label="Output ID"];
+  inN [label="...", shape=plaintext, style="", fillcolor="white"];
+  inputs -> in0 [label="0"];
+  inputs -> in1 [label="1"];
+  inputs -> inN [label="n", arrowhead=none, color="#aaaaaa"];
+
+  // ---- unlock params: tuple per input -> unlock data ----
+  node [style="rounded,filled", fillcolor="#FCE6A8", color="#C9A227"];
+  up0 [label="params"];
+  upN [label="...", shape=plaintext, style="", fillcolor="white"];
+  unlock -> up0 [label="0"];
+  unlock -> upN [label="n", arrowhead=none, color="#aaaaaa"];
+  node [style="filled", shape=box, fillcolor="#DEDEDE", color="#808080"];
+  ud0 [label="data"]; ud1 [label="data"];
+  up0 -> ud0 [label="0"]; up0 -> ud1 [label="1"];
+
+  // ---- produced outputs -> UTXO -> internals ----
+  node [style="rounded,filled", fillcolor="#FCE6A8", color="#C9A227"];
+  ux0 [label="UTXO"];
+  uxN [label="...", shape=plaintext, style="", fillcolor="white"];
+  outputs -> ux0 [label="0"];
+  outputs -> uxN [label="m", arrowhead=none, color="#aaaaaa"];
+  amounts [label="amounts", style="rounded,filled", fillcolor="#FCE6A8", color="#C9A227"];
+  idxval  [label="index-values", style="rounded,filled", fillcolor="#FCE6A8", color="#C9A227"];
+  lock    [label="lock", style="filled", fillcolor="#DEDEDE", color="#808080"];
+  cstr    [label="constraint", style="filled", fillcolor="#DEDEDE", color="#808080"];
+  ux0 -> amounts [label="0"];
+  ux0 -> idxval  [label="1"];
+  ux0 -> lock    [label="2"];
+  ux0 -> cstr    [label="3+"];
+
+  // ---- endorsements -> tx IDs ----
+  node [style="filled", shape=box, fillcolor="#DEDEDE", color="#808080"];
+  e0 [label="Tx ID"];
+  eN [label="...", shape=plaintext, style="", fillcolor="white"];
+  endorse -> e0 [label="0"];
+  endorse -> eN [label="k", arrowhead=none, color="#aaaaaa"];
+
+  // ---- tx-level constraints -> bytecode ----
+  bc0 [label="bytecode", style="filled", fillcolor="#DEDEDE", color="#808080"];
+  txcons -> bc0 [label="0"];
+
+  // Correspondence: unlock-params i unlock input i (one unlock-param per input).
+  edge [constraint=false, style=dashed, color="#8E44AD", arrowhead=vee, penwidth=1.2];
+  up0 -> in0 [xlabel="unlocks", fontcolor="#8E44AD"];
+  edge [constraint=true, style=solid, color="#555555", arrowhead=normal, penwidth=1.0];
+  { rank=same; up0; in0; }
+}

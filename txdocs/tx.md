@@ -50,26 +50,25 @@ We distinguish two forms of a Proxima transaction:
 * **Raw transaction**, also known as canonical or transferable transaction: the form exchanged between nodes, persisted, and stored.
 * **Full transaction context**: the raw transaction extended with the fragment of the ledger state it modifies. This form is transient and used only for validation.
 
-The *raw transaction* is a tuple of 12 elements:
+The *raw transaction* is a tuple of 11 elements (indices 0–10):
 
 | Index | Name                      | Description                                                                                                                   |
 |-------|---------------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| 0     | Version                   | Terminal element: 2 bytes interpreted as big-endian `uint16`. Serial number of upgrade of definitions used in the transaction |
+| 0     | Version                   | Terminal element: 2 bytes interpreted as big-endian `uint16`. Index of the ledger-definitions upgrade used by the transaction |
 | 1     | Timestamp                 | Terminal element: 5 bytes encoding _ledger time_                                                                              |
-| 2     | Sequencer data bytes      | Terminal element: empty for non sequencer transactions, 2 bytes encoding sequencer-related indices                            |
-| 3     | Signature data            | Terminal element: 1 byte of signature type + signature of the transaction ID, that includes public key                        |
+| 2     | Sequencer data bytes      | Terminal element: empty for non-sequencer transactions, 2 bytes encoding sequencer-related indices                            |
+| 3     | Signature data            | Terminal element: 1 byte of signature type + signature of the transaction ID, that includes the public key                    |
 | 4     | Input commitment          | Terminal element: 32-byte `blake2b` hash of all consumed UTXOs                                                                |
 | 5     | Explicit baseline         | Terminal element: optional transaction ID indicating a branch. Empty if absent                                                |
 | 6     | Inputs                    | Non-empty tuple of up to 256 output IDs of consumed UTXOs (not the outputs themselves)                                        |
 | 7     | Unlock data               | Tuple of **unlock parameters**; one per input. Each unlock parameter is a tuple itself                                        |
 | 8     | Produced outputs          | Non-empty tuple of up to 256 newly created outputs                                                                            |
 | 9     | Endorsements              | Tuple of up to 8 transaction IDs                                                                                              |
-| 10    | Transaction level scripts | Tuple of transaction level constraint scripts                                                                                 |
-| 11    | Other data                | Tuple; any other data, a tuple of byte arrays. May contain any additional data referenced by constraint scripts               |
+| 10    | Transaction-level constraints | Tuple of transaction-level constraint scripts (bytecodes)                                                                 |
 
-E.g. for a transaction $T$, element $T_6$ is the tuple of inputs; $T_9$ is the tuple of endorsements. The i-th produced output is $T_{7,i}$.
+E.g. for a transaction $T$, element $T_6$ is the tuple of inputs; $T_9$ is the tuple of endorsements. The i-th produced output is $T_{8,i}$.
 
-<p style="text-align:center;"><img src="../static/img/utxo-tx.png">
+<p style="text-align:center;"><img src="../static/img/tx-raw.svg" width="100%">
 </p>
 
 ## Full transaction context
@@ -78,7 +77,7 @@ Let $utxo(id)$ denote the UTXO loaded from the ledger state by its ID.
 
 Given $T = (T_0, \dots, T_{10})$, define:
 $$
-consumed(T) = (utxo(T_{6,0}), utxo(T_{6,1}) \dots utxo(T_{6,len(T_0)-1}))
+consumed(T) = (utxo(T_{6,0}), utxo(T_{6,1}) \dots utxo(T_{6,len(T_6)-1}))
 $$
 
 The **transaction context** $T^{ctx}$ is defined as:
@@ -94,16 +93,15 @@ Path to the i-th input in the transaction context is $(0,6,i)$.
 From this, we can derive:
 * The ID of the *i-th* consumed output: $T^{ctx}_{0,6,i}$
 * The corresponding consumed output: $T^{ctx}_{1,0,i}$
-* The corresponding unlock-parameters: $T^{ctx}_{0,1,i}$
+* The corresponding unlock-parameters: $T^{ctx}_{0,7,i}$
 
-<p style="text-align:center;"><img src="../static/img/utxo-tx-context.png">
+<p style="text-align:center;"><img src="../static/img/tx-context.svg" width="100%">
 </p>
 
 ## Validation scripts
 The UTXO model often supports programmable validity, like [Bitcoin Script](https://en.bitcoin.it/wiki/Script). This allows the transaction producer to define custom unlock and validation logic, also known as **covenants**, embedded in the UTXO, to be evaluated by the node.
 
-In Proxima, each UTXO is a tuple of terminal elements $(c_0, \dots, c_{k-1})$, where each $c_i > 0$ is a script bytecode. 
-The $c_0$ is a tuple (vector) of amounts, associate with the UTXO.  
+In Proxima, each UTXO is a tuple of elements $(c_0, \dots, c_{k-1})$. The first positions are fixed: $c_0$ is the amounts vector and $c_1$ is the index-values (controller / target / sender hashes used for state indexing) — both are themselves tuples — while $c_2$ is the lock and is a script bytecode. A chain constraint, when present, is at $c_3$, and any further per-lock constraints (also script bytecodes) follow (see [Base data elements](base.md)).  
 
 The significant difference of Proxima's programmability from other models is that each script is evaluated in two contexts: when UTXO is consumed (spent) and when UTXO is produced. 
 
@@ -167,8 +165,8 @@ Transaction producers embed these scripts into UTXOs to enforce desired behavior
 
 Examples:
 
-* `sigLock(0x3705...)` checks that the hash of the public key coming as part of the signature matches the provided hash and that the transaction signature is valid. 
-* `chain(0xabcd1234...)` enforces chain constraint on the UTXO. It creates a `chained account`, a globally identified non-fungible asset on the ledger, that can be modified only by producing its successor UTXO with the same `chained account ID` (called `chain ID`). 
+* `sigLock` is the standard signature lock. It checks that the public key carried in the transaction's signature hashes to the holder ID recorded in the output's index-values, and that the signature is valid. (It is argument-less — the holder ID lives in the index-values, not inline.)
+* `chain(...)` enforces the chain constraint on the UTXO. It creates a `chained account`, a globally identified non-fungible asset on the ledger, that can be modified only by producing its successor UTXO with the same `chained account ID` (called `chain ID`). 
 
 All participants share a globally trusted **library of validation function definitions**. Some are hardcoded (_embedded_); most are open formulas defined in EasyFL (_extended_).
 
@@ -176,8 +174,12 @@ For fundamental reasons, these definitions avoid loops and recursion — they ar
 
 ## Example of the transaction printout
 
-The following is an example of the human-readable printout of the transaction context. 
-It is a sequencer transaction, with two consumed chained outputs and two produced chained outputs, the successors of the tow chains.
+The following is an example of the human-readable printout of a transaction context.
+It is a native-token **mint**: a foundry chained output is consumed (input `#0`) together
+with a plain base-token input, and the transaction produces the foundry's successor (with the
+chain ID and an increased `foundry(supply=…)`), a freshly minted `tokenAmount(...)` output, and
+a base-token remainder. A transaction-level `token(...)` constraint enforces the token balance.
+Long hashes, signatures and raw byte dumps are abbreviated for readability.
 
-<p style="text-align:center;"><img src="../static/img/tx_printout.png" width="1000">
+<p style="text-align:center;"><img src="../static/img/tx-printout.png" width="800">
 </p>

@@ -3,176 +3,87 @@ Proxima UTXO transactions are programmable. By adding validity constraints to UT
 
 UTXO transactions can only update (consume) a finite, bounded, and deterministic fragment of an otherwise unbounded ledger state. This restriction makes the state-update machine non-Turing complete. Consequently, the EasyFL language intentionally excludes loops and recursion.
 
-The programmability of the UTXO ledger in Proxima can be described as non-Turing complete, parallel, and asynchronous smart contracts, akin to finite state machines or even cellular automata. 
+The programmability of the UTXO ledger in Proxima can be described as non-Turing complete, parallel, and asynchronous smart contracts, akin to finite state machines or even cellular automata.
 
-However, we avoid the term "smart contract" in this context, as it typically refers to Ethereum-style SCs, which assume and can update (consume) unbounded infinite state, they are synchronous (atomically-composable) and therefore they need Turing-complete engine (a VM) with loops or recursion and unbounded data structures, to be able to perform their logic.
+However, we avoid the term "smart contract" in this context, as it typically refers to Ethereum-style SCs, which assume and can update (consume) unbounded infinite state, are synchronous (atomically-composable) and therefore need a Turing-complete engine (a VM) with loops or recursion and unbounded data structures to perform their logic.
 
 Instead, UTXO programmability can be seen as **emergent behavior** on the ledger, driven by multiple asynchronous and independent agents. In aggregate, these behaviors can approximate arbitrary complexity, rendering the entire system **quasi-Turing complete**.
 
-## Trust-less evidence of transaction data in UTXO 
-To demonstrate the expressive power of UTXO scripting with EasyFL, we describe two examples. Both are implemented as standard functions in the ledger definition library but can also be included inline within a UTXO with minimal overhead.
+## Trust-less evidence of transaction data in a UTXO
+A challenge in UTXO-based systems is that once an output resides in the ledger, the transaction that created it is no longer directly available. The UTXO commits to the transaction via its _output ID_, but verifying transaction-level data normally requires retrieving the transaction from external storage — introducing a trust assumption.
 
-A challenge in UTXO-based systems is that once an output resides in the ledger, the transaction that created it is no longer directly available. The UTXO commits to the transaction via its _output ID_, but verifying transaction-level data requires retrieving the transaction from external storage—introducing a trust assumption.
+Proxima sidesteps this. As described in [transaction validation](txdocs/validation.md), every constraint is evaluated **twice** — once when its UTXO is produced and again when it is consumed — and the script knows, from its path in the transaction context, which case it is in (`selfIsProducedOutput` / `selfIsConsumedOutput`). A check placed on the **produced** side therefore pins a property of the producing transaction into the output itself. The output then becomes a **trustless witness** of that property: anyone holding just the UTXO can verify the fact, with no need for the original transaction. This is valuable for L1↔L2 interaction, where it relaxes data-availability requirements.
 
-### Total produced amount
-One commonly needed transaction-level field is the total produced amount, always available in field $T_6 = T^{ctx}_{0,6}$ of each transaction. The standard function `txTotalProducedAmount` retrieves it: 
-```
-func txTotalProducedAmount : uint8Bytes(atPath(pathToTotalProducedAmount))
-```
-Because a consumed UTXO cannot access its producing transaction directly, merely duplicating the total produced amount in the UTXO would be insecure — anyone could forge it.
+The simplest example is the standard signature lock. On the produced side, `sigLock` enforces that the holder ID stored in the output equals `blake2b` of the public key that signed the transaction. Once the output is in the ledger state, it is therefore self-evident who created it. More elaborate witnesses — native-token provenance (`token` / `tokenAmount`), redeemed local scripts (`redeemScript`) — are built on the same produced-side mechanism.
 
-Instead, we use the constraint function `total`:
-```
-// $0 - total amount uint64 big-endian
-// $0 must be equal to the total amount value in the transaction
-func total: require(
-	or(
-		selfIsConsumedOutput,
-        equalUint($0, txTotalProducedAmount)
-	),
-    !!!total_amount_constraint_failed
-)
-```
+## Mandatory UTXO elements
+A UTXO is a tuple of elements. The first three positions are fixed (see [Base data elements](txdocs/base.md)):
 
-If a UTXO contains `total(1000000)`, the ledger guarantees that the producing transaction's total output was exactly 1,000,000 — otherwise, the transaction would be invalid.
+* **Index 0 — amounts vector.** A small tuple of values, not a script: token balance (element 0), inflation (element 1) and frozen coverage (element 2). It is parsed, never evaluated as bytecode.
+* **Index 1 — index-value tuple.** Pure data used for ledger-state indexing: the controller / target / sender hashes. Position 0 typically holds the holder ID (for a signature lock) or the chain ID (for a chain lock). Parsed, never evaluated.
+* **Index 2 — lock.** The first actual **script**: the bytecode that defines the unlock policy.
 
-### Trust-less message sender identity  
-Another example is UTXO messages with verifiable sender identity. We may wish to include arbitrary data in a UTXO and associate it securely with its producer's public key. Simply including the message isn’t sufficient—UTXOs don't inherently include the sender’s identity.
-
-A practical use case is sending authenticated requests to L2 entities on-ledger. For example, an L2 custodian might act on behalf of an L1 account owner, and a UTXO message with verifiable sender identity serves as a secure command.
-
-> _(Off-topic: In Proxima, sequencers are one such L2 entity, used during fund withdrawals.)_
-
-The `msgED25519` constraint enables this functionality:
-```
-// Contains arbitrary message and enforces valid sender (originator) as part of the message.
-// Once output is in the state, it is guaranteed to have the real sender
-// $0 - blake2b hash of the signature's public key (not an address, just data)
-// $1 - arbitrary data
-func msgED25519: or(
-    // always valid on consumed output
-	selfIsConsumedOutput,
-    // valid on produced output only if public key of the signature of the transaction equal to $0
-	and(
-		selfIsProducedOutput,
-		equal(
-       		$0, 
-			blake2b(publicKeyED25519(txSignature))
-		),
-        $1 // to enforce mandatory second parameter. It is evaluated
-	)
-)
-```
-A UTXO with `msgED25519(0x1ce4..., 0x0102ff)` proves that the message `0x0102ff` was issued by the account whose address is `addressED25519(0x1ce4...)`.
-
-## Mandatory UTXO constraints
-Constraints at indices 0 and 1 are mandatory:
-* Index 0 must hold the amount constraint.
-* Index 1 must hold a valid **lock script**.
-
-
-### Amount
-The amount constraint is a placeholder that enforces the value and its position:
-```
-// $0 - amount up to 8 bytes big-endian. Will be expanded to 8 bytes by padding
-func amount: 
-   require(
-       // constraint must be at index 0 and arg0 must no more than 8 byte-long 
-       and(equal(selfBlockIndex,0), lessOrEqualThan(len($0), u64/8)), 
-       !!!amount_constraint_must_be_at_index_0_and_len_arg0<=8
-   )
-```
-The value can be 0. Minimum deposit requirements are enforced by the lock script.
+Positions 3 and up carry optional per-lock constraints (the chain constraint at index 3, and further extras after it). Only positions 2 and up are evaluated as EasyFL scripts.
 
 ### Locks
 Locks define the minimum conditions for consuming an output. The current version includes:
 
-* `addressED25519` (alias `a`), signature lock (siglock) (see [AddressED25519 lock](#addressed25519-lock)))
-* `chainLock` -  requires a specific chain output to be consumed in the same transaction. Will be introduced together with the [chain constraint](#chain-constraint).
-* `stemLock` -  used for branch transactions; unlockable without a signature.  
-* `delegationLock` - allows two different keys to unlock it, depending on timing. 
+* `sigLock` — signature lock: unlockable by the holder of the ED25519 key whose hash is the holder ID (see [Signature lock](#signature-lock)).
+* `chainLock` — requires a specific chain output to be consumed in the same transaction. Introduced together with the [chain constraint](#chain-constraint).
+* `stemLock` — used for branch transactions; unlockable without a signature.
+* `delegateLock` — allows two different keys to unlock it, depending on timing (delegation).
 
 ### Unlock parameters
-Constraints can’t dynamically inspect transactions. Instead, they must be statically linked to known paths. For example, if a constraint is at path $(1,0,i,j)$, then its unlock parameters at $(0,1,i,j)$ may contain static references to the data in the consuming transaction, required by the constraint.
+Constraints can’t dynamically search a transaction; they must reference known paths statically. A constraint at path $(1,0,i,j)$ (constraint $j$ of consumed UTXO $i$) reads its **unlock parameters** at $(0,7,i,j)$ — element 7 of the transaction is the tuple of unlock-parameter blocks, one per input. These parameters carry static references into the consuming transaction that the constraint needs (for example, the index of another input to reference for the signature).
 
-### AddressED25519 lock
-This lock ensures that an output can only be consumed by a transaction signed with a specific ED25519 key:
-
+### Signature lock
+The signature lock ensures that an output can only be consumed by a transaction signed with a specific ED25519 key. It is an **argument-less** constraint: the holder ID lives in the index-value tuple (output element 1, position 0) and is supplied to the validation logic by the public wrapper:
 ```
-// $0 self unlock parameters
-func unlockedByReference: and(
-    equal(len($0), u64/1),                     // prevent panic in compound locks
-	lessThan($0, selfOutputIndex),             // unlock parameter must point to another input with 
-                                               // strictly smaller index. This prevents reference cycles	
-	equal(self, consumedLockByInputIndex($0))  // the referenced constraint bytes must be equal to the self constraint bytes
-)
-
-// $0 - ED25519 address, 32 byte blake2b hash of the public key
-// Unlock data is 1 byte with reference index to the previous input or signature unlock with 0xff
-func addressED25519: and(
-	require(equal(selfBlockIndex,1), !!!locks_must_be_at_block_1), 
-	enforceMinimumStorageDeposit,
-	or(
-		and(
-			selfIsProducedOutput, 
-			equal(len($0), u64/32) 
-		),
-		and(
-			selfIsConsumedOutput, 
-			or(
-					// if it is unlocked with reference, the signature is not checked
-				unlockedByReference(selfUnlockParameters),
-					// checked if tx signature corresponds to the address
-                equal($0, blake2b(publicKeyED25519(txSignature)))
-			)
-		)
-	)
-)
-
-// short form of lock a(<hex bytes>)
-// $0 - ED25519 address, 32 byte blake2b hash of the public key
-func a : addressED25519($0)
+// public 0-arg lock — holderID comes from the index-value tuple.
+func sigLock : _sigLock(selfIndexValue(0))
 ```
-This structure enables efficient unlocking: if a previous input has the same lock, later inputs can reference it.
-Note, that the siglock script assumes valid signature of the transaction.
+On the **produced** side, `sigLock` requires the holder ID to be a 32-byte value (the `blake2b` hash of a public key). On the **consumed** side, the output is unlocked when either:
+
+* the holder ID equals `blake2b` of the public key that signed the transaction, or
+* the unlock parameters reference an earlier input (with a strictly smaller index) that is also `sigLock`-locked to the **same** holder ID — so that several inputs of one holder are unlocked by a single signature.
+
+The full source is in `ledger/def/lock_signature.easyfl`.
 
 ## Chain constraint
 The `chain` constraint is central to Proxima. It enables **mutable state**, NFTs, sequencing, delegation and other functions. Unlike standard UTXOs, chain-constrained outputs represent persistent, trackable assets.
 
 Key properties:
-* Each chain constraint encodes the _chain ID_ and **predecessor** info. 
-* Chain origins are created with a zero chain ID, which is later replaced by the hash of the origin's output ID
-* Each chain output must have exactly one **successor**, ensuring single-tip chains
+* Each chain constraint encodes the _chain ID_ (24 bytes) and **predecessor** info, plus cumulative inflation, branch-bonus and counter fields.
+* Chain origins are created with a zero chain ID, which is later replaced by the first 24 bytes of the `blake2b` hash of the origin's output ID.
+* Each chain output must have exactly one **successor**, ensuring single-tip chains.
 
-This enforces a single UTXO per chain ID on the ledger—essentially a native NFT.
-
-The `chain` constraint enforces a non-forkable chain of transactions on the ledger and always a single tip (UTXO) of that chain on the ledger state.
+This enforces a single UTXO per chain ID on the ledger — essentially a native NFT. The `chain` constraint enforces a non-forkable chain of transactions on the ledger and always a single tip (UTXO) of that chain in the ledger state.
 
 <p style="text-align:center;"><img src="../static/img/chain_succ_pred.png"></p>
 
-The source of the chain constraint function in EasyFL we provide [here](ledgerdocs/chain.md):
+The EasyFL source of the `chain` constraint is provided [here](ledgerdocs/chain.md).
 
 ### Chain lock
-The `chainLock` (alias `c`) is an advanced locking mechanism. It allows tokens to be locked to a chain instead of a static address. Whoever controls the chain (via the appropriate private key) can unlock the tokens—even if the controlling key changes.
+The `chainLock` is an advanced locking mechanism. It allows tokens to be locked to a chain instead of a static address. Whoever controls the chain (via the appropriate private key) can unlock the tokens — even if the controlling key changes. Like the signature lock, it is argument-less: the chain ID is read from the index-value tuple.
 
 Chain locks are fundamental for:
 
-* Tag-along mechanism
-* Token custody with rotating keys
-* Secure interaction with the sequencer chain (e.g. token withdrawal) 
-* Trust-less interchain messaging
+* the tag-along mechanism;
+* token custody with rotating keys;
+* secure interaction with the sequencer chain (e.g. token withdrawal);
+* trust-less interchain messaging.
 
-EasyFL source of the `chainLock` is provided [here](ledgerdocs/chain_lock.md).
+The EasyFL source of the `chainLock` is provided [here](ledgerdocs/chain_lock.md).
 
 ## Sequencer constraint
-The _sequencer constraint_ `sequencer`, adds additional conditions to the `chain` constraint. Sequencer chain is a special kind of chain. Its purpose is to support cooperative consensus among sequencers, by enabling branches, baseline and other.  
+The _sequencer constraint_ `sequencer` adds conditions on top of the `chain` constraint. A sequencer chain is a special kind of chain whose purpose is to support cooperative consensus among sequencers, by enabling branches, baselines and more. The sequencer constraint also carries the chain's delegation parameters (its epoch length and the maximum number of epochs it will freeze for).
 
 ## Inflation
 The inflation constraint ensures deterministic inflation based on:
-* Ledger time (for general chains)
-* Verifiable randomness (for branches)
+* ledger time (for general chains);
+* verifiable randomness (for branches).
 
-At transaction level, the following invariant is enforced:
+At the transaction level, the following invariant is enforced:
 ```
 Total Consumed Amount + Inflation == Total Produced Amount
 ```

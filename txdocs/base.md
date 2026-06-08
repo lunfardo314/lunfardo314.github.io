@@ -35,7 +35,7 @@ Ledger time is serialized as a 5-byte array:
 |0-3|Big-endian encoding of the slot value|
 |4|`tick` value multiplied by 2|
 
-This serialized ledger time is called a _timestamp_. Each transaction $T$ contains a timestamp as $T_5$. Bit 0 of the last byte in the timestamp is reserved and must be 0. This bit is used in the transaction ID prefix (see below).
+This serialized ledger time is called a _timestamp_. Each transaction $T$ contains a timestamp as $T_1$. Bit 0 of the last byte in the timestamp is reserved and must be 0. This bit is used in the transaction ID prefix (see below).
 
 ## Transaction ID
 Each transaction is uniquely identified by a 32-byte ID, deterministically formed from the transaction’s data. By design, transaction IDs never repeat. A transaction ID cryptographically commits to the transaction and also encodes its timestamp, the number of UTXOs it produces, and a flag indicating whether it is a sequencer transaction.
@@ -43,14 +43,14 @@ Each transaction is uniquely identified by a 32-byte ID, deterministically forme
 |Byte indices | Description                                                                                                                                   |
 | -------- |-----------------------------------------------------------------------------------------------------------------------------------------------|
 |0-4| *transaction ID prefix*, 5 bytes (see below)                                                                                                  |
-|6| index of the last UTXO produced by the transaction.<br>1 byte $\leftarrow$ maximum index = 255 $\leftarrow$ max 256 outputs per transaction |
-|5-31| The last 26 bytes of of $blake2b(essence(T))$                                                        |
+|5| index of the last UTXO produced by the transaction.<br>1 byte $\leftarrow$ maximum index = 255 $\leftarrow$ max 256 outputs per transaction |
+|6-31| the last 26 bytes of $blake2b(essence(T))$                                                        |
 
-The _transaction essence_ is a concatenation of all elements of the raw transaction, excluding the signature:
+The _transaction essence_ is a concatenation of all elements of the raw transaction, excluding the signature (element $T_3$):
 $$
 essence(T) = \bigoplus_{i=0, i\ne 3}^{10} bytes(T_i)
 $$
-where $\bigoplus$ denotes concatenation.
+where $\bigoplus$ denotes concatenation. (The raw transaction is an 11-element tuple, indices 0–10; see [Transaction](tx.md).)
 
 ### Transaction ID prefix
 The 5-byte _transaction ID prefix_ includes:
@@ -58,29 +58,29 @@ The 5-byte _transaction ID prefix_ includes:
 |Byte indice(s) | Description|
 | -------- | -------- |
 |0-3|*slot* as big-endian `uint32`|
-|4|compound value of *tick* and *sequencer transaction flag*:<ul><li>bits [0:6] is *ticks* of the transaction</li><li>bit 7 is *sequencer transaction flag*</li></ul> |
+|4|compound value of *tick* and *sequencer transaction flag*:<ul><li>bits [1:7] hold the *tick* (so the byte value is *tick* × 2)</li><li>bit 0 is the *sequencer transaction flag*</li></ul> |
 
-Thus, the transaction ID prefix is the timestamp with the sequencer flag set in bit 7 of the last byte.
+Thus, the transaction ID prefix is the timestamp with the sequencer flag set in bit 0 of the last byte.
 
-The genesis transaction is a sequencer transaction; hence, its transaction ID prefix is `0x0000000001`.
+The genesis transaction is a sequencer transaction; hence, its transaction ID prefix is `0x0000000001` (slot 0, tick 0, sequencer flag set).
 
 
-### Human-Readable Transaction ID Prefix
+### Human-readable transaction ID
 
-The human-readable form is `[<slot>|<ticks><seq-flag>]`, where.
-* `<slot>` decimal slot value
-* `<tick>` decimal tick value (max 127)
-* `<seq-flag>`:
-    * empty, if not a sequencer transaction
-    * `sq` for sequencer transactions with $tick\ne 0$
-    * `br` for sequencer transactions with $tick = 0$. i.e. *branch transaction*
+The default human-readable form is the *dashed* form `[s]<slot>-<tick>-<hash>`:
+* a leading `s` means the transaction is a **sequencer transaction** (including branch transactions); ordinary transactions have no prefix.
+* `<slot>` — decimal slot value.
+* `<tick>` — decimal tick value (0–127).
+* `<hash>` — hex of the rest of the ID (the output-count byte followed by the 26-byte hash).
 
-The genesis transaction is a branch transaction producing two UTXOs. Its transaction ID is:
+A sequencer transaction with `<tick> = 0` sits exactly on a slot boundary and is a **branch transaction**.
 
-* raw (hex): `0000000001010000000000000000000000000000000000000000000000000000`
-* human-readable: `[0|0br]010000000000000000000000000000000000000000000000000000`
+The genesis transaction is a branch transaction producing three UTXOs. Its transaction ID is:
 
-> Note: the genesis transaction does not technically exist. Instead, there are two genesis outputs: the **genesis sequencer output** and the **genesis stem output**.
+* raw (hex): `0000000001020000000000000000000000000000000000000000000000000000`
+* human-readable: `s0-0-020000000000000000000000000000000000000000000000000000`
+
+> Note: the genesis transaction does not technically exist. Instead, there are three genesis outputs: the **genesis sequencer output**, the **genesis stem output**, and the **genesis controller (dust) output**.
 
 Most of the transaction and output ID logic is in the `proxima/ledger/base` package.
 
@@ -97,11 +97,15 @@ Each output (UTXO) has a unique output ID, which is used as a key in the key-val
 |Byte indice(s) | Description                                                                                              |
 | -------- |----------------------------------------------------------------------------------------------------------|
 |0-31| Transaction ID that produced the output                                                                  |
-|32| Index of the output within the transaction (must match the last UTXO index in the transaction ID prefix) |
+|32| Index of the output within the transaction (must not exceed the last UTXO index in the transaction ID prefix) |
 
-The human-readable form appends [n] to the transaction ID, where n is the output index. For example:
-- `0000000001010000000000000000000000000000000000000000000000000000` and `[0|0br]010000000000000000000000000000000000000000000000000000[0]` (human-readable) is ID of the genesis sequencer output
--  `0000000001010000000000000000000000000000000000000000000000000001` and `[0|0br]010000000000000000000000000000000000000000000000000000[1]` is ID of the genesis stem output
+The human-readable form appends `#n` to the transaction ID, where `n` is the output index. For example:
+- `0000000001020000000000000000000000000000000000000000000000000000` → `s0-0-020000000000000000000000000000000000000000000000000000#0` is the ID of the genesis sequencer output
+- `0000000001020000000000000000000000000000000000000000000000000001` → `s0-0-020000000000000000000000000000000000000000000000000000#1` is the ID of the genesis stem output
+
+## Chain ID
+
+A **chain ID** identifies a chained account (a sequencer, a foundry, a delegation, …). It is a 24-byte array, derived for a new chain as the first 24 bytes of `blake2b` of the chain origin's output ID. The human-readable form prefixes the hex with `$/`, for example `$/6393b6781206a652070e78d1391bc467e9d9704e9aa59ec7`.
 
 ## Integers and token amounts
 All amounts and integers are encoded as byte arrays of up to 8 bytes, interpreted as big-endian `uint64`.
@@ -110,7 +114,7 @@ Terminal data in the transaction’s tuple tree always includes a size prefix. T
 
 Examples:
 * empty byte array is interpreted as `uint64(0)`
-* 2-byte array `[]byte{0x01, 0x02}` is interpreted as `uint64(18)`
+* 2-byte array `[]byte{0x01, 0x02}` is interpreted as `uint64(258)`
 
 ## Language bindings
 Here are examples of how low-level transaction concepts map to high-level programming language structures.
@@ -133,40 +137,34 @@ type Constraint interface {
 Example: a _time lock_ constraint preventing UTXO consumption before slot 1000:
 ```go
 timeLock := ledger.NewTimeLock(1000)
-fmt.Printf("source: %s\n", timelock.Source())
-fmt.Printf("human-readable: %s\n", timelock.String())
-fmt.Printf("bytecode: %s\n", hex.EncodeToString(timelock.Bytes())
+fmt.Printf("source: %s\n", timeLock.Source())
+fmt.Printf("human-readable: %s\n", timeLock.String())
 ```
-Output:
-```yaml
+```
 source: timelock(u32/1000)
 human-readable: timelock(1000)
-bytecode: 45bf84000003e8
 ```
 
-### Defining UTXO
-In Go, a UTXO wraps a tuple:
+### Defining a UTXO
+In Go, a UTXO wraps a tuple of constraints:
 
 ```go
 type Output struct {
    *tuples.Tuple
 }
 ```
-Example: creating a new UTXO:
-```go
-utxo := ledger.NewOutput(func(o *ledger.OutputBuilder) {
-	o.WithAmount(1337)
-	o.WithLock(ledger.AddressED25519Random())
-	o.MustPushConstraint(tl.Bytes())
-})
-println(utxo.String())
-```
-Output:
-```yaml
-0: amount(1337)
-1: a(0x31608fbd1cc5c98325ea0daac88ed5f752b66603344dc3b071992b5515c0921d)
-2: timelock(1000)
-```
+
+The constraints occupy fixed positions in the tuple:
+
+| Index | Content |
+|-------|---------|
+| 0 | amounts vector (token balance, inflation, frozen coverage) |
+| 1 | index-values (controller / target / sender hashes used for state indexing) |
+| 2 | lock (the unlock-policy bytecode) |
+| 3 | chain constraint (only for chain outputs) |
+| 4+ | per-lock extras |
+
+So, for a simple signature-locked output, the holder's address goes into the index-values at position 1 and the (argument-less) signature lock sits at position 2 — any additional constraints (such as a time lock) follow at positions 3 and up.
 
 ### Building a transaction
-The `txbuilder.TransactionBuilder` type is used to incrementally construct a transaction: consuming and producing UTXOs, setting fields, signing with a private key, and finally producing a byte blob for persistence.
+The transaction builder is used to incrementally construct a transaction: consuming and producing UTXOs, setting fields, signing with a private key, and finally producing a byte blob for persistence.

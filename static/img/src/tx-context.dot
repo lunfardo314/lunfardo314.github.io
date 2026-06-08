@@ -1,0 +1,127 @@
+digraph TxContext {
+  graph [rankdir=TB, fontname="Helvetica", nodesep=0.35, ranksep=0.6, ordering=out, bgcolor="white"];
+  node  [fontname="Helvetica", fontsize=11, shape=box, margin="0.10,0.06"];
+  edge  [fontname="Helvetica-Bold", fontsize=11, fontcolor="#1F5FCC", color="#555555", arrowsize=0.7];
+
+  root [label="Full transaction context", style="rounded,filled", fillcolor="#FCE6A8", color="#C9A227"];
+
+  // ===== index 1: Ledger state =====
+  ledger   [label="Ledger state",     style="rounded,filled", fillcolor="#FCE6A8", color="#C9A227"];
+  consumed [label="Consumed outputs", style="rounded,filled", fillcolor="#FCE6A8", color="#C9A227"];
+  root   -> ledger   [label="1"];
+  ledger -> consumed [label="0"];
+
+  cux0 [label="UTXO", style="rounded,filled", fillcolor="#FCE6A8", color="#C9A227"];
+  cux1 [label="UTXO", style="rounded,filled", fillcolor="#FCE6A8", color="#C9A227"];
+  cuxN [label="...", shape=plaintext];
+  consumed -> cux0 [label="0"];
+  consumed -> cux1 [label="1"];
+  consumed -> cuxN [label="n", arrowhead=none, color="#aaaaaa"];
+
+  c_amounts [label="amounts", style="rounded,filled", fillcolor="#FCE6A8", color="#C9A227"];
+  c_idxval  [label="index-values", style="rounded,filled", fillcolor="#FCE6A8", color="#C9A227"];
+  c_lock    [label="lock", style="filled", fillcolor="white", color="#CC0000", penwidth=1.6];
+  c_cstr    [label="constraint", style="filled", fillcolor="white", color="#CC0000", penwidth=1.6];
+  cux0 -> c_amounts [label="0"];
+  cux0 -> c_idxval  [label="1"];
+  cux0 -> c_lock    [label="2"];
+  cux0 -> c_cstr    [label="3+"];
+
+  // ===== index 0: Transaction =====
+  tx [label="Transaction", style="rounded,filled", fillcolor="#FCE6A8", color="#C9A227"];
+  root -> tx [label="0"];
+
+  // ---- compact legend, same rank as the Transaction node, above the elements ----
+  legend [shape=none, margin=0, label=<
+    <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="3" CELLPADDING="2">
+      <TR>
+        <TD BGCOLOR="#FCE6A8" WIDTH="13"> </TD><TD ALIGN="LEFT"><FONT POINT-SIZE="9">tuple</FONT></TD>
+        <TD BGCOLOR="#DEDEDE" WIDTH="13"> </TD><TD ALIGN="LEFT"><FONT POINT-SIZE="9">terminal</FONT></TD>
+        <TD BORDER="2" COLOR="#CC0000" BGCOLOR="white" WIDTH="13"> </TD><TD ALIGN="LEFT"><FONT POINT-SIZE="9">bytecode (evaluated)</FONT></TD>
+      </TR>
+    </TABLE>>];
+  { rank=same; tx; legend; }
+
+  // scalar terminal fields 0..5 : one vertical column (a row per field)
+  terminals [shape=plaintext, margin=0, label=<
+    <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="7" CELLPADDING="5" COLOR="#808080">
+      <TR><TD PORT="p0" BGCOLOR="#DEDEDE">Version</TD></TR>
+      <TR><TD PORT="p1" BGCOLOR="#DEDEDE">Timestamp</TD></TR>
+      <TR><TD PORT="p2" BGCOLOR="#DEDEDE">Sequencer data</TD></TR>
+      <TR><TD PORT="p3" BGCOLOR="#DEDEDE">Signature</TD></TR>
+      <TR><TD PORT="p4" BGCOLOR="#DEDEDE">Input commitment</TD></TR>
+      <TR><TD PORT="p5" BGCOLOR="#DEDEDE">Explicit baseline</TD></TR>
+    </TABLE>>];
+
+  // tuple fields 6..10
+  inputs  [label="Inputs",               style="rounded,filled", fillcolor="#FCE6A8", color="#C9A227"];
+  unlock  [label="Unlock params",        style="rounded,filled", fillcolor="#FCE6A8", color="#C9A227"];
+  outputs [label="Produced outputs",     style="rounded,filled", fillcolor="#FCE6A8", color="#C9A227"];
+  endorse [label="Endorsements",         style="rounded,filled", fillcolor="#FCE6A8", color="#C9A227"];
+  txcons  [label="Tx-level constraints", style="rounded,filled", fillcolor="#FCE6A8", color="#C9A227"];
+
+  tx -> inputs  [label="6"];
+  tx -> unlock  [label="7"];
+  tx -> outputs [label="8"];
+  tx -> endorse [label="9"];
+  tx -> txcons  [label="10"];
+  tx -> terminals:p0:w [label="0"];
+  tx -> terminals:p1:w [label="1"];
+  tx -> terminals:p2:w [label="2"];
+  tx -> terminals:p3:w [label="3"];
+  tx -> terminals:p4:w [label="4"];
+  tx -> terminals:p5:w [label="5"];
+
+  // inputs -> output IDs
+  in0 [label="Output ID", style=filled, fillcolor="#DEDEDE", color="#808080"];
+  in1 [label="Output ID", style=filled, fillcolor="#DEDEDE", color="#808080"];
+  inN [label="...", shape=plaintext];
+  inputs -> in0 [label="0"];
+  inputs -> in1 [label="1"];
+  inputs -> inN [label="n", arrowhead=none, color="#aaaaaa"];
+
+  // unlock params
+  up0 [label="params", style="rounded,filled", fillcolor="#FCE6A8", color="#C9A227"];
+  upN [label="...", shape=plaintext];
+  unlock -> up0 [label="0"];
+  unlock -> upN [label="n", arrowhead=none, color="#aaaaaa"];
+
+  // produced outputs -> UTXO -> internals (scripts red)
+  ux0 [label="UTXO", style="rounded,filled", fillcolor="#FCE6A8", color="#C9A227"];
+  uxN [label="...", shape=plaintext];
+  outputs -> ux0 [label="0"];
+  outputs -> uxN [label="m", arrowhead=none, color="#aaaaaa"];
+
+  p_amounts [label="amounts", style="rounded,filled", fillcolor="#FCE6A8", color="#C9A227"];
+  p_idxval  [label="index-values", style="rounded,filled", fillcolor="#FCE6A8", color="#C9A227"];
+  p_lock    [label="lock", style="filled", fillcolor="white", color="#CC0000", penwidth=1.6];
+  p_cstr    [label="constraint", style="filled", fillcolor="white", color="#CC0000", penwidth=1.6];
+  ux0 -> p_amounts [label="0"];
+  ux0 -> p_idxval  [label="1"];
+  ux0 -> p_lock    [label="2"];
+  ux0 -> p_cstr    [label="3+"];
+
+  // endorsements
+  e0 [label="Tx ID", style=filled, fillcolor="#DEDEDE", color="#808080"];
+  eN [label="...", shape=plaintext];
+  endorse -> e0 [label="0"];
+  endorse -> eN [label="k", arrowhead=none, color="#aaaaaa"];
+
+  // tx-level constraints (evaluated -> red)
+  bc0 [label="bytecode", style="filled", fillcolor="white", color="#CC0000", penwidth=1.6];
+  txcons -> bc0 [label="0"];
+
+  // Correspondence: input i (an Output ID) resolves to consumed UTXO i, i.e.
+  // utxo(T_{6,i}). Dashed cross-links + rank alignment make it explicit.
+  edge [constraint=false, style=dashed, color="#2E7D32", arrowhead=vee, penwidth=1.2];
+  in0 -> cux0 [xlabel="utxo(id)", fontcolor="#2E7D32"];
+  in1 -> cux1;
+
+  // Correspondence: unlock-params i unlock input i (one unlock-param per input).
+  edge [constraint=false, style=dashed, color="#8E44AD", arrowhead=vee, penwidth=1.2];
+  up0 -> in0 [xlabel="unlocks", fontcolor="#8E44AD"];
+
+  edge [constraint=true, style=solid, color="#555555", arrowhead=normal, penwidth=1.0];
+  { rank=same; cux0; in0; up0; }
+  { rank=same; cux1; in1; }
+}
