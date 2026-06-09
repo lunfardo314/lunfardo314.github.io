@@ -18,7 +18,7 @@ implementation.
 
 > This file documents the **node** config only. The `proxi` CLI wallet reads a
 > separate `proxi.yaml` profile (`wallet.*`, `api.endpoint`, `tag_along.*`, …),
-> documented in [`wallet_config.md`](wallet_config.md).
+> documented in [`wallet_config.md`](participate/wallet_config.md).
 
 ## Quick reference
 

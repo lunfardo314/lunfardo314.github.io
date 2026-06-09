@@ -10,7 +10,7 @@ ledger is reset from genesis and everyone starts again from a fresh state.
 
 ### Other docs
 
-Please read at least the basics on [proxi](proxi.md) and [delegation](delegate.md), along
+Please read at least the basics on [proxi](participate/proxi.md) and [delegation](participate/delegate.md), along
 with any other available materials.
 
 ### Public access points
@@ -69,14 +69,14 @@ faucet:
 
 #### Transfer tokens between accounts
 
-Use `proxi node send` to send tokens between accounts (see the [proxi docs](proxi.md)).
+Use `proxi node send` to send tokens between accounts (see the [proxi docs](participate/proxi.md)).
 For this, `proxi.yaml` must be configured properly — in particular the _tag-along
 sequencer_ and _tag-along fee_. List the available sequencers with
 `proxi node allchains -q` and pick one as your tag-along.
 
 #### Earn inflation by delegation
 
-Please read [delegation](delegate.md). It is **strongly encouraged** to delegate all but a
+Please read [delegation](participate/delegate.md). It is **strongly encouraged** to delegate all but a
 small reserve (say `100 or 1000 PROX`) of your tokens as soon as you receive them. List the
 sequencers available as delegation targets with `proxi node allchains -q`.
 
@@ -92,9 +92,9 @@ To run a sequencer you need two things:
    does not run a sequencer. It is easy to run and needs no tokens. It does not add to the
    consensus security, but it does add to its decentralization by keeping a replica of the
    ledger — the whole network can be recovered from a single node (plus the private keys
-   controlling the token accounts). See [Running an access node](run_access.md).
+   controlling the token accounts). See [Running an access node](participate/run_access.md).
 2. **A sequencer** configured on that access node (which then makes it a _sequencer node_).
-   Running a sequencer requires tokens. See [Running a node with a sequencer](run_sequencer.md). 
+   Running a sequencer requires tokens. See [Running a node with a sequencer](participate/run_sequencer.md). 
 Sequencers generate inflation and so contribute to the network's security on behalf of the
 token holder. In addition to the usual inflation, a sequencer may receive a _branch
 inflation bonus_.

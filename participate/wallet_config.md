@@ -9,7 +9,7 @@ admin tasks and as a demo. Most commands build and sign transactions and talk to
 a node over the HTTP API (configured by `api.endpoint`). The exception is the
 `proxi db …` family, which opens a local BadgerDB directly and does not use this
 profile's API settings. The node itself is configured separately — see
-[`node_config.md`](node_config.md) for `proxima.yaml`.
+[`node_config.md`](participate/node_config.md) for `proxima.yaml`.
 
 ## File location and profile selection
 
@@ -22,7 +22,7 @@ profile's API settings. The node itself is configured separately — see
 - A profile is created with `proxi config wallet` (see below).
 
 > This file documents the **wallet profile** only. For node (`proxima.yaml`)
-> configuration see [`node_config.md`](node_config.md).
+> configuration see [`node_config.md`](participate/node_config.md).
 
 ## Quick reference
 
@@ -85,7 +85,7 @@ How `proxi` reaches the node's REST API.
 
 | Tag | Type | Default | Description |
 |-----|------|---------|-------------|
-| `api.endpoint` | URL | (required) | Base URL of the node API, e.g. `http://127.0.0.1:8000`. Must point at the node's `api.port` (see [`node_config.md` § `api`](node_config.md)). Overridable per-command via the `--api.endpoint` flag on `node`/`snapshot` subcommands. |
+| `api.endpoint` | URL | (required) | Base URL of the node API, e.g. `http://127.0.0.1:8000`. Must point at the node's `api.port` (see [`node_config.md` § `api`](participate/node_config.md)). Overridable per-command via the `--api.endpoint` flag on `node`/`snapshot` subcommands. |
 | `api.timeout_sec` | int | (client default) | HTTP client timeout in seconds. Only applied when `> 0`; otherwise the client default is used. Not written by `proxi config wallet` — add it manually if needed. |
 
 ```yaml
@@ -163,7 +163,7 @@ tag_along:
 > Cross-reference: when you run `proxi config node --standalone`/`--sequencer`,
 > the node's `sequencer.controller_key_file` is filled from this profile's
 > `wallet.key_file` (or the default `proxima.key`). See
-> [`node_config.md` § Generating a starting config](node_config.md).
+> [`node_config.md` § Generating a starting config](participate/node_config.md).
 
 ---
 
@@ -195,7 +195,7 @@ process, so each command prompts at most once.
 
 > Cross-reference: on a **node**, the sequencer's controller key is loaded from
 > `sequencer.controller_key_file` and uses the `SEQUENCER_KEY_PASSPHRASE` env
-> var instead. See [`node_config.md` § `sequencer`](node_config.md).
+> var instead. See [`node_config.md` § `sequencer`](participate/node_config.md).
 
 ---
 

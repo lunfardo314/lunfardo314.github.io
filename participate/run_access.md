@@ -68,7 +68,7 @@ holds a deterministic, fully auditable record of the ledger state's history.
 
 These are step-by-step instructions to start an access node and sync it with the
 testnet. For the full list of `proxima.yaml` config options see
-[`node_config.md`](node_config.md).
+[`node_config.md`](participate/node_config.md).
 
 > Placeholders such as `<BOOTSTRAP_HOST>`, `<BOOTSTRAP_PORT>`,
 > `<BOOTSTRAP_HOST_ID>` and `<BOOTSTRAP_API>` refer to a public testnet node. Use
@@ -107,7 +107,7 @@ The generated file contains sensible defaults: peering port `4000`, API port
 > If you plan to add a sequencer to this node later, generate the config with
 > `proxi config node --sequencer`. It adds a **disabled** sequencer section, so
 > the node still runs as a plain access node until you enable it. See
-> [`run_sequencer.md`](run_sequencer.md).
+> [`run_sequencer.md`](participate/run_sequencer.md).
 
 ### Add a bootstrap peer
 
@@ -124,7 +124,7 @@ peering:
 
 Adjust the `api.port` / `peering.host.port` if those ports are taken on your
 machine. Other options are documented inline as comments and in
-[`node_config.md`](node_config.md).
+[`node_config.md`](participate/node_config.md).
 
 ## 3. Configure state sources (automatic snapshot download)
 
@@ -232,7 +232,7 @@ The node serves several read-only browser tools on its API port (default
 - **dagviz** (live MemDAG) — `/dagviz`. Real-time visualizer of the **in-memory**
   DAG as transactions arrive. It connects to the node's WebSocket vertex stream,
   so it requires streaming to be enabled in `proxima.yaml`
-  (`api.streaming.enable: true`; see [`node_config.md`](node_config.md)).
+  (`api.streaming.enable: true`; see [`node_config.md`](participate/node_config.md)).
 
 - **Chain explorer** — `/chain_explorer`. Browser view of chained accounts
   (sequencers, delegations, foundries, …) in the latest reliable branch, with
@@ -275,7 +275,7 @@ journalctl -u proxima -f
 
 > If you run a **sequencer** on this node, note the constraint on the controller
 > key under systemd (no interactive passphrase prompt) — see
-> [`run_sequencer.md`](run_sequencer.md).
+> [`run_sequencer.md`](participate/run_sequencer.md).
 
 ## Operational notes
 
@@ -287,7 +287,7 @@ journalctl -u proxima -f
   garbage and the database grows. Two ways to reclaim it:
   - *Automatic:* enable the `snapshot_restore` section in `proxima.yaml` to
     periodically restart and restore from the latest snapshot, keeping the
-    database compact (see [`node_config.md`](node_config.md)).
+    database compact (see [`node_config.md`](participate/node_config.md)).
   - *Manual:* stop the node, delete the state DB (`proximadb`) directory, and
     restart. The node downloads the latest snapshot, syncs, and continues from
     there — exactly the first-start flow (step 3 / step 4).

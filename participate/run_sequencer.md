@@ -18,7 +18,7 @@ transactions every slot they push the tangle — and the consensus — forward; 
 nodes only validate and relay, so without sequencers the ledger would not advance.
 
 - A node that runs a sequencer is a **sequencer node**.
-- A node that does not is an **access node** ([`run_access.md`](run_access.md)).
+- A node that does not is an **access node** ([`run_access.md`](participate/run_access.md)).
 
 The node core supports multiple sequencers, but the current version allows **one
 sequencer per node**.
@@ -32,8 +32,8 @@ sequencer per node**.
 ## Prerequisites
 
 A sequencer runs as part of a normal node, so first get an **access node running
-and synced** following [`run_access.md`](run_access.md). You also need a funded
-wallet ([`wallet_config.md`](wallet_config.md)) — the key that creates the
+and synced** following [`run_access.md`](participate/run_access.md). You also need a funded
+wallet ([`wallet_config.md`](participate/wallet_config.md)) — the key that creates the
 sequencer chain is the key that controls it.
 
 ## 1. Create the sequencer chain origin
@@ -92,7 +92,7 @@ sequencer:
 
 The other sequencer options (`max_tag_along_inputs`, `tag_along_drain_rate`,
 `logging`, `force_activity`, `standalone`, …) are documented in
-[`node_config.md`](node_config.md).
+[`node_config.md`](participate/node_config.md).
 
 ## 3. (Optional) Encrypt the controller key
 
@@ -147,7 +147,7 @@ transactions effectively fee-less.
 ## The controller key when running as a service
 
 For production you typically run the node under `systemd` (see
-[Running as a systemd service](run_access.md) in the access-node guide). One
+[Running as a systemd service](participate/run_access.md) in the access-node guide). One
 caveat applies specifically to the sequencer's controller key:
 
 **Do not encrypt the controller key when the node is controlled by `systemctl`.**
@@ -179,10 +179,10 @@ reasonable choice.
 
 - **Clock sync matters most here.** A sequencer issues timestamped transactions,
   so keep the node's clock tightly synced to real time (see the clock note in
-  [`run_access.md`](run_access.md)).
+  [`run_access.md`](participate/run_access.md)).
 - **Logging.** Use the `logger` and `sequencer.logging` options to control how
   much sequencer activity is written, and to a separate file if desired (see
-  [`node_config.md`](node_config.md)).
+  [`node_config.md`](participate/node_config.md)).
 - Everything from the access-node guide (snapshots, sync, browser tools, state
   cleanup, running as a service) applies unchanged — a sequencer node *is* a full
   node that additionally issues transactions.

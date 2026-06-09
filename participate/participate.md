@@ -4,23 +4,23 @@ Proxima is **permissionless**: the only participants are token holders, and anyo
 
 ## Ways to participate
 
-* **As a token holder.** Hold and move your tokens with the [`proxi`](proxi.md) command-line wallet. Moving tokens (building a chain) is what earns inflation and contributes to the security of the ledger — see [Incentives](overview/incentives.md).
-* **By delegating.** [Delegate](delegate.md) your funds to a sequencer of your choice to earn inflation on your behalf, while keeping full, trustless control of your tokens. This is the recommended option for most holders — see [Delegation and liveness](overview/delegation.md).
-* **By running an access node.** [Run a full (non-sequencer) node](run_access.md) to follow the tangle, serve the API, and relay transactions to peers. A good first step for developers and infrastructure operators.
-* **By running a sequencer.** [Run a sequencer](run_sequencer.md) to proactively build a sequencer chain, issue branches, and pull user transactions via the tag-along mechanism. Sequencers are the most active participants and are critical to the security of the ledger.
+* **As a token holder.** Hold and move your tokens with the [`proxi`](participate/proxi.md) command-line wallet. Moving tokens (building a chain) is what earns inflation and contributes to the security of the ledger — see [Incentives](overview/incentives.md).
+* **By delegating.** [Delegate](participate/delegate.md) your funds to a sequencer of your choice to earn inflation on your behalf, while keeping full, trustless control of your tokens. This is the recommended option for most holders — see [Delegation and liveness](overview/delegation.md).
+* **By running an access node.** [Run a full (non-sequencer) node](participate/run_access.md) to follow the tangle, serve the API, and relay transactions to peers. A good first step for developers and infrastructure operators.
+* **By running a sequencer.** [Run a sequencer](participate/run_sequencer.md) to proactively build a sequencer chain, issue branches, and pull user transactions via the tag-along mechanism. Sequencers are the most active participants and are critical to the security of the ledger.
 
-The quickest way to get hands-on is the [open testnet](testnet.md). Frontend and wallet developers who want a private node to build against can spin up a [standalone developer node](run_standalone.md).
+The quickest way to get hands-on is the [open testnet](participate/testnet.md). Frontend and wallet developers who want a private node to build against can spin up a [standalone developer node](participate/run_standalone.md).
 
 ## Guides in this section
 
-* [Participating in the open testnet](testnet.md) — get tokens and start moving them on the live testnet.
-* [The `proxi` wallet](proxi.md) — the command-line wallet and node-management tool.
-* [Wallet configuration](wallet_config.md) — the `proxi.yaml` wallet profile.
-* [Delegation](delegate.md) — delegate funds to a sequencer to earn inflation trustlessly.
-* [Running an access node](run_access.md) — join and sync a full node with the testnet.
-* [Running a sequencer node](run_sequencer.md) — run a sequencer chain.
-* [Running a standalone developer node](run_standalone.md) — a throwaway single-node network for frontend/wallet development.
-* [Node configuration reference](node_config.md) — every `proxima.yaml` tag.
+* [Participating in the open testnet](participate/testnet.md) — get tokens and start moving them on the live testnet.
+* [The `proxi` wallet](participate/proxi.md) — the command-line wallet and node-management tool.
+* [Wallet configuration](participate/wallet_config.md) — the `proxi.yaml` wallet profile.
+* [Delegation](participate/delegate.md) — delegate funds to a sequencer to earn inflation trustlessly.
+* [Running an access node](participate/run_access.md) — join and sync a full node with the testnet.
+* [Running a sequencer node](participate/run_sequencer.md) — run a sequencer chain.
+* [Running a standalone developer node](participate/run_standalone.md) — a throwaway single-node network for frontend/wallet development.
+* [Node configuration reference](participate/node_config.md) — every `proxima.yaml` tag.
 
 ## Contribute
 

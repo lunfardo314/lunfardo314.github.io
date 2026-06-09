@@ -205,4 +205,4 @@ the details of each.
 
 ### Delegation
 
-See [delegation](delegate.md).
+See [delegation](participate/delegate.md).
