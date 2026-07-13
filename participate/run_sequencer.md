@@ -91,7 +91,8 @@ sequencer:
 - `enable: false` keeps the node a plain access node.
 
 The other sequencer options (`max_tag_along_inputs`, `tag_along_drain_rate`,
-`logging`, `force_activity`, `standalone`, …) are documented in
+`max_frozen_delegations`, `do_not_produce_branches`, `logging`, `force_activity`,
+`standalone`, …) are documented in
 [`node_config.md`](participate/node_config.md).
 
 ## 3. (Optional) Encrypt the controller key
