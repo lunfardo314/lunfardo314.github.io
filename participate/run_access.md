@@ -129,7 +129,7 @@ machine. Other options are documented inline as comments and in
 ## 3. Configure state sources (automatic snapshot download)
 
 <!-- TODO / REVISIT before publishing these docs to the public:
-     the whole snapshot download + sync process (sync.sources, automatic
+     the whole snapshot download + sync process (sources, automatic
      download/restore, verification) is still evolving and must be reviewed
      and re-tested before release. -->
 > **⚠ Draft — to be revisited.** The snapshot download and sync process is still
@@ -139,13 +139,12 @@ machine. Other options are documented inline as comments and in
 A new node needs an initial ledger state to start from. You no longer download a
 snapshot by hand — the node fetches one automatically when its state database is
 **missing or corrupted**. You only need to tell it where to look, via the
-`sync.sources` list in `proxima.yaml`:
+top-level `sources` list in `proxima.yaml`:
 
 ```yaml
-sync:
-  sources:
-    - "http://<BOOTSTRAP_API>"
-    - "http://<ANOTHER_NODE_API>"
+sources:
+  - "http://<BOOTSTRAP_API>"
+  - "http://<ANOTHER_NODE_API>"
 ```
 
 On startup, if the `proximadb` state database is absent or corrupted, the node:
@@ -158,9 +157,10 @@ On startup, if the `proximadb` state database is absent or corrupted, the node:
    if every download fails). If neither a download nor a local snapshot is
    available, the node refuses to start.
 
-The same `sync.sources` list is also used for ongoing branch-by-branch
-forward-sync, so configuring it serves both purposes. The remote nodes must have
-`snapshot.enable_api: true` to serve snapshots. A snapshot taken before a ledger
+The same `sources` list is also used for ongoing branch-by-branch
+forward-sync, so configuring it serves both purposes — in fact, an empty `sources`
+is what disables forward-sync. The remote nodes must have
+`snapshot.enable_download_api: true` to serve snapshots. A snapshot taken before a ledger
 upgrade that has since activated is detected and discarded automatically.
 
 > Manual override (rarely needed): you may still drop a `*.snapshot` file into
@@ -232,7 +232,7 @@ The node serves several read-only browser tools on its API port (default
 - **dagviz** (live MemDAG) — `/dagviz`. Real-time visualizer of the **in-memory**
   DAG as transactions arrive. It connects to the node's WebSocket vertex stream,
   so it requires streaming to be enabled in `proxima.yaml`
-  (`api.streaming.enable: true`; see [`node_config.md`](participate/node_config.md)).
+  (`api.dag_streaming.enable: true`; see [`node_config.md`](participate/node_config.md)).
 
 - **Chain explorer** — `/chain_explorer`. Browser view of chained accounts
   (sequencers, delegations, foundries, …) in the latest reliable branch, with

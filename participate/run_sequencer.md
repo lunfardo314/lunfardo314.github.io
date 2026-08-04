@@ -90,8 +90,15 @@ sequencer:
   node clamps any smaller value up to the ledger minimum.
 - `enable: false` keeps the node a plain access node.
 
+- **`produce_branches`** is `false` by default: the sequencer does not issue
+  branch transactions and does not compete for the branch inflation bonus. It
+  still captures chain inflation, services tag-along and delegation freezing, and
+  its milestones reach committed state via other sequencers' branches. Opt in
+  only if you intend to compete for the bonus and have the CPU and latency
+  headroom — a handful of branching sequencers per slot is all the network needs.
+
 The other sequencer options (`max_tag_along_inputs`, `tag_along_drain_rate`,
-`max_frozen_delegations`, `do_not_produce_branches`, `logging`, `force_activity`,
+`max_frozen_delegations`, `logging`, `force_activity`,
 `standalone`, …) are documented in
 [`node_config.md`](participate/node_config.md).
 
