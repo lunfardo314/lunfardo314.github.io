@@ -34,28 +34,36 @@ The generated profile:
 
 ```yaml
 # default sequencer ID is used when own or tag-along sequencer is not specified
-default_sequencer_id: 9d2c6fedeb0f31a9a97d28c59b276402f6c8e78777b89a825e31496c08ef8d6d
+default_sequencer_id: 50726f78696d612e626f6f7473747261702e636861696e2e
 
 wallet:
     key_file: proxima.key
     holder_id: <your account holder ID>
     # the sequencer this wallet controls; 'proxi node seq withdraw' draws from it
-    sequencer_id: 9d2c6fedeb0f31a9a97d28c59b276402f6c8e78777b89a825e31496c08ef8d6d
+    sequencer_id: 50726f78696d612e626f6f7473747261702e636861696e2e
 api:
     endpoint: http://127.0.0.1:8000
 
 tag_along:
-    # fee paid to a sequencer so the tx gets pulled
+    # preferred fee paid to a sequencer so the tx gets pulled; the sequencer's own
+    # declared minimum wins if it is larger
     fee: 1
+    # pick whichever sequencer is currently active
+    sequencer_id: random
 ```
+
+> On a standalone network the only sequencer is the bootstrap one, so `random`
+> resolves to it as soon as it is producing milestones. If you prefer the wallet
+> not to depend on that, set `sequencer_id` to the bootstrap sequencer ID above.
 
 - `holder_id` is your account identifier: `blake2b(<sig type byte> || <public key>)`.
   It is what sigLock outputs are addressed to, and what the frontend passes to
   `get_outputs` / `HolderIDFromPrivateKeyED25519` in the WASM wallet.
 - Both `default_sequencer_id` and `wallet.sequencer_id` are set to the **bootstrap
   sequencer ID**. This is a **predefined constant** (`ledger.BoostrapSequencerIDHex`
-  = `9d2c6fed…08ef8d6d`, the blake2b hash of the genesis output ID) — the same for
-  every standalone ledger. In standalone mode the wallet key controls that
+  = `50726f78696d612e626f6f7473747261702e636861696e2e`, the hex of the 24-byte
+  ASCII string `Proxima.bootstrap.chain.`) — independent of the genesis output
+  IDs, and the same for every ledger. In standalone mode the wallet key controls that
   bootstrap sequencer, which is why this wallet can withdraw from it (step 4).
 
 ### 2. Create the standalone node config + genesis

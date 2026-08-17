@@ -498,7 +498,7 @@ key/ID. Fixed defaults baked into the generated file: peering `port: 4000`,
 |------|--------|
 | (none) | Base node config: `peering`, `api`, `snapshot`, `snapshot_restore`, `logger`, `metrics`, plus commented-out `workflow`, `health_relief`, `sources`, `sync` and `memory` blocks. No sequencer section. |
 | `--sequencer` | Add a **disabled** sequencer section with a placeholder `chain_id` (`<sequencer id hex encoded>`) and `enable: false`. If `proxima.yaml` already exists, this is **edit mode**: only the `sequencer:` section is added/replaced, the rest of the file is untouched. |
-| `--standalone` | Fresh single-node dev network: an **enabled** bootstrap sequencer (`name: boot`, `enable: true`, `chain_id` = the fixed bootstrap sequencer ID `9d2c6fed…`, `standalone: true`), plus an enabled `txlogger` section and an enabled `api.dag_streaming` block (the DAG visualizer is the main way to watch a single node, so its connection TTL is set long). Also reads the wallet key and writes a **genesis snapshot** into the current directory. Cannot be combined with the existing-file edit mode. |
+| `--standalone` | Fresh single-node dev network: an **enabled** bootstrap sequencer (`name: boot`, `enable: true`, `chain_id` = the fixed bootstrap sequencer ID `50726f78696d61…636861696e2e`, `standalone: true`), plus an enabled `txlogger` section and an enabled `api.dag_streaming` block (the DAG visualizer is the main way to watch a single node, so its connection TTL is set long). Also reads the wallet key and writes a **genesis snapshot** into the current directory. Cannot be combined with the existing-file edit mode. |
 | `--trace` | Also include the `trace_tags` block and an enabled `txlogger` section. |
 | `--name <1-6 chars>` | Sequencer name, used with `--sequencer`/`--standalone` (defaults to `boot` under `--standalone`). |
 
@@ -604,7 +604,7 @@ txlogger:
 sequencer:
   name: boot
   enable: true
-  chain_id: 9d2c6fedeb0f31a9a97d28c59b276402f6c8e78777b89a825e31496c08ef8d6d
+  chain_id: 50726f78696d612e626f6f7473747261702e636861696e2e
   controller_key_file: proxima.key
   pace: 12
   max_tag_along_inputs: 15

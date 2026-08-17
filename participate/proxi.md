@@ -54,7 +54,7 @@ The generated `proxi.yaml` looks like this (with explanatory comments; the
 
 ```yaml
 # default sequencer ID is used when own or tag-along sequencer is not specified
-default_sequencer_id: 9d2c6fedeb0f31a9a97d28c59b276402f6c8e78777b89a82
+default_sequencer_id: 50726f78696d612e626f6f7473747261702e636861696e2e
 
 wallet:
     key_file: proxi.key
@@ -62,14 +62,14 @@ wallet:
     # sequencer_id is the sequencer ID controlled by the private key of the wallet.
     # The controller wallet can withdraw tokens from the sequencer chain with command
     # 'proxi node seq withdraw'
-    sequencer_id: 9d2c6fedeb0f31a9a97d28c59b276402f6c8e78777b89a82
+    sequencer_id: 50726f78696d612e626f6f7473747261702e636861696e2e
 api:
     endpoint: http://127.0.0.1:8000
 
 tag_along:
-    # tag-along fee amount and ID of the tag-along sequencer
+    # preferred tag-along fee, and which sequencer to tag along to
     fee: 1
-#    sequencer_id: <tag-along sequencer ID>
+    sequencer_id: random
 ```
 
 **You usually need to adjust the profile before using it** — in particular the API
@@ -83,7 +83,7 @@ wallet's public key. The node uses it as a consistency check against the key fil
 
 `default_sequencer_id` is used whenever a tag-along or own sequencer ID is not given
 explicitly. `proxi config wallet` sets it to
-`9d2c6fedeb0f31a9a97d28c59b276402f6c8e78777b89a82`, which is the ID of the
+`50726f78696d612e626f6f7473747261702e636861696e2e`, which is the ID of the
 *bootstrap sequencer* (a built-in constant).
 
 `wallet.sequencer_id` matters only if you run a sequencer. It is the ID of the
@@ -97,13 +97,23 @@ for example a public access node of the testnet.
 
 `tag_along.fee` and `tag_along.sequencer_id` describe the *tag-along* mechanism, which
 every token-sending command relies on. Each transaction you send carries a small extra
-output, the **tag-along output**, that pays `tag_along.fee` tokens to the sequencer in
-`tag_along.sequencer_id` (defaulting to `default_sequencer_id`). That sequencer
-consumes the tag-along output in its own transaction, which is what pulls your
-transaction into the ledger. Without this, your transaction would not be picked up.
-Common configuration mistake is wrong, non-existent tag-along sequencer ID. In that case `proxi` creates
-transaction that is tagged-along the non-existent sequencer, so nobody picks it.
-Everything looks well but transaction does not confirm (is not included into the ledger state).
+output, the **tag-along output**, that pays a fee to the sequencer in
+`tag_along.sequencer_id`. That sequencer consumes the tag-along output in its own
+transaction, which is what pulls your transaction into the ledger. Without this, your
+transaction would not be picked up.
+
+The fee paid is `max(tag_along.fee, the minimum fee the target sequencer declares)`.
+A sequencer refuses anything under its declared minimum, so `tag_along.fee` is a
+preference that matters only when it is the larger of the two — raise it to outbid
+other senders, since a sequencer serves its backlog biggest-fee-first.
+
+`tag_along.sequencer_id` takes a chain ID or the literal `random`, which picks a
+sequencer that has been active within the last slot and fails if none is. Naming a
+sequencer explicitly is the common source of a puzzling failure: if the ID is wrong,
+or that sequencer has stopped, `proxi` builds a transaction tagged along to nobody.
+Everything looks fine but the transaction never confirms. `random` avoids that by
+choosing from sequencers known to be alive; the generated profile uses it by default.
+Leaving `sequencer_id` empty falls back to `default_sequencer_id`.
 
 ### How to read transaction and other IDs
 

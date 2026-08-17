@@ -34,8 +34,8 @@ profile's API settings. The node itself is configured separately — see
 | `wallet.sequencer_id` | hex chain ID | Sequencer controlled by this wallet (for `seq withdraw` etc)    |
 | `api.endpoint` | URL | Node REST API endpoint `proxi` talks to                         |
 | `api.timeout_sec` | int | Optional HTTP client timeout (seconds)                          |
-| `tag_along.fee` | uint64 | Tag-along fee attached to outgoing transactions                 |
-| `tag_along.sequencer_id` | hex chain ID | Tag-along sequencer (optional; falls back to default)           |
+| `tag_along.fee` | uint64 | Preferred tag-along fee; the sequencer's declared minimum wins if larger |
+| `tag_along.sequencer_id` | hex chain ID or `random` | Tag-along sequencer (`random` = pick an active one; falls back to default only when unset) |
 
 ---
 
@@ -48,10 +48,10 @@ more specific sequencer is not configured — both `wallet.sequencer_id` and
 
 `proxi config wallet` seeds this with the **bootstrap sequencer ID**
 (`ledger.BoostrapSequencerIDHex`,
-`9d2c6fedeb0f31a9a97d28c59b276402f6c8e78777b89a825e31496c08ef8d6d`).
+`50726f78696d612e626f6f7473747261702e636861696e2e`).
 
 ```yaml
-default_sequencer_id: 9d2c6fedeb0f31a9a97d28c59b276402f6c8e78777b89a825e31496c08ef8d6d
+default_sequencer_id: 50726f78696d612e626f6f7473747261702e636861696e2e
 ```
 
 ---
@@ -74,7 +74,7 @@ keystore stores as `holder_id`.
 wallet:
   key_file: proxima.key
   holder_id: 7d3142a5af76d4be9de683d8f492dce2110936d553415102be768cf4df8cacc1
-  sequencer_id: 9d2c6fedeb0f31a9a97d28c59b276402f6c8e78777b89a825e31496c08ef8d6d
+  sequencer_id: 50726f78696d612e626f6f7473747261702e636861696e2e
 ```
 
 ---
@@ -107,14 +107,76 @@ output (fee). Only one tag-along sequencer is supported at a time.
 
 | Tag | Type | Default | Description |
 |-----|------|---------|-------------|
-| `tag_along.fee` | uint64 | `1` (template) | Fee amount attached as the tag-along output. Read by `GetTagAlongFee`. |
-| `tag_along.sequencer_id` | hex chain ID | "" (→ `default_sequencer_id`) | Sequencer that should pick up the transaction. If empty, falls back to `default_sequencer_id`. Read by `GetTagAlongSequencerID`, which also validates (via the node) that the ID is a live sequencer chain. |
+| `tag_along.fee` | uint64 | `1` (template) | *Preferred* fee, not the price paid. See below. Read by `GetTagAlongFee`. |
+| `tag_along.sequencer_id` | hex chain ID or `random` | `random` (template) | Sequencer that should pick up the transaction. `random` picks one that is currently active. Empty falls back to `default_sequencer_id`. Read by `GetTagAlongSequencerID`, which also validates (via the node) that an explicitly named ID is a live sequencer chain. |
 
 ```yaml
 tag_along:
   fee: 1
-  # sequencer_id: <tag-along sequencer ID>
+  sequencer_id: random
 ```
+
+### The fee is a floor, not the price
+
+Every sequencer publishes a **minimum tag-along fee** in its on-chain sequencer
+data. Its own operator sets it with `proxi node seq set-params --fee`; anyone can
+read it with `proxi node delegate target_info <sequencer ID>`. A transaction
+paying less than that minimum is refused by the target: it is dropped at the door
+of the sequencer's backlog and never sequenced.
+
+So the fee actually attached is:
+
+```
+fee paid = max(tag_along.fee, minimum fee declared by the target sequencer)
+```
+
+`tag_along.fee` is therefore only a *preference*, and it has an effect just when
+it is the larger of the two. Raise it above the sequencer's minimum to outbid
+other senders — a sequencer consumes its backlog biggest-fee-first — and leave
+it alone otherwise. Every `proxi` command that builds a tag-along resolves the
+figure this way, so no command can underpay a sequencer by relying on a stale
+profile.
+
+If the target sequencer cannot be read, the command fails rather than falling
+back to `tag_along.fee`: a transaction built on a guessed fee would be ignored
+by the sequencer and would look lost rather than rejected.
+
+### `sequencer_id: random`
+
+Instead of a chain ID, `tag_along.sequencer_id` accepts the literal string
+`random`:
+
+```yaml
+tag_along:
+  sequencer_id: random
+```
+
+This is a **complete specification of the target**, not an absent one — it never
+falls back to `default_sequencer_id`. `proxi` picks uniformly among the
+sequencers that are currently **active**, meaning their latest known milestone
+is no more than one slot old, and fails with an error when none is:
+
+```
+no sequencer has been active in the last 1 slot(s): cannot pick a tag-along target at random
+```
+
+That is the point of the setting: naming a fixed sequencer that has since gone
+quiet gets your transactions silently ignored, whereas `random` either finds a
+live target or tells you the network has none.
+
+Notes:
+
+- Activity is judged in **ledger time** (the slot of the sequencer's latest
+  milestone against the current slot), not by how recently the node happened to
+  hear from it.
+- The choice is made **once per `proxi` run** and reused for the whole command,
+  so a command that prices the fee and then builds the output cannot end up
+  addressing two different sequencers. Consecutive commands may well pick
+  different sequencers.
+- The candidate list comes from the node's own view of live sequencers
+  (`/api/v1/last_known_milestones`), so `random` cannot be resolved offline.
+  Display-only commands such as `proxi wallet` report the setting rather than
+  resolving it.
 
 ---
 
@@ -128,8 +190,8 @@ Writes a new `<name>.yaml` profile (refuses to overwrite an existing one) and
 ensures a key file exists:
 
 1. **Key file** — if `proxima.key` already exists, offers to reuse it; otherwise
-   prompts for ≥10 random seed characters, generates an ED25519 key, and
-   optionally encrypts it with a passphrase.
+   generates an ED25519 key from system entropy and optionally encrypts it with
+   a passphrase.
 2. **Profile** — renders the template (`proxi/config_cmd/wallet_profile.template`)
    with:
    - `wallet.key_file: proxima.key`
@@ -137,28 +199,33 @@ ensures a key file exists:
    - `wallet.sequencer_id:` and `default_sequencer_id:` both set to the bootstrap
      sequencer ID
    - `api.endpoint: http://127.0.0.1:8000`
-   - `tag_along.fee: 1` (and a commented `tag_along.sequencer_id`)
+   - `tag_along.fee: 1` and `tag_along.sequencer_id: random`
 
-The file is written with `0600` permissions.
+The file is written with `0600` permissions. Explanatory comments are included
+only when the command is run verbosely (`-v`).
 
 ### Generated profile example
 
 ```yaml
 # Proxi wallet profile
 
-default_sequencer_id: 9d2c6fedeb0f31a9a97d28c59b276402f6c8e78777b89a825e31496c08ef8d6d
+default_sequencer_id: 50726f78696d612e626f6f7473747261702e636861696e2e
 
 wallet:
     key_file: proxima.key
     holder_id: <derived holder ID hex>
-    sequencer_id: 9d2c6fedeb0f31a9a97d28c59b276402f6c8e78777b89a825e31496c08ef8d6d
+    sequencer_id: 50726f78696d612e626f6f7473747261702e636861696e2e
 api:
     endpoint: http://127.0.0.1:8000
 
 tag_along:
     fee: 1
-#    sequencer_id: <tag-along sequencer ID>
+    sequencer_id: random
 ```
+
+Out of the box the profile therefore tags along to whichever sequencer is
+active, at whatever fee that sequencer requires. Replace `random` with a chain
+ID to always use the same sequencer.
 
 > Cross-reference: when you run `proxi config node --standalone`/`--sequencer`,
 > the node's `sequencer.controller_key_file` is filled from this profile's
@@ -174,7 +241,7 @@ ED25519 key (optionally encrypted with Argon2id + AES-256-GCM). Subcommands:
 
 | Command | Purpose | Key flags |
 |---------|---------|-----------|
-| `proxi util key generate` | Generate a new ED25519 key pair into a `.key` file (prompts for entropy). | `--output`/`-o` (default `proxima.key`), `--encrypt`, `--hint` |
+| `proxi util key generate` | Generate a new ED25519 key pair into a `.key` file (from system entropy). | `--output`/`-o` (default `proxima.key`), `--encrypt`, `--hint` |
 | `proxi util key encrypt` | Encrypt an existing unencrypted `.key` file with a passphrase. | `--file` (default `proxima.key`), `--hint` |
 | `proxi util key decrypt` | Decrypt an encrypted `.key` file back to plaintext. | `--file` (default `proxima.key`) |
 | `proxi util key info` | Print key-file metadata (version, type, encrypted, holder ID); `--verify` checks the private key matches the public key. | `--file` (default `proxima.key`), `--verify` |
