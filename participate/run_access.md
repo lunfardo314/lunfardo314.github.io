@@ -167,7 +167,7 @@ upgrade that has since activated is detected and discarded automatically.
 > `snapshot.directory` yourself — the node uses the newest of local vs. remote.
 > To pull one by hand: `wget --content-disposition http://<NODE_API>/api/v1/get_snapshot`.
 > To check a local file is part of the network's latest reliable branch before
-> using it: `proxi snapshot check --api.endpoint <NODE_API>` (and `proxi snapshot
+> using it: `proxi snapshot check --api.node_url <NODE_API>` (and `proxi snapshot
 > info` prints a file's metadata offline).
 
 ## 4. Run the node

@@ -6,7 +6,7 @@ in the code, so the defaults and semantics reflect the actual implementation.
 
 `proxi` is a simple CLI front end for the Proxima network, intended mostly for
 admin tasks and as a demo. Most commands build and sign transactions and talk to
-a node over the HTTP API (configured by `api.endpoint`). The exception is the
+a node over the HTTP API (configured by `api.node_url`). The exception is the
 `proxi db …` family, which opens a local BadgerDB directly and does not use this
 profile's API settings. The node itself is configured separately — see
 [`node_config.md`](participate/node_config.md) for `proxima.yaml`.
@@ -32,7 +32,7 @@ profile's API settings. The node itself is configured separately — see
 | `wallet.key_file` | path | Keystore (`.key`) file holding the wallet's private key         |
 | `wallet.holder_id` | hex | Optional consistency check against the key file                 |
 | `wallet.sequencer_id` | hex chain ID | Sequencer controlled by this wallet (for `seq withdraw` etc)    |
-| `api.endpoint` | URL | Node REST API endpoint `proxi` talks to                         |
+| `api.node_url` | URL | Base URL of the node API `proxi` talks to (legacy name: `api.endpoint`) |
 | `api.timeout_sec` | int | Optional HTTP client timeout (seconds)                          |
 | `tag_along.fee` | uint64 | Preferred tag-along fee; the sequencer's declared minimum wins if larger |
 | `tag_along.sequencer_id` | hex chain ID or `random` | Tag-along sequencer (`random` = pick an active one; falls back to default only when unset) |
@@ -65,7 +65,7 @@ sequencer it controls.
 |-----|------|---------|-------------|
 | `wallet.key_file` | path | `proxima.key` (when created via `proxi config wallet`) | Path to the JSON keystore (`.key`) file holding the wallet's ED25519 private key. Loaded (and decrypted if needed) by `GetPrivateKey`. Managed with `proxi util key` (below). |
 | `wallet.holder_id` | hex | "" (no check) | If set, `proxi` asserts it matches the holder ID derived from the key file's public key, failing fast on a mismatched key/profile. Read by `GetWalletData`. |
-| `wallet.sequencer_id` | hex chain ID | "" (→ `default_sequencer_id`) | The sequencer chain controlled by this wallet's key. Used e.g. by `proxi node seq withdraw` to pull tokens off the sequencer chain. If empty, falls back to `default_sequencer_id`. Read by `GetOwnSequencerID`. |
+| `wallet.sequencer_id` | hex chain ID | "" (→ `default_sequencer_id`) | The sequencer chain controlled by this wallet's key. Used e.g. by `proxi node seq withdraw` to pull tokens off the sequencer chain. If empty, falls back to `default_sequencer_id`. Written by `proxi node seq init_genesis` when it creates the chain; `proxi config wallet` leaves it commented out. Read by `GetOwnSequencerID`. |
 
 The holder ID is `hex(blake2b(sigType || publicKey))` — the same value the
 keystore stores as `holder_id`.
@@ -74,7 +74,7 @@ keystore stores as `holder_id`.
 wallet:
   key_file: proxima.key
   holder_id: 7d3142a5af76d4be9de683d8f492dce2110936d553415102be768cf4df8cacc1
-  sequencer_id: 50726f78696d612e626f6f7473747261702e636861696e2e
+  # sequencer_id: <own sequencer ID>
 ```
 
 ---
@@ -85,16 +85,17 @@ How `proxi` reaches the node's REST API.
 
 | Tag | Type | Default | Description |
 |-----|------|---------|-------------|
-| `api.endpoint` | URL | (required) | Base URL of the node API, e.g. `http://127.0.0.1:8000`. Must point at the node's `api.port` (see [`node_config.md` § `api`](participate/node_config.md)). Overridable per-command via the `--api.endpoint` flag on `node`/`snapshot` subcommands. |
+| `api.node_url` | URL | (required) | Base URL of the node API, e.g. `http://127.0.0.1:8000`. Must point at the node's `api.port` (see [`node_config.md` § `api`](participate/node_config.md)). Overridable per-command via the `--api.node_url` flag on `node`/`snapshot` subcommands. |
+| `api.endpoint` | URL | — | Legacy name of `api.node_url`, still read (and still accepted as `--api.endpoint`) so existing profiles keep working. `api.node_url` wins if both are set. |
 | `api.timeout_sec` | int | (client default) | HTTP client timeout in seconds. Only applied when `> 0`; otherwise the client default is used. Not written by `proxi config wallet` — add it manually if needed. |
 
 ```yaml
 api:
-  endpoint: http://127.0.0.1:8000
+  node_url: http://127.0.0.1:8000
   # timeout_sec: 30
 ```
 
-> Cross-reference: `api.endpoint`'s port must equal the node's `api.port`
+> Cross-reference: `api.node_url`'s port must equal the node's `api.port`
 > (`proxima.yaml`). On the testnet, sequencer nodes serve the API on `:8000` and
 > access nodes on `:8001`.
 
@@ -196,9 +197,9 @@ ensures a key file exists:
    with:
    - `wallet.key_file: proxima.key`
    - `wallet.holder_id:` derived from the generated/loaded key
-   - `wallet.sequencer_id:` and `default_sequencer_id:` both set to the bootstrap
-     sequencer ID
-   - `api.endpoint: http://127.0.0.1:8000`
+   - `default_sequencer_id:` set to the bootstrap sequencer ID, and
+     `wallet.sequencer_id:` left commented out
+   - `api.node_url: http://127.0.0.1:8000`, plus the public nodes as commented hints
    - `tag_along.fee: 1` and `tag_along.sequencer_id: random`
 
 The file is written with `0600` permissions. Explanatory comments are included
@@ -214,9 +215,12 @@ default_sequencer_id: 50726f78696d612e626f6f7473747261702e636861696e2e
 wallet:
     key_file: proxima.key
     holder_id: <derived holder ID hex>
-    sequencer_id: 50726f78696d612e626f6f7473747261702e636861696e2e
+    # sequencer_id: <own sequencer ID>
 api:
-    endpoint: http://127.0.0.1:8000
+    node_url: http://127.0.0.1:8000
+    # hloc0: http://65.21.170.230:8001
+    # oseq1: http://79.137.70.25:8001
+    # oloc2: http://51.254.47.76:8001
 
 tag_along:
     fee: 1

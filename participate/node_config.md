@@ -17,7 +17,7 @@ implementation.
   relative to the working directory (see `snapshot.directory`).
 
 > This file documents the **node** config only. The `proxi` CLI wallet reads a
-> separate `proxi.yaml` profile (`wallet.*`, `api.endpoint`, `tag_along.*`, …),
+> separate `proxi.yaml` profile (`wallet.*`, `api.node_url`, `tag_along.*`, …),
 > documented in [`wallet_config.md`](participate/wallet_config.md).
 
 ## Quick reference
@@ -73,8 +73,8 @@ peering:
     id: 12D3KooWL32QkXc8ZuraMJkLaoZjRXBkJVjRz7sxGWYwmzBFig3M
     port: 4000
   peers:
-    peer1: /ip4/127.0.0.1/udp/4001/quic-v1/p2p/12D3KooWT1MQM1kXKRaj6j9xjzVzUCWcrzihnVicepn82dTDkNYM
-    peer2: /ip4/63.250.56.190/udp/4000/quic-v1/p2p/12D3KooWGpPKLTg4srCokDmdRZefCUQtVnzuaRzcJxZtBxUAkmy2
+    hloc0: /ip4/65.21.170.230/udp/4001/quic-v1/p2p/12D3KooWG8zty1Yfbxw4mpiLW6Eoh6wTpPNdqn2B3f22XqArLsnT
+    oseq1: /ip4/79.137.70.25/udp/4001/quic-v1/p2p/12D3KooWPG5KW9JuunvpU5kBm51HZKYv7taYbtx1ThdjXPN533u8
   max_dynamic_peers: 10
   allow_local_ips: false
 ```
@@ -243,8 +243,9 @@ reachable API; the node cycles to the next source on failure.
 
 ```yaml
 sources:
-  - "http://63.250.56.190:8001"
-  - "http://5.180.181.103:8001"
+  - "http://65.21.170.230:8001"
+  - "http://79.137.70.25:8001"
+  - "http://51.254.47.76:8001"
 ```
 
 ---
@@ -519,7 +520,7 @@ peering:
     id: 12D3KooW...
     port: 4000
   peers:
-    boot: /ip4/113.30.191.219/udp/4000/quic-v1/p2p/12D3KooW...
+    hloc0: /ip4/65.21.170.230/udp/4001/quic-v1/p2p/12D3KooW...
   max_dynamic_peers: 10
   allow_local_ips: false
 

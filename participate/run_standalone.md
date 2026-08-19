@@ -42,7 +42,7 @@ wallet:
     # the sequencer this wallet controls; 'proxi node seq withdraw' draws from it
     sequencer_id: 50726f78696d612e626f6f7473747261702e636861696e2e
 api:
-    endpoint: http://127.0.0.1:8000
+    node_url: http://127.0.0.1:8000
 
 tag_along:
     # preferred fee paid to a sequencer so the tx gets pulled; the sequencer's own

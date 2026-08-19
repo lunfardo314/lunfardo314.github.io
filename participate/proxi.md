@@ -62,9 +62,9 @@ wallet:
     # sequencer_id is the sequencer ID controlled by the private key of the wallet.
     # The controller wallet can withdraw tokens from the sequencer chain with command
     # 'proxi node seq withdraw'
-    sequencer_id: 50726f78696d612e626f6f7473747261702e636861696e2e
+    # sequencer_id: <own sequencer ID>
 api:
-    endpoint: http://127.0.0.1:8000
+    node_url: http://127.0.0.1:8000
 
 tag_along:
     # preferred tag-along fee, and which sequencer to tag along to
@@ -88,9 +88,10 @@ explicitly. `proxi config wallet` sets it to
 
 `wallet.sequencer_id` matters only if you run a sequencer. It is the ID of the
 sequencer controlled by this wallet's private key, needed for the
-`proxi node seq withdraw` command. It defaults to the bootstrap sequencer ID.
+`proxi node seq withdraw` command. `proxi node seq init_genesis` writes it when
+it creates the chain; while it is unset, `default_sequencer_id` is used instead.
 
-`api.endpoint` must contain the address of a node's API, in the form
+`api.node_url` must contain the address of a node's API, in the form
 `http://<host>:<port>`. The generated profile points at a local node
 (`http://127.0.0.1:8000`). **Change it to the address of the node you want to use** —
 for example a public access node of the testnet.

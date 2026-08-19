@@ -15,19 +15,18 @@ with any other available materials.
 
 ### Public access points
 
-These are public API endpoints you can use from `proxi` (set one as `api.endpoint` in your
+These are public API endpoints you can use from `proxi` (set one as `api.node_url` in your
 `proxi.yaml`) or for other purposes:
 
-* http://113.30.191.219:8001
-* http://63.250.56.190:8001
-* http://83.229.84.197:8001
-* http://5.180.181.103:8001
+* http://65.21.170.230:8001
+* http://79.137.70.25:8001
+* http://51.254.47.76:8001
 
 ### Web tools
 
 Each public access node also serves a few read-only browser tools on its API port. Open
 them at `http://<access point>:8001/<path>` — for example
-`http://113.30.191.219:8001/chain_explorer`:
+`http://65.21.170.230:8001/chain_explorer`:
 
 * **Chain explorer** — `/chain_explorer`. A view of the _chained accounts_ (sequencers,
   delegations, foundries) in the latest reliable branch, with the UTXOs of each chain.
@@ -58,7 +57,7 @@ The faucet location is configured in `proxi.yaml`:
 
 ```yaml
 faucet:
-    host: 113.30.191.219
+    host: <faucet host>
     port: 9500
 ```
 
