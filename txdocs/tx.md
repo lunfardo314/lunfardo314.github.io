@@ -117,11 +117,46 @@ These formulas serve two roles:
 * As **serialization descriptors** for UTXO data.
 
 ## Single signature model
-The Proxima transaction model does not support multi-signature transactions. However, an exactly one signature is enforced always: the only signature of the transaction defines a `spender`: always exactly one entity (token holder) that is producing the transaction. 
 
-One of the main reason is that Proxima uses DDoS and spam prevention based on **rate limits for individual token holder**. Note that raw transaction is the only type of messages sent between peers and each of those messages (transactions) is an entity known in the ledger as a token holder.
+A Proxima transaction carries **exactly one signature**. This is not a limitation that was
+never lifted; it is a deliberate choice, and several other parts of the design rest on it.
 
-Additional signatures on the transaction can be added using scripting mechanism, if necessary.  
+The single signature defines the transaction's *spender*: exactly one token holder
+produced this transaction, and every input it consumes must be unlockable by that holder.
+
+### The holder ID
+
+The signer is identified by a **holder ID**: the 32-byte `blake2b` hash of the signature
+type byte followed by the public key.
+
+An output says who controls it by storing a holder ID — and it stores it in the
+**index-value tuple** (output element 1), not inside the lock. The standard signature
+lock, `sigLock`, therefore takes no arguments at all: its bytecode carries no data, and it
+reads the holder ID from the index-value tuple.
+
+That placement is what makes "which outputs does this holder control?" a direct lookup
+rather than a scan: entries in the index-value tuple are indexed in the ledger state, so a
+wallet can find its outputs without walking the UTXO set.
+
+### Why exactly one
+
+The raw transaction is the only kind of message peers exchange, and every one of them is
+attributable to exactly one token holder. That gives the node a basis for spam and DDoS
+resistance that does not depend on reputation or on any external identity: **rate limits
+are applied per holder**. A transaction whose sender cannot be named unambiguously could
+not be limited this way.
+
+The same property is what makes tag-along work. When a transaction pays a sequencer to
+include it, the sequencer must know without ambiguity who is asking.
+
+### Multiple signatures, when you need them
+
+m-of-n multisignature is not a protocol primitive, and deliberately so — adding it would
+give up the unambiguous single spender that the above depends on.
+
+It is still available, one level up: a spending condition requiring several signatures can
+be written as a redeemer script and committed to by an output, without the ledger itself
+knowing anything about multisig. See [Redeemer scripts](txdocs/redeemer_scripts.md).
 
 ## Validation of transaction
 Nodes apply globally trusted rules to determine if transaction $T$ is valid or not by running hardcoded validation code and validation scripts that come with transaction and UTXOs. Invalid transactions are rejected immediately.
