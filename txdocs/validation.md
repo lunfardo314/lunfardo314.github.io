@@ -54,7 +54,7 @@ The following checks are then run over $T^{ctx}$:
 
 1. **Input commitment.** An integrity script enforces that the input commitment $T^{ctx}_{0,4}$ equals `blake2b-256` of the consumed outputs $T^{ctx}_{1,0}$. If not, the loaded consumed outputs are not the ones used to build the transaction (tampering), and validation fails.
 2. **Transaction-level scripts $T_{10}$.** Each element of the transaction-level constraints tuple is a script evaluated over $T^{ctx}$; all must succeed. These enforce rules that span the whole transaction rather than a single UTXO. Examples:
-    * `redeemScript` / `callRedeemer` — the transaction redeems a *local script* whose hash it committed to, supplying the script and its arguments at the transaction level.
+    * `redeemScript` / `callRedeemer` — the transaction redeems a *local script* whose hash it committed to, supplying the script and its arguments at the transaction level. See [Redeemer scripts](txdocs/redeemer_scripts.md).
     * `token(tag, …)` — closes the **native-token** balance equation (a mint or burn) for a token across the whole transaction.
 3. **Amount conservation (ledger invariant).** The total produced token balance must equal the total consumed balance plus total inflation: $A^{in} + I = A^{out}$.
 4. **UTXO constraint scripts.** Every validation script of every **consumed** UTXO and every **produced** UTXO is evaluated over $T^{ctx}$; all must return true. In addition, every produced output must meet a minimum **storage deposit** (with the stem and tag-along outputs exempt). The per-token sub-totals accumulated by each `tokenAmount(tag, amount)` constraint as it fires are reconciled against the transaction-level `token(...)` declarations.
