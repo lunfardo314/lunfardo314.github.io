@@ -9,14 +9,34 @@ the whole time and, in most situations, you can take them back immediately. Even
 one situation where you cannot (while the tokens are _frozen_, explained below), they
 always become freely yours again once the freeze period ends.
 
+**Your tokens cannot be stolen, and this is not a matter of trusting the sequencer.** A
+delegation is a **covenant**: the tokens are placed in a chained account carrying a set of
+constraints that spell out exactly what each side may do with them. Those constraints are
+part of the transaction and are checked by every node on the network before a transaction
+is accepted. A transaction that let the sequencer walk off with your tokens is not a
+transaction that gets rejected by an honest node — it is not a valid transaction at all,
+anywhere, and no amount of cooperation between sequencers could make it one.
+
+What you are trusting the sequencer for is much narrower: to keep generating inflation
+while it holds your tokens, and to honour an early-release request. Both are covered
+below, and neither puts the tokens themselves at risk.
+
 Throughout this page, commands are shown as `proxi node delegate ...`. You can shorten
 `delegate` to `dlg`.
 
 ### How delegated tokens are held
 
 When you delegate, your tokens are placed into a special chained output (a UTXO)
-controlled by a **delegation lock**. This output is a _chained account_ that moves between
-you and the sequencer according to fixed rules that neither side can break (a **covenant**).
+controlled by a **delegation lock**. This output is a _chained account_ that passes back
+and forth between you and the sequencer, and the delegation lock is the covenant governing
+it: rules neither side can break, because breaking them produces something the ledger
+does not recognise as a transaction.
+
+Concretely, the covenant fixes who may unlock the output and what they may do with it in
+each state, that the tokens must stay in the chain when the sequencer touches it, how the
+inflation is split, how long a freeze may last, and that the output returns to your sole
+control when the freeze ends. The sequencer can generate inflation with your tokens; it
+cannot move them anywhere except forward along the same chain.
 
 At any moment a delegation is in one of these states:
 
@@ -39,6 +59,13 @@ At any moment a delegation is in one of these states:
 * `proxi node delegate status` lists all delegations controlled by your wallet.
   `proxi node delegate status <delegation ID>` (add `-v` for detail) shows one
   delegation.
+
+To browse rather than query, any node serves a **chain explorer** in the browser at
+`/chain_explorer` — for example `http://<node address>:8001/chain_explorer`. It lists the
+chained accounts in the latest reliable state and lets you filter by kind, so you can look
+at every delegation on the network, or every sequencer, or every token foundry, and open
+any one of them to see its current output. Delegations are chained accounts like any
+other, which is why they show up there alongside the rest.
 
 ### Sharing the inflation: the inflation cut
 
@@ -84,7 +111,7 @@ needs your private key:
 
 * `proxi node delegate target_info <sequencer ID>` shows everything about a target: its
   balances and how much it has available for advances, its parameters (profit margin,
-  minimum fee, freeze settings), and the current delegation epoch and its boundaries.
+  minimum fee), and the current delegation epoch and its boundaries.
 * `proxi node delegate estimate <sequencer ID> <amount>` estimates whether that sequencer
   can afford the advance for a given amount and cut. Add `--cut <promille>` to test a
   different cut, or pass amount `0` to ask for the largest delegation the sequencer can
@@ -104,13 +131,14 @@ likely — the preferred default, as it spreads delegations across the network.
 To choose the target and terms yourself:
 
 ```
-proxi node delegate amount <amount> [-q <target sequencer ID>] [-e <max frozen epochs>] [--cut <promille>]
+proxi node delegate amount <amount> [-q <target sequencer ID>] [--cut <promille>]
 ```
 
 * `-q` / `--delegation_target` — the sequencer to delegate to.
-* `-e` / `--epochs` — the largest number of freeze epochs you will allow (see below).
-  `0` (the default) means "as many as this sequencer allows".
 * `--cut` — your inflation cut in promille (default `900`).
+
+The freeze length is not yours to choose. The sequencer decides how long to freeze each
+delegation, within a ceiling fixed by the ledger (see below).
 
 Before sending, `proxi` shows an affordability estimate. If your cut is too high for the
 sequencer's margin, or the sequencer cannot afford the advance, it offers a workable
@@ -121,19 +149,25 @@ slots later the sequencer consumes it, adds the advance, and freezes it.
 
 ### The freeze period
 
-While frozen, your tokens work for the sequencer (you already have your cut in your delegation output). The length of the
-freeze is measured in **delegation epochs**, and **each sequencer sets its own epoch
-length and its own ceiling on how many epochs it may freeze for**. So there is no single
-network-wide number — use `proxi node delegate target_info` to see a particular
-sequencer's values.
+While frozen, your tokens work for the sequencer (you already have your cut in your
+delegation output). The length of the freeze is measured in **delegation epochs**. Two
+things are fixed by the ledger and identical for every sequencer:
 
-As a rough guide, a common epoch is about 600 slots (roughly 1.7 hours), and a sequencer
-typically allows up to around 20 epochs (a day or more) of freezing. The ledger keeps
-each sequencer's epoch length within 500–2000 slots and its maximum freeze within 8–32
-epochs.
+* an epoch is **600 slots**, roughly 1 hour 45 minutes;
+* a delegation may be frozen for at most **60 epochs**, roughly 4 days and 6 hours.
 
-The `-e` flag at delegation time lets you cap the freeze below the sequencer's maximum if
-you want shorter commitments.
+Within that ceiling, **each freeze is as long as the sequencer chooses**, and different
+delegations at the same sequencer will differ. The sequencer is not picking arbitrarily:
+it spreads unfreezes out, choosing the epoch that is carrying the least frozen value so
+far, and preferring the longest freeze when several are equally light. Leaving all its
+delegations to unfreeze in the same epoch would give it a moment where a large part of the
+tokens it works with are simultaneously withdrawable, which is bad for the sequencer and
+for the stability of the network's consensus.
+
+So there is no per-sequencer freeze setting to compare when picking a target — only the
+ledger-wide ceiling, and a scheduling decision the sequencer makes per delegation. Epoch
+boundaries are also staggered per sequencer, so different targets freeze and release at
+different moments.
 
 ### Taking your tokens back
 
@@ -152,9 +186,14 @@ delegation right away, moving it to `on hold`. (The shorter alias is
 
 Because the sequencer already paid you the advance up front, releasing early before it has
 earned that money back would leave it out of pocket. To make the request fair, `askstop`
-includes a calculated **compensation** to the sequencer, paid through the request's
-tag-along output. Your wallet therefore needs at least that compensation amount available.
-If it does not, you cannot force an early release — you must wait for the freeze to end.
+includes a calculated **compensation** to the sequencer.
+
+You do not need to hold that compensation in your wallet. Whatever your own tokens do not
+cover is authorised as a signed **allowance** and comes out of the delegated balance
+itself — so an early release is always available to you, whatever your wallet balance.
+All your wallet must cover is the request's tag-along fee. `askstop` prints the split
+before it sends anything.
+
 (A sequencer is a centralized, trusted party: in principle it could ignore an `askstop`
 request, but doing so only delays its own inflation and damages its reputation, so users
 would avoid it afterwards.)
@@ -170,5 +209,33 @@ Whenever the delegation is not frozen (`unlockable by the owner` or `on hold`) y
 
 * **End it** — `proxi node killchain <delegation ID>` returns all the funds to an ordinary
   address-locked output in your wallet.
-* **Continue it** — `proxi node delegate chain <delegation ID> [-e <max frozen epochs>]
-  [--cut <promille>] [-q <sequencer ID>]` re-delegates the same chain to the same or a different sequencer.
+* **Continue it** — `proxi node delegate chain <delegation ID> [--cut <promille>]
+  [-q <sequencer ID>] [--add <amount>]` re-delegates the same chain to the same or a
+  different sequencer, optionally moving more tokens in at the same time.
+
+### Adding to a delegation you already have
+
+If you have more tokens to delegate, you can put them into an existing delegation instead
+of creating another one:
+
+```
+proxi node delegate topup [--delegation <delegation ID>]
+```
+
+Without `--delegation` it tops up the smallest delegation you can currently act on. The
+same thing is available as `--add <amount>` on `delegate chain` when you are continuing a
+delegation anyway.
+
+**Prefer this to creating another delegation.** Every delegation is a chained output that
+lives in the ledger state forever, and every node on the network carries that state for as
+long as it exists. One delegation holding ten times the tokens costs the network the same
+as one holding a tenth; ten separate delegations cost ten times as much. Nothing stops you
+from creating many — it is a matter of not imposing an avoidable cost on everyone else,
+and topping up is cheaper for you too, since it is one transaction rather than a new chain.
+
+Topping up is a plain unwind-and-redelegate under the covers, so it costs only fees. Note
+that freshly added tokens are subject to the freeze like the rest.
+
+If you mine, the miner does this for you: it delegates its payouts automatically and, once
+it is holding its configured number of delegations, tops up an existing one rather than
+starting another. See [Mining](participate/mine.md).
