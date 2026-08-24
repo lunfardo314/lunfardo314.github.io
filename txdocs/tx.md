@@ -180,6 +180,8 @@ with a plain base-token input, and the transaction produces the foundry's succes
 chain ID and an increased `foundry(supply=…)`), a freshly minted `tokenAmount(...)` output, and
 a base-token remainder. A transaction-level `token(...)` constraint enforces the token balance.
 Long hashes, signatures and raw byte dumps are abbreviated for readability.
+Foundries, minting and the balance rule are covered in
+[Native tokens and foundries](txdocs/native_tokens.md).
 
 <p style="text-align:center;"><img src="../static/img/tx-printout.png" width="800">
 </p>
