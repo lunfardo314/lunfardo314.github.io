@@ -4,6 +4,7 @@ Join and participate
 - [The `proxi` wallet](participate/proxi.md)
 - [Wallet configuration](participate/wallet_config.md)
 - [Delegation](participate/delegate.md)
+- [Mining](participate/mine.md)
 - [Running an access node](participate/run_access.md)
 - [Running a sequencer node](participate/run_sequencer.md)
 - [Running a standalone developer node](participate/run_standalone.md)
