@@ -37,7 +37,7 @@ In the cooperative consensus, it is assumed that all token holders follow the **
 
 In the game theory, an *optimal strategy* means, that, by deviating from it, participant will incur significant costs compared to sticking to it. (An everyday example of this kind of phenomenon -- Nash equilibrium -- is driving the right (or left) side of the road. We are quite comfortable when passing a car on the other side of the road because we know that for the other driver not to drive on the correct side may cost then their life)
 
-In Proxima, we can assume that the absolute majority of the token holders will follow the biggest ledger coverage rule because it is the most profitable strategy, as per enforced validity constraints and [incentives](overview/incentives.md) on the ledger. So, new *tips* of the UTXO tangle will be appearing according to that rule with very high probability.
+In Proxima, we can assume that the absolute majority of the token holders will follow the biggest ledger coverage rule because it is the most profitable strategy, as per enforced validity constraints and [incentives](overview/2-tokens-and-supply.md) on the ledger. So, new *tips* of the UTXO tangle will be appearing according to that rule with very high probability.
 
 After sufficient amount of time, a user can be overwhelmingly convinced that once their transaction $T$ is included into the past cone of every tip of the UTXO tangle, it will remain that way in the future: their transaction become *confirmed*.
 
@@ -67,7 +67,7 @@ The *ledger coverage* as defined above cannot grow forever. It will reach maximu
 *Chains*, *sequencers*, *branches*, *inflation* are the ledger constraints enforced on the ledger (validity rules), that guides participants towards eventual consensus.
 
 ## Sequencers
-*Sequencers* build chains of transactions called *sequencer transactions*. By design, only sequencer transactions are allowed to consolidate several ledger states by endorsing other sequencer transactions. For more about chains and sequencers, see the [incentives](overview/incentives.md).
+*Sequencers* build chains of transactions called *sequencer transactions*. By design, only sequencer transactions are allowed to consolidate several ledger states by endorsing other sequencer transactions. For more about chains see [how transactions work](overview/4-transactions.md); for sequencers as a role, [taking part](overview/3-participate.md).
 
 The above makes the cooperative consensus in Proxima a cooperation among sequencers. Each sequencer issues its transaction with as big ledger coverage as possible in the dynamic context. "Consolidation" of the ledger states means consuming and endorsing other non-conflicting transactions in the past cone. By endorsing transactions produced by other token holders, a sequencer transaction can achieve bigger ledger coverage than its predecessor in the own chain. 
 This way, the sequencer chain is always advancing by growing its ledger coverage. This is only possible when sequencers cooperate by consolidating others into their own ledger state.
@@ -130,6 +130,34 @@ In essence, history is shaped by the most successful participants—those who co
 
 <p style="text-align:center;"><img src="../static/img/big_picture.png">
 </p>
+
+### How long a slot is, and why
+
+A slot is currently **10.24 seconds** — 128 ticks of 80 milliseconds. The figure looks
+arbitrary until you ask what the slot is *for*.
+
+A slot is the window in which the network has to gather a dominating share of the capital
+into a single branch's past cone. A branch that consolidates only a small part of the
+capital is not a healthy branch, and if no healthy branch forms at a boundary the chain
+stalls there or splits. So the slot has to be long enough for capital that is far apart to
+be pulled into one common past cone before the boundary arrives.
+
+"Far apart" here means far apart in **latency**, not in tokens or geography. What binds
+the slot is the round-trip time along the gossip paths between sequencers, and how much
+capital lies within reach of that. Capital nobody can hear from in time might as well not
+be participating that slot.
+
+That sets up a trade-off with no free direction. Shorter slots settle faster — the latest
+reliable branch confirms in a few slots — and produce branches more often. Longer slots
+reach further, gathering capital that a short slot would leave out, and give nodes more
+slack to keep up. The slot wants to be as short as it can be while leaving the chance of
+a boundary passing without a healthy branch negligibly small.
+
+Two things make the choice heavier than it looks. Chain inflation is defined *per slot*,
+so changing the tick would silently rescale annual inflation unless the inflation
+constants were re-derived alongside it. And the tick is part of the genesis ledger
+identity — changing it is a fresh-genesis event, not an upgrade a running network can
+take.
 
 ### Selecting a branch
 All branches on the same slot boundary are intentionally conflicting. Let's explore how the biggest ledger coverage rule manages conflict resolution among branches.
