@@ -165,8 +165,8 @@ bootstrap band keeps growing in absolute terms while shrinking as a share.
 
 Year-over-year the picture is a cliff and then a gentle slope, which is why the chart uses
 a logarithmic scale. The launch year is around 1,300% as mining floods in. Once mining
-ends the rate drops to single digits — roughly 8% in year 3 — and declines steadily from
-there, reaching under 3% by year 30.
+ends the rate drops to single digits — just under 10% in year 3 — and declines steadily
+from there, reaching under 3% by year 30.
 
 Beyond the chart, the same arithmetic keeps going: no schedule ends it, and the rate keeps
 falling. The ledger runs out of slot numbers to count time with roughly fourteen centuries
