@@ -89,6 +89,11 @@ consensus is rewarded in proportion to the capital it puts to work: an account b
 twice as much earns twice as much. A chained account is an output that persists across
 transactions instead of being spent away — the form tokens take while they are working.
 
+"Working" is meant literally. The account earns for each slot it is actually moved
+through, not for existing: a chain left untouched for a hundred slots and then moved once
+earns one slot's worth, and the rest is never minted. Constant movement is the behaviour
+being paid for.
+
 The rate starts at roughly **10% a year** and declines slowly and permanently as the
 ledger's total supply grows. Nothing about it is random and nothing about it is a
 competition: it is the base return on capital that is being put to work.

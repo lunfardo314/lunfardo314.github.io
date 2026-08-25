@@ -83,14 +83,24 @@ $$ A' = A \cdot (1 + R_t), \qquad R_t = \frac{1}{C + t} $$
 with ledger time, the rate declines permanently and predictably. Nobody sets it, and
 there is no schedule to revise.
 
-One convenient property falls out of the arithmetic. Over *k* slots the result is
+**One transition mints one slot's worth, and no more.** The amount is computed from the
+slot of the predecessor, so a single transition claims a single slot's inflation however
+long the chain has been standing still. Two transitions inside the same slot mint nothing
+the second time — the ledger yields zero when successor and predecessor share a slot.
+
+The consequence is the point of the whole design. To collect *k* slots of inflation you
+must move the chain through *k* slots, a step at a time:
 
 $$ A'_k = A \cdot (1 + k \cdot R_t) $$
 
-— growth is **linear in ledger time**, and the total does not depend on how the interval
-was divided into transactions. Moving a chain every slot and moving it once after a
-hundred earn the same amount. The design does not reward transaction spam, and a holder
-loses nothing by consolidating.
+Growth is **linear in ledger time** — but only for a chain that is actually being moved.
+Leave one idle for a hundred slots and then move it once, and it earns one slot's worth;
+the other ninety-nine are not banked, they are simply never minted.
+
+This is not a penalty bolted on afterwards. Inflation pays for contributing to the
+consensus, and a chain that is not moving contributes nothing to coverage — there is
+nothing to pay it for. Constant movement of funds is exactly the behaviour the ledger
+means to buy, which is why it is the only behaviour it pays for.
 
 ## Ledger time, and the pace
 
