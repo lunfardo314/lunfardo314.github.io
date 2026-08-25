@@ -189,16 +189,23 @@ Putting tokens to work means one of two things: **delegate** them to a sequencer
 a sequencer means operating software that takes part continuously, and is rewarded on
 that basis.
 
-Two further roles need no tokens at all. **Mining** competes for the supply that has not
-been minted yet, and is the way in for someone holding nothing. **Running an access
-node** supports the network — relaying transactions and serving the ledger — but earns no
-inflation, because inflation pays for contribution to the consensus and an access node
-makes none.
+**Running a full (access) node** is a third role, and needs no tokens. A full node
+validates every transaction for itself, so it can vouch for the ledger state it holds
+without trusting any peer; it is called an access node because it also hosts the API
+through which people reach the ledger, and keeps the snapshots new nodes start from. It
+earns no inflation, because inflation pays for contribution to the consensus and
+validating is not contributing.
+
+**Mining** is not a role at all but a way of *acquiring* tokens: it competes for the
+supply not yet minted, needs nothing to start, and ends when the mineable supply runs
+out. It is how tokens reach people during the launch, not how the consensus runs
+afterwards.
 
 Which one suits you, and what each costs and returns, is the subject of the next page.
 
 ## Where to go next
 
+- [Taking part](overview/3-participate.md) — the roles above, in detail.
 - [The fair launch](overview/fair_launch.md) — the philosophy behind how Proxima starts.
 - [Delegation and liveness](overview/delegation.md) — putting tokens to work without
   running anything.

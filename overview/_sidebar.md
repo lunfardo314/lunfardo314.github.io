@@ -1,6 +1,7 @@
 Overview of Proxima concepts
 - [What Proxima is](overview/1-what-proxima-is.md) 
 - [Tokens and supply](overview/2-tokens-and-supply.md)
+- [Taking part](overview/3-participate.md)
 - [The fair launch](overview/fair_launch.md)
 - [UTXO ledger](overview/utxo_ledger.md)
 - [Cooperative consensus](overview/consensus.md)

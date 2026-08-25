@@ -104,6 +104,8 @@ below is optional and can be taken in any order.
 
 - [Tokens and supply](overview/2-tokens-and-supply.md) — where PROX comes from, and what
   holding it earns.
+- [Taking part](overview/3-participate.md) — delegating, sequencing and the other ways in:
+  what each costs and returns.
 - [UTXO ledger](overview/utxo_ledger.md) — how transactions, conflicts and the tangle
   actually fit together.
 - [Cooperative consensus](overview/consensus.md) — the full argument sketched above.
