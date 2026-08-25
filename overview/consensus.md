@@ -37,7 +37,7 @@ In the cooperative consensus, it is assumed that all token holders follow the **
 
 In the game theory, an *optimal strategy* means, that, by deviating from it, participant will incur significant costs compared to sticking to it. (An everyday example of this kind of phenomenon -- Nash equilibrium -- is driving the right (or left) side of the road. We are quite comfortable when passing a car on the other side of the road because we know that for the other driver not to drive on the correct side may cost then their life)
 
-In Proxima, we can assume that the absolute majority of the token holders will follow the biggest ledger coverage rule because it is the most profitable strategy, as per enforced validity constraints and [incentives](overview/incentives.md) on the ledger. So, new *tips* of the UTXO tangle will be appearing according to that rule with very high probability.
+In Proxima, we can assume that the absolute majority of the token holders will follow the biggest ledger coverage rule because it is the most profitable strategy, as per enforced validity constraints and [incentives](overview/2-tokens-and-supply.md) on the ledger. So, new *tips* of the UTXO tangle will be appearing according to that rule with very high probability.
 
 After sufficient amount of time, a user can be overwhelmingly convinced that once their transaction $T$ is included into the past cone of every tip of the UTXO tangle, it will remain that way in the future: their transaction become *confirmed*.
 
@@ -67,7 +67,7 @@ The *ledger coverage* as defined above cannot grow forever. It will reach maximu
 *Chains*, *sequencers*, *branches*, *inflation* are the ledger constraints enforced on the ledger (validity rules), that guides participants towards eventual consensus.
 
 ## Sequencers
-*Sequencers* build chains of transactions called *sequencer transactions*. By design, only sequencer transactions are allowed to consolidate several ledger states by endorsing other sequencer transactions. For more about chains and sequencers, see the [incentives](overview/incentives.md).
+*Sequencers* build chains of transactions called *sequencer transactions*. By design, only sequencer transactions are allowed to consolidate several ledger states by endorsing other sequencer transactions. For more about chains see [how transactions work](overview/4-transactions.md); for sequencers as a role, [taking part](overview/3-participate.md).
 
 The above makes the cooperative consensus in Proxima a cooperation among sequencers. Each sequencer issues its transaction with as big ledger coverage as possible in the dynamic context. "Consolidation" of the ledger states means consuming and endorsing other non-conflicting transactions in the past cone. By endorsing transactions produced by other token holders, a sequencer transaction can achieve bigger ledger coverage than its predecessor in the own chain. 
 This way, the sequencer chain is always advancing by growing its ledger coverage. This is only possible when sequencers cooperate by consolidating others into their own ledger state.

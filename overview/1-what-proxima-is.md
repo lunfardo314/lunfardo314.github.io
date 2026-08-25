@@ -106,11 +106,11 @@ below is optional and can be taken in any order.
   holding it earns.
 - [Taking part](overview/3-participate.md) — delegating, sequencing and the other ways in:
   what each costs and returns.
+- [How transactions work](overview/4-transactions.md) — chains, covenants and where
+  inflation actually comes from.
 - [UTXO ledger](overview/utxo_ledger.md) — how transactions, conflicts and the tangle
   actually fit together.
 - [Cooperative consensus](overview/consensus.md) — the full argument sketched above.
-- [Incentives](overview/incentives.md) — where tokens come from and what makes the
-  rules profitable to follow.
 - [Delegation and liveness](overview/delegation.md) — putting tokens to work without
   running anything yourself.
 - [Join and contribute](participate/participate.md) — the practical guides: running a

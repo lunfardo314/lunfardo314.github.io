@@ -190,3 +190,5 @@ delegates its rewards is already doing both, which is what a miner does by defau
   ledger safe.
 - [Tokens and supply](overview/2-tokens-and-supply.md) — what the inflation being earned
   actually is.
+- [How transactions work](overview/4-transactions.md) — chains, covenants, and what makes
+  a delegation impossible to cheat.

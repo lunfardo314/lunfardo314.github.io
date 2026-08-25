@@ -4,7 +4,7 @@ Proxima is **permissionless**: the only participants are token holders, and anyo
 
 ## Ways to participate
 
-* **As a token holder.** Hold and move your tokens with the [`proxi`](participate/proxi.md) command-line wallet. Moving tokens (building a chain) is what earns inflation and contributes to the security of the ledger — see [Incentives](overview/incentives.md).
+* **As a token holder.** Hold and move your tokens with the [`proxi`](participate/proxi.md) command-line wallet. Moving tokens (building a chain) is what earns inflation and contributes to the security of the ledger — see [Tokens and supply](overview/2-tokens-and-supply.md).
 * **By delegating.** [Delegate](participate/delegate.md) your funds to a sequencer of your choice to earn inflation on your behalf, while keeping full, trustless control of your tokens. This is the recommended option for most holders — see [Delegation and liveness](overview/delegation.md).
 * **By running an access node.** [Run a full (non-sequencer) node](participate/run_access.md) to follow the tangle, serve the API, and relay transactions to peers. A good first step for developers and infrastructure operators.
 * **By running a sequencer.** [Run a sequencer](participate/run_sequencer.md) to proactively build a sequencer chain, issue branches, and pull user transactions via the tag-along mechanism. Sequencers are the most active participants and are critical to the security of the ledger.

@@ -209,8 +209,9 @@ Which one suits you, and what each costs and returns, is the subject of the next
 - [The fair launch](overview/fair_launch.md) — the philosophy behind how Proxima starts.
 - [Delegation and liveness](overview/delegation.md) — putting tokens to work without
   running anything.
-- [Incentives](overview/incentives.md) — the fuller economic treatment, including
-  sequencer economics and custody.
+- [Taking part](overview/3-participate.md) — sequencer economics, custody and the rest.
+- [How transactions work](overview/4-transactions.md) — how a chain transition mints
+  the inflation described above.
 - [Cooperative consensus](overview/consensus.md) — why participation is what makes the
   ledger safe.
 - [Mining](participate/mine.md) — running the miner.
