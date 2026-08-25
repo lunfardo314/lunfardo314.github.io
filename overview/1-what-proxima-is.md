@@ -102,6 +102,8 @@ provable equivalence with the base asset, using it as universal collateral.
 This page is the first of the overview. It is meant to be read on its own; everything
 below is optional and can be taken in any order.
 
+- [Tokens and supply](overview/2-tokens-and-supply.md) — where PROX comes from, and what
+  holding it earns.
 - [UTXO ledger](overview/utxo_ledger.md) — how transactions, conflicts and the tangle
   actually fit together.
 - [Cooperative consensus](overview/consensus.md) — the full argument sketched above.
