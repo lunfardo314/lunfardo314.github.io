@@ -131,6 +131,34 @@ In essence, history is shaped by the most successful participants—those who co
 <p style="text-align:center;"><img src="../static/img/big_picture.png">
 </p>
 
+### How long a slot is, and why
+
+A slot is currently **10.24 seconds** — 128 ticks of 80 milliseconds. The figure looks
+arbitrary until you ask what the slot is *for*.
+
+A slot is the window in which the network has to gather a dominating share of the capital
+into a single branch's past cone. A branch that consolidates only a small part of the
+capital is not a healthy branch, and if no healthy branch forms at a boundary the chain
+stalls there or splits. So the slot has to be long enough for capital that is far apart to
+be pulled into one common past cone before the boundary arrives.
+
+"Far apart" here means far apart in **latency**, not in tokens or geography. What binds
+the slot is the round-trip time along the gossip paths between sequencers, and how much
+capital lies within reach of that. Capital nobody can hear from in time might as well not
+be participating that slot.
+
+That sets up a trade-off with no free direction. Shorter slots settle faster — the latest
+reliable branch confirms in a few slots — and produce branches more often. Longer slots
+reach further, gathering capital that a short slot would leave out, and give nodes more
+slack to keep up. The slot wants to be as short as it can be while leaving the chance of
+a boundary passing without a healthy branch negligibly small.
+
+Two things make the choice heavier than it looks. Chain inflation is defined *per slot*,
+so changing the tick would silently rescale annual inflation unless the inflation
+constants were re-derived alongside it. And the tick is part of the genesis ledger
+identity — changing it is a fresh-genesis event, not an upgrade a running network can
+take.
+
 ### Selecting a branch
 All branches on the same slot boundary are intentionally conflicting. Let's explore how the biggest ledger coverage rule manages conflict resolution among branches.
 
