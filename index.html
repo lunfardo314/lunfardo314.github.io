@@ -5,7 +5,15 @@
   <title>Proxima Documentation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/themes/vue.css">
+  <link rel="icon" href="static/img/proxima-centaur-min-onlight.svg">
   <style>
+    /* Sidebar masthead: the logo lockup carries the name, so the docsify site
+       name is reduced to the word that qualifies it. */
+    .app-name-link .brand { display: block; width: 200px; max-width: 100%; height: auto; margin: 0 auto 2px; }
+    .app-name-link .brand-sub {
+      display: block; font-size: 14px; font-weight: 400; color: #7f8c98;
+      letter-spacing: 0.09em; text-transform: uppercase;
+    }
     body {
       font-size: 18px;
     }
@@ -31,7 +39,8 @@
     };
 
     window.$docsify = {
-      name: 'Proxima documents',
+      name: '<img class="brand" src="static/img/proxima-lockup-onlight.svg" alt="Proxima">'
+          + '<span class="brand-sub">documents</span>',
       loadSidebar: true,
       subMaxLevel: 3,
       afterEach: function () {
