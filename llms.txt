@@ -20,8 +20,9 @@ the code is authoritative.
 
 ## Start here
 
-- [Manifesto](https://lunfardo314.github.io/README.md): what the project is for and why it exists. The landing page.
+- [Proxima manifesto](https://lunfardo314.github.io/manifesto.md): what the project is for and why it exists — beliefs, architectural principles, and the vision of a digital gold standard. The statement of intent behind every design decision.
 - [What Proxima is](https://lunfardo314.github.io/overview/1-what-proxima-is.md): the plainest description of the ledger, for a reader who knows nothing Proxima-specific. Read this before anything else.
+- [Landing page](https://lunfardo314.github.io/README.md): the site index. Mostly navigation.
 
 ## Overview of concepts
 
