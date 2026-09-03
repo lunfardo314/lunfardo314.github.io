@@ -1,12 +1,9 @@
 The site is dedicated to the [Proxima project](https://github.com/lunfardo314/proxima).
-
-It also contains [blog](blog/blog.md) with articles on general topics which may or may not be related to Proxima.
-
 Currently available sub-sites:
 
 - [Overview of Proxima concepts](overview/1-what-proxima-is.md)
 - [Transaction model](txdocs/intro.md)
-- [UTXO scripting](ledgerdocs/library.md)
+- [UTXO programmability](ledgerdocs/library.md)
 - Videos:
   - [Introduction to the cooperative consensus](https://youtu.be/XT6GBSLCbZo)
 
