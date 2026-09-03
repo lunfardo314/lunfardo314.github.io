@@ -34,15 +34,21 @@ Most PROX does not exist yet. The base supply arrives from two places:
 
 Inflation is added on top of this, by continuous contribution to the consensus.
 
-The remaining 94% sits on a single **mine chain** and is released gradually, one reward
-at a time, to whoever competes for it. Mining requires no tokens to begin — it is the one
-entry into Proxima that does not ask you to already hold some — and the reward is shaped
-so that the whole of the mineable supply is emitted over roughly fourteen to fifteen
-months rather than several years.
+The remaining 94% does not exist anywhere. It is a **cap**, not a balance: a single
+**mine chain** carries a counter of how much may still be mined, starting at 940,000,000
+PROX. Each time someone mines, new tokens come into existence and the counter falls by the
+same amount. Nothing is released from a reserve, because there is no reserve. When the
+counter reaches zero, mining is over for good — though inflation goes on creating tokens
+after that, which is why the 1,000,000,000 figure is the *base* supply rather than a
+final one.
 
-That release *is* the decentralization process: with every reward, a larger share of the
-supply sits outside the founder's hands, and the influence the bootstrap capital started
-with shrinks.
+Mining requires no tokens to begin — it is the one entry into Proxima that does not ask
+you to already hold some — and the reward is shaped so that the whole of the mineable
+supply is minted over roughly fourteen to fifteen months rather than several years.
+
+That minting *is* the decentralization process: with every reward, a larger share of the
+supply is held outside the founder's hands, and the influence the bootstrap capital
+started with shrinks.
 
 [The fair launch](overview/fair_launch.md) covers the philosophy and what has to be true
 before Proxima can be called decentralized. [Mining](participate/mine.md) covers the
