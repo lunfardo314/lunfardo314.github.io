@@ -1,0 +1,82 @@
+# Proxima
+
+> Proxima is a distributed ledger in which UTXO transactions are the vertices of a
+> DAG called the tangle. There are no blocks, no mempool and no leader election.
+> Consensus comes from the biggest ledger coverage rule — like Bitcoin's longest
+> chain, but measured in token coverage of the ledger state rather than proof of
+> work — and token holders converge on it by cooperating, which is also the most
+> profitable thing each can do. Hence *cooperative consensus*.
+
+This site is rendered with docsify, which builds every page in the browser. A
+fetch of `https://lunfardo314.github.io/` or of any `#/`-style link returns a
+~1.7 KB shell containing only the word "Loading…", because the part of a URL
+after `#` is never sent to the server. **Fetch the `.md` files listed below
+instead** — they are served directly as `text/markdown`. The rule is: drop the
+`#`, add `.md`. So `/#/participate/mine` is fetched as `/participate/mine.md`.
+
+The source code lives at https://github.com/lunfardo314/proxima — the ledger
+rules in `ledger/`, the node in `core/`. Where this site and the code disagree,
+the code is authoritative.
+
+## Start here
+
+- [Manifesto](https://lunfardo314.github.io/README.md): what the project is for and why it exists. The landing page.
+- [What Proxima is](https://lunfardo314.github.io/overview/1-what-proxima-is.md): the plainest description of the ledger, for a reader who knows nothing Proxima-specific. Read this before anything else.
+
+## Overview of concepts
+
+An ordered four-page spine, then reference pages behind it.
+
+- [What Proxima is](https://lunfardo314.github.io/overview/1-what-proxima-is.md): page 1 of the spine — the ledger, the tangle, what makes it different from a blockchain.
+- [Tokens and supply](https://lunfardo314.github.io/overview/2-tokens-and-supply.md): page 2 — PROX and motes, inflation's two components, and how supply grows.
+- [Taking part](https://lunfardo314.github.io/overview/3-participate.md): page 3 — why there is no class of miners or validators, only token holders.
+- [How transactions work](https://lunfardo314.github.io/overview/4-transactions.md): page 4 — the mechanics, explicitly not needed to hold, delegate or run a node.
+- [Cooperative consensus](https://lunfardo314.github.io/overview/consensus.md): the deep treatment of the consensus rule, slots, and why the ledger converges. The longest page on the site.
+- [UTXO ledger](https://lunfardo314.github.io/overview/utxo_ledger.md): the UTXO tangle as a data structure.
+- [Safety and liveness](https://lunfardo314.github.io/overview/safety_liveness.md): Proxima framed as a Nakamoto consensus, and what it guarantees.
+- [Being permissionless, and bootstrap](https://lunfardo314.github.io/overview/permissionless.md): what "permissionless" and "trustless" mean here, against the formal definitions.
+- [Delegation and liveness](https://lunfardo314.github.io/overview/delegation.md): why consensus needs most of the supply participating every slot, and how delegation supplies it.
+
+## Transaction model
+
+- [Introduction](https://lunfardo314.github.io/txdocs/intro.md): the UTXO model Proxima builds on, and the few foundational concepts it adds.
+- [Classical UTXO](https://lunfardo314.github.io/txdocs/utxo.md): what a UTXO is, for readers new to the term.
+- [Base data elements](https://lunfardo314.github.io/txdocs/base.md): the byte-level types a transaction is defined and validated in.
+- [Proxima transaction](https://lunfardo314.github.io/txdocs/tx.md): the transaction structure itself, tuple by tuple.
+- [Validation](https://lunfardo314.github.io/txdocs/validation.md): how a raw transaction is validated before it updates the ledger state.
+- [EasyFL](https://lunfardo314.github.io/txdocs/easyfl.md): the functional language UTXO constraints are written in — LISP-like, no recursion.
+- [Native tokens and foundries](https://lunfardo314.github.io/txdocs/native_tokens.md): issuing tokens other than PROX.
+- [Redeemer scripts](https://lunfardo314.github.io/txdocs/redeemer_scripts.md): keeping large scripts out of permanent state.
+
+## UTXO programmability
+
+- [Ledger definition library](https://lunfardo314.github.io/ledgerdocs/library.md): the single JSON file that defines the ledger and initializes it.
+- [UTXO constraints and programmability](https://lunfardo314.github.io/ledgerdocs/constraints.md): how validity constraints on UTXOs make transactions programmable.
+- [General purpose ledger definitions](https://lunfardo314.github.io/ledgerdocs/general-def.md): the library's general definitions and how constraint formulas are evaluated.
+
+## Join and contribute
+
+- [Join Proxima](https://lunfardo314.github.io/participate/participate.md): the entry point — who can take part and how.
+- [Open testnet](https://lunfardo314.github.io/participate/testnet.md): what the testnet is and how to reach it.
+- [Delegation](https://lunfardo314.github.io/participate/delegate.md): how to delegate tokens and earn from it without running anything.
+- [Mining](https://lunfardo314.github.io/participate/mine.md): the fair launch — at genesis only 6% of the final supply exists; the rest is mined.
+- [proxi CLI wallet](https://lunfardo314.github.io/participate/proxi.md): the command-line wallet and tool.
+- [Running an access node](https://lunfardo314.github.io/participate/run_access.md): the simplest node configuration, with no sequencer.
+- [Running a sequencer node](https://lunfardo314.github.io/participate/run_sequencer.md): the optional process that runs inside a node and actively takes part in consensus.
+- [Running a standalone developer node](https://lunfardo314.github.io/participate/run_standalone.md): a local node for frontend and wallet developers.
+- [Node configuration](https://lunfardo314.github.io/participate/node_config.md): every YAML tag read by the node, in `proxima.yaml`. The most detailed page on the site.
+- [Wallet configuration](https://lunfardo314.github.io/participate/wallet_config.md): the `proxi.yaml` profile read by the CLI wallet.
+
+## Blog
+
+- [On definition of Nakamoto consensus](https://lunfardo314.github.io/blog/nakamoto.md): what makes a consensus Nakamoto, beyond proof of work. Background for the consensus pages.
+- [On digital gold](https://lunfardo314.github.io/blog/digital_gold.md): revisiting the fundamentals of proof of work.
+
+## Optional
+
+Secondary material — skip these when context is short.
+
+- [Multi-state database](https://lunfardo314.github.io/multistate/multistate.md): how the ledger state is stored and indexed. Not linked from the site navigation.
+- [Chain constraint source](https://lunfardo314.github.io/ledgerdocs/chain.md): the verbatim EasyFL source of the `chain` constraint. Not linked from the site navigation; the code is authoritative.
+- [Chain lock source](https://lunfardo314.github.io/ledgerdocs/chain_lock.md): the verbatim EasyFL source of the `chainLock` lock. Not linked from the site navigation; the code is authoritative.
+- [The fair launch](https://lunfardo314.github.io/overview/fair_launch.md): a placeholder — the page is not written yet. Read `participate/mine.md` instead.
