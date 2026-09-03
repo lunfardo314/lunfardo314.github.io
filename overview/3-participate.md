@@ -109,7 +109,7 @@ prefer a deposit over it.
 
 ## Mining: a way in, while it lasts
 
-Mining is how the unminted 95% of the supply reaches people, and it is the only route
+Mining is how the unminted 94% of the supply reaches people, and it is the only route
 into Proxima for someone holding nothing at all: the work is CPU-bound, the fee comes out
 of the reward, and no balance is required to start.
 

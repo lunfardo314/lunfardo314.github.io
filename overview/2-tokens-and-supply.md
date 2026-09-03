@@ -28,16 +28,16 @@ Most PROX does not exist yet. The base supply arrives from two places:
 
 | Source | Amount | Share |
 |--------|--------|-------|
-| Bootstrap capital created at genesis | 50,000,000 PROX | 5% |
-| Mined during the fair launch, the gradual decentralization process | 950,000,000 PROX | 95% |
+| Bootstrap capital created at genesis | 60,000,000 PROX | 6% |
+| Mined during the fair launch, the gradual decentralization process | 940,000,000 PROX | 94% |
 | **Total base supply** | **1,000,000,000 PROX** | 100% |
 
 Inflation is added on top of this, by continuous contribution to the consensus.
 
-The remaining 95% sits on a single **mine chain** and is released gradually, one reward
+The remaining 94% sits on a single **mine chain** and is released gradually, one reward
 at a time, to whoever competes for it. Mining requires no tokens to begin — it is the one
 entry into Proxima that does not ask you to already hold some — and the reward is shaped
-so that the whole of the mineable supply is emitted over roughly fifteen to seventeen
+so that the whole of the mineable supply is emitted over roughly fourteen to fifteen
 months rather than several years.
 
 That release *is* the decentralization process: with every reward, a larger share of the
@@ -136,7 +136,7 @@ suggest something near half the maximum, and that is not what the ledger sees.
 
 The amount is flat from genesis onward — it does not decay on a schedule. What falls over
 time is its significance: five PROX a slot is a meaningful addition when the supply is
-fifty million, and a rounding error once the supply is in the billions.
+sixty million, and a rounding error once the supply is in the billions.
 
 ## How the supply behaves in the long run
 
@@ -155,8 +155,8 @@ shrinks. The result is a steep launch flattening into a long, slow climb.
 
 <p style="text-align:center;"><img src="../static/img/supply-30y.png">
 
-The first eighteen months are the whole of the mining phase: supply goes from the
-50,000,000 PROX of bootstrap capital to about a billion, and the mined band — the tokens
+The first fourteen months or so are the whole of the mining phase: supply goes from the
+60,000,000 PROX of bootstrap capital to about a billion, and the mined band — the tokens
 that reached people by open competition — becomes and stays the largest part of the
 supply. Each band includes the chain inflation the tokens in it earned, which is why the
 bootstrap band keeps growing in absolute terms while shrinking as a share.
@@ -164,7 +164,7 @@ bootstrap band keeps growing in absolute terms while shrinking as a share.
 <p style="text-align:center;"><img src="../static/img/inflation-rate-30y.png">
 
 Year-over-year the picture is a cliff and then a gentle slope, which is why the chart uses
-a logarithmic scale. The launch year is around 1,300% as mining floods in. Once mining
+a logarithmic scale. The launch year is around 1,230% as mining floods in. Once mining
 ends the rate drops to single digits — just under 10% in year 3 — and declines steadily
 from there, reaching under 3% by year 30.
 

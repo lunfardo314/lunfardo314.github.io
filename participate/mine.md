@@ -1,7 +1,7 @@
 # Mining
 
-Most of Proxima's tokens do not exist yet. At genesis only 5% of the final supply is
-created; the other 95% is **mined**, one reward at a time, by anyone who cares to
+Most of Proxima's tokens do not exist yet. At genesis only 6% of the final supply is
+created; the other 94% is **mined**, one reward at a time, by anyone who cares to
 compete for it. Mining is how a newcomer with no tokens gets tokens.
 
 This page is about running the miner. Why the launch is arranged this way belongs to the
@@ -17,7 +17,7 @@ Only one transit can follow any given mine output, so miners race for each step.
 a step gives you the reward and nothing else: no fees, no privileged position, no
 influence over the next step.
 
-The chain carries a counter of how much remains to be minted. It starts at 950,000,000
+The chain carries a counter of how much remains to be minted. It starts at 940,000,000
 PROX and falls with every transit. When it reaches zero, mining is over and the supply is
 complete at 1,000,000,000 PROX.
 
@@ -70,15 +70,15 @@ It runs until you stop it, or until the chain is exhausted. Useful options:
 
 ### The reward, and how it changes
 
-For roughly the first 45 days the reward _A_ is flat at **375 PROX** per transit. After
-slot 379,688 it grows by 462 motes per slot, so a transit mined later is worth slightly
+For roughly the first 46 days the reward _A_ is flat at **500 PROX** per transit. After
+slot 388,125 it grows by 464 motes per slot, so a transit mined later is worth slightly
 more than one mined earlier.
 
 The ramp is about **how long emission takes**, not about hashrate. However much hashrate
 arrives, the retarget holds the chain at its target pace, so transits keep arriving at
-roughly the same rate — and at a flat 375 PROX that rate would take more than three years
+roughly the same rate — and at a flat 500 PROX that rate would take close to three years
 to mint the remaining supply. The reward grows so that the whole of it is mined in
-**roughly fifteen to seventeen months** instead.
+**roughly fourteen to fifteen months** instead.
 
 ### Difficulty, and why waiting helps
 

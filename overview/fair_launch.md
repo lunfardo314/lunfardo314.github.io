@@ -10,6 +10,6 @@ Until it is written, the mechanics are covered elsewhere:
 
 - [Tokens and supply](overview/2-tokens-and-supply.md) — the genesis share, the mined
   remainder, and how inflation is earned.
-- [Mining](participate/mine.md) — competing for the mined 95%.
+- [Mining](participate/mine.md) — competing for the mined 94%.
 - [Being permissionless. Bootstrap](overview/permissionless.md) — how a ledger that does
   not use proof of work can still be started from nothing.
