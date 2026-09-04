@@ -32,6 +32,10 @@ Locks define the minimum conditions for consuming an output. The current version
 * `chainLock` — requires a specific chain output to be consumed in the same transaction. Introduced together with the [chain constraint](#chain-constraint).
 * `stemLock` — used for branch transactions; unlockable without a signature.
 * `delegateLock` — allows two different keys to unlock it, depending on timing (delegation).
+* `tagAlong` — a small fee output aimed at a particular sequencer by a particular sender. The sequencer may spend it during the tag-along window; after the window the sender may reclaim it. Argument-less: the sender and the target sequencer live in the index-value tuple.
+* `sendWithDeadline` — a conditional transfer with a deadline. Which party may unlock depends on how many slots have passed since the output was created: first the target, then the master alone, and finally anyone at all — the last path exists so that abandoned dust can be cleaned up.
+* `mineLock` — the fair-launch mine chain lock, carried by the single mine output. It is an **open** lock: anyone may spend that output without a per-output signature, and the transaction's own signature identifies the miner the reward is paid to. It enforces the whole mining policy by itself.
+* `sellOrder` and `buyOrder` — decentralized-exchange order locks, with an optional `randomizeConsumption` helper that reduces contention between takers.
 
 ### Unlock parameters
 Constraints can’t dynamically search a transaction; they must reference known paths statically. A constraint at path $(1,0,i,j)$ (constraint $j$ of consumed UTXO $i$) reads its **unlock parameters** at $(0,7,i,j)$ — element 7 of the transaction is the tuple of unlock-parameter blocks, one per input. These parameters carry static references into the consuming transaction that the constraint needs (for example, the index of another input to reference for the signature).

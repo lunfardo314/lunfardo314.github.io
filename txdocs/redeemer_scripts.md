@@ -53,8 +53,8 @@ case.
 
 ### What a constraint ends up looking like
 
-The order locks used by the example decentralized exchange are the whole picture. A sell
-order's lock is:
+The order locks of the example decentralized exchange in `examples/dex/` are the whole
+picture. A sell order's lock is:
 
 ```
 callRedeemer(dexHash, sellOrderFnIdx, price, timeoutSlots)
@@ -63,6 +63,18 @@ callRedeemer(dexHash, sellOrderFnIdx, price, timeoutSlots)
 A hash, a function index, and the two parameters specific to this order. All the logic —
 what a valid fill looks like, how a timeout refund works — lives in the script, in the
 transaction of whoever spends the order, not in the order itself.
+
+That example is a **proof of concept, and no longer how the exchange is built.** Having
+been demonstrated this way, the order locks were graduated into the ledger definition
+library, where `sellOrder(price, timeoutSlots)` and `buyOrder(amount, price, timeoutSlots)`
+are now native locks like any other — see [UTXO constraints](ledgerdocs/constraints.md).
+Examples are not part of the library.
+
+That progression is worth noticing, because it is the point of the mechanism. A redeemer
+script lets an idea be built and used with no ledger change and no permission; if it then
+proves broadly useful, it can be moved into the library by an upgrade, and the
+transactions using it stop carrying the code. What could not have happened is the reverse
+order — waiting for a hardfork before the idea could be tried at all.
 
 ### Why the hash must be a literal
 
@@ -93,7 +105,8 @@ was defined. Anyone can write a spending condition and use it, without a ledger 
 and without asking anyone, and the cost of doing so falls on the transactions that use it
 rather than on every node's state.
 
-The exchange order locks above are one example. Another is m-of-n multisignature: Proxima
+The exchange order locks above are one example — and, having since graduated into the
+library, an illustration of the whole path. Another is m-of-n multisignature: Proxima
 deliberately does **not** make multisig a protocol primitive — every transaction carries
 exactly one signature, which is what gives it an unambiguous holder (see
 [Proxima transaction](txdocs/tx.md)) — but an m-of-n spending rule is straightforward as a
