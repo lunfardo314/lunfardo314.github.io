@@ -188,10 +188,18 @@ Stage 2 validation is performed by the node after transaction passes all spam an
 
 ### Stage 3. Validation in the full context
 After (and if) all consumed UTXOs of the transaction are determined, full context of the transaction is formed. Stage 3 validations means:
+- checking the _input commitment_ against the consumed UTXOs actually loaded
 - running all transaction level validation scripts, if any
 - running all validation scripts in _consumed_ UTXOs
 - running all validation scripts in _produced_ UTXOs
-- summing up amounts in the consumed outputs and checking if consumed total amount of tokens plus inflation is equal to the produced amount.
+
+Some rules cannot be expressed inside a single constraint, because they are properties of the transaction **as a whole**, or properties of a produced output that an arbitrary lock is under no obligation to police. They require traversing the transaction, and are enforced at this level:
+
+- **Token balance.** The total amount consumed, plus inflation, must equal the total amount produced.
+- **Native token balance.** For every tag declared by a transaction-level `token(...)` constraint, the per-tag sub-totals accumulated by the `tokenAmount(...)` constraints of individual outputs must balance across the whole transaction — a mint or a burn.
+- **Storage deposit.** Every produced output must carry at least the minimum deposit for its size, a few lock kinds excepted.
+- **Chain-only quantities.** A produced output carrying no chain constraint must carry zero inflation and zero frozen coverage. Both are meaningful only on a chain; allowing them elsewhere would manufacture ledger coverage with no tokens behind it.
+- **No duplicate index values.** The non-empty entries of a produced output's index-value tuple must be distinct, since the state indexer turns each one into a separate record.
 
 Transaction is discarded if any of check fail.
 

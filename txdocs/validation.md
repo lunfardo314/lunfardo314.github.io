@@ -58,6 +58,9 @@ The following checks are then run over $T^{ctx}$:
     * `token(tag, …)` — closes the **native-token** balance equation (a mint or burn) for a token across the whole transaction.
 3. **Amount conservation (ledger invariant).** The total produced token balance must equal the total consumed balance plus total inflation: $A^{in} + I = A^{out}$.
 4. **UTXO constraint scripts.** Every validation script of every **consumed** UTXO and every **produced** UTXO is evaluated over $T^{ctx}$; all must return true. In addition, every produced output must meet a minimum **storage deposit**. Three lock kinds are exempt: stem and tag-along outputs, which are meant to be small, and `sendWithDeadline`, whose lifetime is bounded by its cleanup deadline so its dust cannot accumulate indefinitely. The per-token sub-totals accumulated by each `tokenAmount(tag, amount)` constraint as it fires are reconciled against the transaction-level `token(...)` declarations.
+5. **Per-output rules a lock cannot be trusted with.** Slot 2 of an output admits arbitrary bytecode as an opaque lock, and such a lock is under no obligation to police the rest of the output. Two rules are therefore enforced here, by traversal, rather than inside any constraint:
+    * a produced output carrying **no chain constraint** must carry zero inflation and zero frozen coverage — both are chain-only quantities, and frozen coverage on a plain output would manufacture ledger coverage (consensus weight) with no tokens behind it;
+    * the **non-empty entries of the index-value tuple must be distinct**. The state indexer adds one trie record per non-empty entry and rejects a key that already exists, so two byte-equal entries would pass validation and then fail the state mutation at branch commit.
 
 If any check fails, the transaction is rejected.
 
