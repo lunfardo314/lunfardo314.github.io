@@ -77,7 +77,7 @@ By definition, a _zero-prefix-trimmed_ integers are big-endian byte representati
 
 Literals are constants, meaning they always evaluate to the same value independently on the context. Supported literal types include:
 * Decimal numbers from `0` to `255`: Represented as a single byte. E.g., `0`, `42`. Values like `1337` are invalid.
-* Hexadecimal literals with prefix `0x`: Represent byte arrays up to $2^16-1$ bytes. E.g., `0xff0102` (3 bytes); `0x123` is invalid. Note that very long data normally are subject to much smaller protocol constraints. 
+* Hexadecimal literals with prefix `0x`: Represent byte arrays up to $2^{16}-1$ bytes. E.g., `0xff0102` (3 bytes); `0x123` is invalid. Note that very long data normally are subject to much smaller protocol constraints. 
 * Prefixed integers:
    * `u16/` → 2-byte big-endian
    * `u32/` → 4-byte big-endian
