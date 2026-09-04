@@ -17,11 +17,24 @@ A transaction can carry a **local script** — a self-contained piece of EasyFL 
 transaction-level constraint:
 
 ```
-redeemScript(<script binary>)
+redeemScript(<script>)
 ```
 
 This does not run the script. It hashes it, and records that hash in the transaction's set
 of *redeemed scripts*.
+
+The argument is usually the script binary written out inline, and that stays the fast path.
+It may also be **any formula that can be evaluated without a transaction** — in practice, a
+call to a function in the ledger definition library. Such a formula is evaluated in an
+empty context, so one that reaches for the transaction, or for a parameter, simply fails.
+What survives is exactly the expressions whose value follows from the library alone, which
+is what keeps the committed binary reproducible from the transaction's own bytes.
+
+This matters for size. A frequently used script can be carried by a library upgrade as an
+ordinary function, and transactions then *name* it instead of repeating it. The difference
+is not small: in the chess game described below, the two script binaries account for 8,253
+bytes of an 8,887-byte move transaction, whereas a `redeemScript` constraint naming a
+library-resident script is 3 bytes.
 
 Any constraint on a UTXO invokes a function of a script by hash:
 
@@ -51,19 +64,27 @@ A hash, a function index, and the two parameters specific to this order. All the
 what a valid fill looks like, how a timeout refund works — lives in the script, in the
 transaction of whoever spends the order, not in the order itself.
 
-### Why both arguments must be literals
+### Why the hash must be a literal
 
-The script binary in `redeemScript` and the hash in `callRedeemer` must both be written as
-inline literals; a formula that computes them is rejected.
+The hash in `callRedeemer` must be written as an inline literal; a formula computing it is
+rejected. This is **auditability of the call site**: a reader can tell which script a call
+reaches by looking at the call, without evaluating anything. The argument of `redeemScript`
+is deliberately not restricted in the same way, because the set of committed scripts stays
+readable either way — as an inline binary, or as the library function named.
 
-For `redeemScript` this is **auditability**: the set of scripts a transaction commits to
-can be read straight out of the transaction's bytecode, without evaluating anything.
+### Why scripts terminate
 
-For `callRedeemer` it is **termination**. A 32-byte hash literal can only be written down
-once the script it identifies is finished, so a script cannot contain its own hash and
-cannot call itself. Scripts can call other scripts, but only ones that already existed
-when they were written — which makes recursion impossible by construction rather than by
-checking for it.
+Scripts may call other scripts, so something has to rule out cycles. The guarantee is a
+bound on **dispatch depth**: every `callRedeemer` dispatches into one of the scripts the
+transaction has committed, so a chain of *distinct* scripts can never be deeper than that
+commitment list. A run that goes deeper must have re-entered a script it already used —
+that is a cycle, and it is refused. The bound is exact, rejecting cycles and nothing else,
+and there is no tunable limit to set wrongly.
+
+An earlier, structural argument was that a script cannot contain its own hash, since the
+hash exists only once the script is finished. That reasoning holds only while every hash is
+an inline literal, and it is not what the ledger relies on: the depth bound does not care
+how a hash was written down.
 
 ### What this makes possible
 
@@ -77,6 +98,15 @@ deliberately does **not** make multisig a protocol primitive — every transacti
 exactly one signature, which is what gives it an unambiguous holder (see
 [Proxima transaction](txdocs/tx.md)) — but an m-of-n spending rule is straightforward as a
 redeemer script.
+
+The most complete demonstration is a **trustless chess game**, in `examples/chess_poc/`.
+A game is a chained account and one transition is one half-move, with the rules of chess
+enforced by the ledger itself: an illegal move is not a valid transaction, so no node will
+record it. Two redeemer scripts compose to achieve this — a rule-pure move validator, and
+a protocol layer above it handling whose turn it is, deadlines, resignation and the
+bounty — the second calling the first by its hash. The output's own lock stays small,
+because the rules live in the transactions that play the game rather than in the state.
+Neither player has to trust the other and there is no referee.
 
 Where a script's checks are evaluated, and how they fit into the rest of validation, is
 covered in [Validation of transaction](txdocs/validation.md).
