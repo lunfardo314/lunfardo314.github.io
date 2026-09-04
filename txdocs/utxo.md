@@ -26,7 +26,7 @@ Each UTXO has a unique **output ID** (or **UTXO ID**), which is assigned at the 
 
 The ledger state is a key-value database consisting of pairs _(output ID, output)_. UTXOs can be retrieved by referencing their _output IDs_.
 
-The history of the ledger begins with a _genesis ledger state_, which initially contains three UTXOs: the genesis sequencer output, the genesis stem output and the genesis controller output (see [Base data elements](base.md)).
+The history of the ledger begins with a _genesis ledger state_, which initially contains four UTXOs: the genesis sequencer output, the genesis stem output, the genesis controller output and the mine chain output of the fair launch (see [Base data elements](base.md)).
 
 A transaction does not include the full consumed outputs. Instead, it contains _inputs_, which are simply the IDs of the consumed outputs.
 

@@ -75,12 +75,12 @@ The default human-readable form is the *dashed* form `[s]<slot>-<tick>-<hash>`:
 
 A sequencer transaction with `<tick> = 0` sits exactly on a slot boundary and is a **branch transaction**.
 
-The genesis transaction is a branch transaction producing three UTXOs. Its transaction ID is:
+The genesis transaction is a branch transaction producing four UTXOs. Its transaction ID is:
 
-* raw (hex): `0000000001020000000000000000000000000000000000000000000000000000`
-* human-readable: `s0-0-020000000000000000000000000000000000000000000000000000`
+* raw (hex): `0000000001030000000000000000000000000000000000000000000000000000`
+* human-readable: `s0-0-030000000000000000000000000000000000000000000000000000`
 
-> Note: the genesis transaction does not technically exist. Instead, there are three genesis outputs: the **genesis sequencer output**, the **genesis stem output**, and the **genesis controller (dust) output**.
+> Note: the genesis transaction does not technically exist. Instead, there are four genesis outputs, at fixed indices: the **genesis sequencer output** (0), the **genesis stem output** (1), the **genesis controller (dust) output** (2), and the **mine chain output** (3). The last carries the fair launch's `mineLock`, holding the remaining-mintable counter and the seed difficulty.
 
 Most of the transaction and output ID logic is in the `proxima/ledger/base` package.
 
@@ -100,8 +100,8 @@ Each output (UTXO) has a unique output ID, which is used as a key in the key-val
 |32| Index of the output within the transaction (must not exceed the last UTXO index in the transaction ID prefix) |
 
 The human-readable form appends `#n` to the transaction ID, where `n` is the output index. For example:
-- `0000000001020000000000000000000000000000000000000000000000000000` → `s0-0-020000000000000000000000000000000000000000000000000000#0` is the ID of the genesis sequencer output
-- `0000000001020000000000000000000000000000000000000000000000000001` → `s0-0-020000000000000000000000000000000000000000000000000000#1` is the ID of the genesis stem output
+- `0000000001030000000000000000000000000000000000000000000000000000` → `s0-0-030000000000000000000000000000000000000000000000000000#0` is the ID of the genesis sequencer output
+- `0000000001030000000000000000000000000000000000000000000000000001` → `s0-0-030000000000000000000000000000000000000000000000000000#1` is the ID of the genesis stem output
 
 ## Chain ID
 
