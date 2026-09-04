@@ -45,7 +45,7 @@ constraints, checked by every node, which no participant can talk their way arou
 [The transaction model](txdocs/intro.md) has the detail;
 [EasyFL](txdocs/easyfl.md) is the language.
 
-## Chains: identities that persist
+## Chains, or chained accounts: identities that persist
 
 An ordinary output is transient. It exists until something spends it, and then it is
 gone. That is fine for moving tokens and useless for anything that needs to *persist* —
@@ -55,17 +55,25 @@ The **chain constraint** solves this. An output carrying it can only be spent by
 transaction that produces exactly one successor output carrying the same constraint. Not
 zero, not two — exactly one. A chain therefore cannot fork, and cannot quietly end.
 
+What that succession forms is called a **chain**, or equally a **chained account**. The
+two words mean exactly the same and are used interchangeably here and in the software:
+*chain* when the point is the unbroken succession of outputs, *chained account* when it is
+the persistent thing that succession carries.
+
 <p style="text-align:center;"><img src="../static/img/chain_succ_pred.png">
 
-Each chain has a 24-byte **chain ID** that never changes as the chain advances. At any
-moment the ledger state holds **exactly one output for a given chain ID**, which is the
-chain's current state and can be looked up directly by that ID. What moves along the
-chain — the balance, the data, the constraints — is mutable; the identity is not.
+Each chained account has a 24-byte **chain ID** that never changes as the chain advances.
+At any moment the ledger state holds **exactly one output for a given chain ID**, which is
+the account's current state and can be looked up directly by that ID. What moves along the
+chain — the balance, the data, the constraints — is mutable; the identity is not. This is
+what makes it an account rather than a coin: a fixed name with a changing balance behind
+it.
 
-So a chain is a permanent, non-fungible identity with a mutable state, built out of
-transient outputs. Sequencers are chains. Delegations are chains. So are token foundries
-and NFTs. Each is governed by a **chain controller**, the lock deciding who may move it
-forward: an ordinary signature for a plain chain, a delegation lock for a delegation.
+So a chained account is a permanent, non-fungible identity with a mutable state, built out
+of transient outputs. Sequencers are chained accounts. Delegations are chained accounts.
+So are token foundries and NFTs. Each is governed by a **chain controller**, the lock
+deciding who may move it forward: an ordinary signature for a plain chain, a delegation
+lock for a delegation.
 
 ## Inflation is minted by moving a chain forward
 
@@ -107,7 +115,20 @@ means to buy, which is why it is the only behaviour it pays for.
 Every transaction and every output carries a **timestamp** measured in **ticks**. Genesis
 is tick 0, and 128 ticks make one slot. A transaction's timestamp must be strictly
 greater than the timestamps of everything it consumes, which is what makes the tangle
-acyclic: a transaction can never reference its own future.
+acyclic: a transaction can never reference its own future. Ticks are the resolution the
+rules are written in; almost everything else — consensus, inflation, delegation — is
+reasoned about in slots.
+
+**Ledger time and clock time are different things.** Ledger time is a position on the
+ledger's own axis, counted in ticks from genesis and carried inside the transaction.
+Clock time is what a participant's clock happens to read. The two are tied by a fixed
+correspondence: genesis is pinned to a real instant, and each tick is 80 milliseconds
+after it, so a slot is 10.24 seconds and any ledger timestamp converts to a wall-clock
+instant and back.
+
+That correspondence is what makes cooperation possible. Each participant converts its own
+clock into ledger time to know which slot is current, and so independent token holders
+aim at the same slot without anyone having to agree on whose clock is right.
 
 Timestamps are also subject to a **pace constraint** — a minimum gap between an output
 and the transaction spending it. With the default pace of 12 ticks, an output stamped at
