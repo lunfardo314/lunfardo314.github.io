@@ -10,6 +10,9 @@ Each time a constraint script is evaluated, its path within the transaction cont
 
 - $(0, 8, i, j)$ — constraint $j$ of the **produced** UTXO $i$ (produced outputs are element 8 of the transaction).
 - $(1, 0, i, j)$ — constraint $j$ of the **consumed** UTXO $i$.
+- $(0, 10, i)$ — **transaction-level** constraint $i$ (transaction-level constraints are element 10 of the transaction).
+
+The transaction-level path has three elements rather than four: such a script belongs to the transaction as a whole, so there is no enclosing UTXO and no output index. Helpers that assume one — `selfOutputPath` below, for instance — are meaningless there, and both `selfIsConsumedOutput` and `selfIsProducedOutput` are false.
 
 The `at` function (with no parameters) returns this evaluation-context path, allowing a formula to determine where it is being evaluated — specifically, in which UTXO and at which constraint index.
 
@@ -72,8 +75,6 @@ The function `mustSize` enforces a certain size of the data:
 func mustSize : if(equalUint(len($0), $1), $0, !!!wrong_data_size)
 ```
 
-The **transaction ID** is no longer assembled by an EasyFL formula — `txID` is now an **embedded** function. It returns the 32-byte ID: the transaction-ID prefix (the timestamp with the sequencer flag in its last byte), the produced-output-count byte, and the last 26 bytes of `blake2b` of the transaction essence (all transaction elements except the signature). See [Base data elements](txdocs/base.md) and [Validation of transaction](txdocs/validation.md).
-
 Other examples are `selfOutputPath` and `selfSiblingConstraint`:
 ```
 // selfOutputPath returns the first 3 bytes of the 4-byte current evaluation-context path
@@ -86,10 +87,12 @@ These allow scripts to access other constraints within the same UTXO.
 
 ## Bytecode manipulation
 
-Bytecode manipulation functions allow constraint scripts to inspect other scripts' structure, enabling rich programmable behavior.
+Bytecode manipulation functions allow constraint scripts to inspect structure of serialized transaction parts, the EasyFL bytecode.
+This enables rich programmable behavior: script can enforce structure of other scripts on the same transaction. 
+For example `chain` constraint requires chain constraint on the successor output by enforcing it's bytecode is `chain` bytecode too. 
 
 ### parseBytecode
-`parseBytecode($0, $1 [, $2 …])` treats $0 as a bytecode. The second argument $1 is either a 1-byte index selecting an argument of the call, or `0x` to select the **call prefix** (the encoded function identity). Any further arguments are expected call prefixes that the bytecode must match — otherwise the call panics.
+`parseBytecode($0, $1 [, $2 …])` treats `$0` as a bytecode. The second argument $1 is either a 1-byte index selecting an argument of the call, or `0x` to select the **call prefix** (the encoded function identity). Any further arguments are expected call prefixes that the bytecode must match — otherwise the call panics.
 
 For example, this checks whether the chain constraint (at index 3 of the current UTXO) really is a `chain` call:
 ```
@@ -100,10 +103,10 @@ equal(parseBytecode(selfSiblingConstraint(3), 0x), #chain)
 A literal such as `z64/1337` does not compile to the raw value — it compiles to a small **formula** that returns that value when evaluated. To recover the underlying bytes:
 
 * `parseInlineData($0)` strips the call prefix of such an inline-data bytecode and returns the data.
-* `parseInlineDataArgument($0, $1, $2)` combines the two steps: it parses argument $1 of bytecode $0, enforces that the argument is inline data with call prefix $2, and returns the data.
+* `parseInlineDataArgument($0, $1, $2)` combines the two steps: it parses argument `$1` of bytecode `$0`, enforces that the argument is inline data with call prefix `$2`, and returns the data.
 
 ### Reading the token balance of an output
-The **amounts vector** lives at index 0 of every output (token balance, inflation, frozen coverage). The function `amountAt(vector, i)` returns element $i$ of that vector. Helper functions read the token balance (element 0) of any output:
+The **amounts vector** lives at index 0 of every output (token balance, inflation, frozen coverage). The function `amountAt(vector, i)` returns element `i` of that vector. Helper functions read the token balance (element 0) of any output:
 ```
 // $0 - path to an output. Returns its 8-byte token balance.
 func tokenBalanceByOutputPath : amountAt(atPath(concat($0, amountsConstraintIndex)), 0)
