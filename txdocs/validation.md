@@ -57,7 +57,7 @@ The following checks are then run over $T^{ctx}$:
     * `redeemScript` / `callRedeemer` — the transaction redeems a *local script* whose hash it committed to, supplying the script and its arguments at the transaction level. See [Redeemer scripts](txdocs/redeemer_scripts.md).
     * `token(tag, …)` — closes the **native-token** balance equation (a mint or burn) for a token across the whole transaction.
 3. **Amount conservation (ledger invariant).** The total produced token balance must equal the total consumed balance plus total inflation: $A^{in} + I = A^{out}$.
-4. **UTXO constraint scripts.** Every validation script of every **consumed** UTXO and every **produced** UTXO is evaluated over $T^{ctx}$; all must return true. In addition, every produced output must meet a minimum **storage deposit** (with the stem and tag-along outputs exempt). The per-token sub-totals accumulated by each `tokenAmount(tag, amount)` constraint as it fires are reconciled against the transaction-level `token(...)` declarations.
+4. **UTXO constraint scripts.** Every validation script of every **consumed** UTXO and every **produced** UTXO is evaluated over $T^{ctx}$; all must return true. In addition, every produced output must meet a minimum **storage deposit**. Three lock kinds are exempt: stem and tag-along outputs, which are meant to be small, and `sendWithDeadline`, whose lifetime is bounded by its cleanup deadline so its dust cannot accumulate indefinitely. The per-token sub-totals accumulated by each `tokenAmount(tag, amount)` constraint as it fires are reconciled against the transaction-level `token(...)` declarations.
 
 If any check fails, the transaction is rejected.
 

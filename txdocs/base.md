@@ -162,9 +162,16 @@ The constraints occupy fixed positions in the tuple:
 | 1 | index-values (controller / target / sender hashes used for state indexing) |
 | 2 | lock (the unlock-policy bytecode) |
 | 3 | chain constraint (only for chain outputs) |
-| 4+ | per-lock extras |
+| 4 | foundry or sequencer constraint — the chain-type marker, and the two are mutually exclusive at origin. Empty on a regular chain |
+| 5 | foundry policy (foundry outputs only, optional) |
+| 6+ | freeform per-output extras |
 
-So, for a simple signature-locked output, the holder's address goes into the index-values at position 1 and the (argument-less) signature lock sits at position 2 — any additional constraints (such as a time lock) follow at positions 3 and up.
+Positions 0 to 5 are fixed by the wire format: a constraint of a given kind may
+only appear at its own position. Everything else goes into the freeform region
+from position 6 on — a time lock, for example, or the delegation-lock state that
+sits at the last position of a delegation output.
+
+So, for a simple signature-locked output, the holder's address goes into the index-values at position 1, the (argument-less) signature lock sits at position 2, positions 3 to 5 are empty, and any additional constraints follow at position 6 and up.
 
 ### Building a transaction
 The transaction builder is used to incrementally construct a transaction: consuming and producing UTXOs, setting fields, signing with a private key, and finally producing a byte blob for persistence.

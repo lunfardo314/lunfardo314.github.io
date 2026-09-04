@@ -89,7 +89,7 @@ Literals are constants, meaning they always evaluate to the same value independe
 * Function code literals: `#function_name` $\rightarrow$ returns byte-encoded representation of the function code, the _call prefix_.
 
 ### Examples of closed expressions
-The standard library includes embedded functions such as  `fail`, `concat`, `slice`, `byte`, `tail`, `equal`, `if`, `and`, `or`, `not`, `len8`. 
+The standard library includes embedded functions such as  `fail`, `concat`, `slice`, `byte`, `tail`, `equal`, `if`, `and`, `or`, `not`, `len`. 
 
 Some valid expressions:
 

@@ -51,9 +51,17 @@ An ordinary output is transient. It exists until something spends it, and then i
 gone. That is fine for moving tokens and useless for anything that needs to *persist* —
 an account that accrues a balance, a sequencer, a delegation, a token issuer.
 
-The **chain constraint** solves this. An output carrying it can only be spent by a
-transaction that produces exactly one successor output carrying the same constraint. Not
-zero, not two — exactly one. A chain therefore cannot fork, and cannot quietly end.
+The **chain constraint** solves this. A transaction spending an output that carries it
+must produce exactly one successor output carrying the same constraint — never two. A
+chain therefore cannot fork, and there is never a question of which of two states is the
+real one.
+
+A chain can be ended, by spending the output without naming a successor. Whether that is
+allowed at all is decided by the output's **lock**: with an ordinary signature lock it is
+the holder's own choice, while a more elaborate lock can forbid it outright, or permit it
+only under stated conditions. A token foundry is the clearest example — its policy can
+refuse to let the foundry be destroyed while any of its tokens are still in circulation,
+so every minted token must be burned back into the foundry before it can be retired.
 
 What that succession forms is called a **chain**, or equally a **chained account**. The
 two words mean exactly the same and are used interchangeably here and in the software:
