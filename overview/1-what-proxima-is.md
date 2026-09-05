@@ -113,7 +113,7 @@ below is optional and can be taken in any order.
 - [Cooperative consensus](overview/consensus.md) — the full argument sketched above.
 - [Delegation and liveness](overview/delegation.md) — putting tokens to work without
   running anything yourself.
-- [Join and contribute](participate/participate.md) — the practical guides: running a
+- [Join Proxima](participate/participate.md) — the practical guides: running a
   node, delegating, mining, using the wallet.
 - [Transaction model](txdocs/intro.md) — the technical treatment of transactions and
   the scripting that constrains them.

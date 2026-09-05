@@ -8,7 +8,13 @@ Currently available sub-sites:
 - Videos:
   - [Introduction to the cooperative consensus](https://youtu.be/XT6GBSLCbZo)
 
-[Join Proxima testnet and mainnet](participate/participate.md): instructions, tutorials.
+> ### [Join the Proxima effort](participate/participate.md)
+>
+> Explanations, instructions and tutorials: how to acquire and use Proxima tokens, how to run
+> nodes and sequencers, and many other things to do during the launch and decentralization
+> phase.
+
+--- 
 
 **Reading this with an LLM or a coding agent?** Start from
 [llms.txt](https://lunfardo314.github.io/llms.txt), which indexes every page on

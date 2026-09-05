@@ -1,10 +1,10 @@
-Join and participate
+Join Proxima
 - [Join Proxima](participate/participate.md)
-- [Participating in the open testnet](participate/testnet.md)
+- [Launch phase network](participate/launch_network.md)
 - [The `proxi` wallet](participate/proxi.md)
 - [Wallet configuration](participate/wallet_config.md)
-- [Delegation](participate/delegate.md)
 - [Mining](participate/mine.md)
+- [Delegation](participate/delegate.md)
 - [Running an access node](participate/run_access.md)
 - [Running a sequencer node](participate/run_sequencer.md)
 - [Running a standalone developer node](participate/run_standalone.md)

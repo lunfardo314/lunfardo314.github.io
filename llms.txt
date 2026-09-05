@@ -55,10 +55,10 @@ An ordered four-page spine, then reference pages behind it.
 - [UTXO constraints and programmability](https://lunfardo314.github.io/ledgerdocs/constraints.md): how validity constraints on UTXOs make transactions programmable.
 - [General purpose ledger definitions](https://lunfardo314.github.io/ledgerdocs/general-def.md): the library's general definitions and how constraint formulas are evaluated.
 
-## Join and contribute
+## Join Proxima
 
 - [Join Proxima](https://lunfardo314.github.io/participate/participate.md): the entry point — who can take part and how.
-- [Open testnet](https://lunfardo314.github.io/participate/testnet.md): what the testnet is and how to reach it.
+- [Launch phase network](https://lunfardo314.github.io/participate/launch_network.md): what the launch phase network is and how to reach it.
 - [Delegation](https://lunfardo314.github.io/participate/delegate.md): how to delegate tokens and earn from it without running anything.
 - [Mining](https://lunfardo314.github.io/participate/mine.md): the fair launch — at genesis only 6% of the final supply exists; the rest is mined.
 - [proxi CLI wallet](https://lunfardo314.github.io/participate/proxi.md): the command-line wallet and tool.

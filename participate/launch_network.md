@@ -1,4 +1,4 @@
-# Participating in the open testnet
+# Launch phase network
 
 The Proxima testnet is an experimental network for testing the node software and the
 various aspects of the Proxima concept.

@@ -226,4 +226,4 @@ Which one suits you, and what each costs and returns, is the subject of the next
 - [Cooperative consensus](overview/consensus.md) — why participation is what makes the
   ledger safe.
 - [Mining](participate/mine.md) — running the miner.
-- [Join and contribute](participate/participate.md) — the practical guides.
+- [Join Proxima](participate/participate.md) — the practical guides.
