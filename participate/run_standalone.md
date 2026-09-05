@@ -2,7 +2,7 @@
 
 These instructions are aimed at **frontend developers** (wallets, browser apps,
 React UIs, the WASM transaction builder) who need a real Proxima node to develop
-against without joining the testnet.
+against without joining a public network.
 
 A **standalone node** is a single, self-contained, throwaway network: one node
 running its own bootstrap sequencer, with a fresh genesis created on the spot. It
@@ -21,16 +21,16 @@ the database directory.
 All commands below are run in a single working directory. Build the binaries
 first (`go install -v` in `proxima/` and `proxima/proxi/`), then check `proxi -h`.
 
-### 1. Create the wallet (key + profile)
+## Create the wallet (key + profile)
 
 ```
 proxi config wallet
 ```
 
 This single command creates **both** the ED25519 key and the wallet profile. It
-asks for some entropy, writes the key to `proxima.key` (a small JSON keystore),
-and writes the profile to `proxi.yaml` (the default profile name is `proxi`).
-The generated profile:
+generates the key from system entropy, writes it to `proxima.key` (a small JSON
+keystore), and writes the profile to `proxi.yaml` (the default profile name is
+`proxi`). The generated profile:
 
 ```yaml
 # default sequencer ID is used when own or tag-along sequencer is not specified
@@ -39,8 +39,8 @@ default_sequencer_id: 50726f78696d612e626f6f7473747261702e636861696e2e
 wallet:
     key_file: proxima.key
     holder_id: <your account holder ID>
-    # the sequencer this wallet controls; 'proxi node seq withdraw' draws from it
-    sequencer_id: 50726f78696d612e626f6f7473747261702e636861696e2e
+    # sequencer_id is left unset; commands fall back to default_sequencer_id above
+    # sequencer_id: <own sequencer ID>
 api:
     node_url: http://127.0.0.1:8000
 
@@ -50,6 +50,10 @@ tag_along:
     fee: 1
     # pick whichever sequencer is currently active
     sequencer_id: random
+
+delegate:
+    # delegator cut required of a delegation target, in promille
+    minimum_cut: 900
 ```
 
 > On a standalone network the only sequencer is the bootstrap one, so `random`
@@ -59,14 +63,16 @@ tag_along:
 - `holder_id` is your account identifier: `blake2b(<sig type byte> || <public key>)`.
   It is what sigLock outputs are addressed to, and what the frontend passes to
   `get_outputs` / `HolderIDFromPrivateKeyED25519` in the WASM wallet.
-- Both `default_sequencer_id` and `wallet.sequencer_id` are set to the **bootstrap
-  sequencer ID**. This is a **predefined constant** (`ledger.BoostrapSequencerIDHex`
-  = `50726f78696d612e626f6f7473747261702e636861696e2e`, the hex of the 24-byte
-  ASCII string `Proxima.bootstrap.chain.`) — independent of the genesis output
-  IDs, and the same for every ledger. In standalone mode the wallet key controls that
-  bootstrap sequencer, which is why this wallet can withdraw from it (step 4).
+- `default_sequencer_id` is set to the **bootstrap sequencer ID**, a **predefined
+  constant** (`ledger.BoostrapSequencerIDHex` =
+  `50726f78696d612e626f6f7473747261702e636861696e2e`, the hex of the 24-byte ASCII
+  string `Proxima.bootstrap.chain.`) — independent of the genesis output IDs, and the
+  same for every ledger. `wallet.sequencer_id` is left commented out and falls back to
+  it, so `proxi node seq withdraw` addresses the bootstrap sequencer without further
+  configuration. In standalone mode the wallet key controls that sequencer, which is
+  why this wallet can withdraw from it.
 
-### 2. Create the standalone node config + genesis
+## Create the standalone node config + genesis
 
 ```
 proxi config node --standalone
@@ -81,13 +87,16 @@ genesis account. It produces two things in the working directory:
 - a **genesis snapshot** (`*.snapshot`) for a fresh single-node ledger, timestamped
   now. On first start the node restores its database from it.
 
-Genesis distribution:
+Genesis distribution — the supply is split three ways:
 
-- the **bootstrap sequencer chain owns the whole supply** (`initialSupply - 1`);
-- **1 token sits in your ED25519 sigLock account** (the genesis "mote" output),
-  enough to bootstrap the first transaction.
+- the **bootstrap sequencer chain** holds nearly all of it,
+  `initialSupply - 1 - 50,000,000` motes;
+- **1 mote sits in your ED25519 sigLock account** (the genesis dust output), just
+  enough that the wallet always has an output to build a first transaction from;
+- **50,000,000 motes (50 PROX) go to the fair-launch mine chain**, which exists on a
+  standalone ledger exactly as it does on a public one.
 
-### 3. Run the node
+## Run the node
 
 ```
 proxima
@@ -97,7 +106,7 @@ Run it from the working directory (it needs `proxima.yaml` and the `*.snapshot`
 there). The REST API the frontend uses comes up on `http://127.0.0.1:8000`
 (`get_ledger_definition`, `get_ledger_time`, `get_outputs`, `submit_tx`, …).
 
-### 4. Fund your account from the bootstrap sequencer
+## Fund your account from the bootstrap sequencer
 
 The genesis mote is only 1 token. Withdraw a working balance from the boot
 sequencer into your sigLock account — you will need it for fees and for any chains
@@ -106,6 +115,24 @@ you create:
 ```
 proxi node seq withdraw 500000000000
 ```
+
+## Mining works too
+
+The mine chain is part of the genesis, so a standalone network can be mined against
+like any other:
+
+```
+proxi node mine
+```
+
+This is the easiest way to exercise the mining path end to end without competing
+with anyone. Difficulty starts at the seeded value and retargets one bit per transit
+towards the target pace, so on a single idle machine it falls to the floor rather
+than stalling — and the pace relief means waiting longer always makes the next
+transit easier. By default the miner also delegates what it earns to the bootstrap
+sequencer and compacts its payouts, which exercises those paths as well; pass
+`--delegate=false` to keep the rewards in plain outputs. See
+[Mining](participate/mine.md).
 
 ## Example commands
 
@@ -134,5 +161,5 @@ proxi node compact
 
 These same operations — fetch the library and UTXOs, compose + sign, submit with
 validation — are exactly what a browser wallet performs against the node; see
-[`ledger/txbuildercore/wasm/README.md`](https://github.com/lunfardo314/proxima/blob/develop/ledger/txbuildercore/wasm/README.md) for
+[the WASM wallet README](https://github.com/lunfardo314/proxima/blob/develop/ledger/txbuildercore/wasm/README.md) for
 the WASM/JS equivalent.
