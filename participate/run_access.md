@@ -1,11 +1,11 @@
-# Running an access node (join the testnet)
+# Running an access node
 
 An **access node** is the simplest node configuration: it has no sequencer, needs
 no tokens, and anyone can run one. It keeps a copy of the multi-ledger state in
 sync with the network, gossips transactions, and serves the REST API used by the
 `proxi` wallet and other programs.
 
-### An access node is a full node
+## An access node is a full node
 
 In blockchain terms, a **full node** is one that independently and trustlessly
 validates transactions against the consensus rules and maintains its own copy of
@@ -40,9 +40,9 @@ a snapshot that is *not* in that common history — for example an orphaned or s
 branch — the node cannot connect it to the live branches and **will not sync**.
 Because Proxima uses probabilistic, Nakamoto-style cooperative consensus, the exact
 set of competing healthy branches is never known with certainty, which is why you
-should start from a **recent** snapshot (see step 3).
+should start from a **recent** snapshot (see *Configure state sources* below).
 
-#### Archival or not — the operator's choice
+### Archival or not — the operator's choice
 
 State validation does not need any history before the snapshot. But the node also
 has a separate **transaction store** (`txstore` DB) that, in the current
@@ -62,21 +62,57 @@ The store is also what makes the ledger history auditable. So whether the node i
 **archival** is the operator's choice: if the `txstore` DB is never deleted, it
 holds a deterministic, fully auditable record of the ledger state's history.
 
-> Future work: past-cone cleanup tools that drop orphaned transactions from the
-> `txstore` (and optionally prune old history of the transaction DAG), and likely
-> a long-term decentralized backing store such as IPFS.
+Minimal tooling for this already exists:
+
+```
+proxi db txstore audit <slot from>|latest [<slot back to>] --output <new store>
+```
+
+It walks the past cones of every branch in the slot range and reports whether the
+store is complete. With `--output` it writes just the transactions it visited into
+a fresh txstore — so the copy holds the reachable history for that range and
+leaves the orphans behind. Add `--validate` to re-validate every transaction on
+the way (this needs the state DB), or `--file` to write portable `.txsave` chunks
+instead of a database. Stop the node first: `proxi db` opens the database
+directly.
+
+> Future work: pruning history in place rather than by copying, and likely a
+> long-term decentralized backing store such as IPFS.
 
 These are step-by-step instructions to start an access node and sync it with the
-testnet. For the full list of `proxima.yaml` config options see
-[`node_config.md`](participate/node_config.md).
+network. For the full list of `proxima.yaml` config options see
+[Node configuration reference](participate/node_config.md).
 
 > Placeholders such as `<BOOTSTRAP_HOST>`, `<BOOTSTRAP_PORT>`,
-> `<BOOTSTRAP_HOST_ID>` and `<BOOTSTRAP_API>` refer to a public testnet node. Use
-> the values published for the current testnet.
+> `<BOOTSTRAP_HOST_ID>` and `<BOOTSTRAP_API>` refer to a public node. Use the
+> values published for the
+> [launch phase network](participate/launch_network.md).
 
 All commands below use a single working directory for the config and database.
 
-## 1. Build
+## What the machine needs
+
+There is no measured 100 TPS network yet, so the figures below are an **extrapolation**,
+not a benchmark. 
+
+| Resource | Suggested for ~100 TPS | Where it comes from |
+|---|---|---|
+| CPU | **4 cores**, 8 comfortable | Constraint validation costs 0.15–0.3 ms per transaction, so validation alone is a fraction of one core. The whole process measures 0.01–0.07 core at 1.7 TPS; sixty times that is under 4. |
+| RAM | **16 GB** | An access node holds 0.7–0.9 GB today. What grows with load is the memDAG — the transactions in flight — so the figure is headroom for that, not a measured ceiling. |
+| Disk | **NVMe SSD, 1 TB** | See below. Spinning disks are not suitable: the state is a trie and commits are random writes. |
+| Network | **100 Mbit/s symmetric** | Every transaction is relayed to every peer, so traffic is roughly `TPS × peers × transaction size`. At 100 TPS, 10 peers and the measured 835-byte average that is about 0.8 MB/s — some 7 Mbit/s — **each way**. Upload is the side that matters: it scales with the number of peers. |
+
+Disk is the resource that actually runs out. The transaction store keeps every raw
+transaction that reaches the node, so at 100 TPS it grows by roughly **7 GB a day, or
+some 200 GB a month**, and the state database grows on top of that. Plan for one of the
+two remedies described above — periodic snapshot restore to keep the state compact, or
+trimming the transaction store with `proxi db txstore audit` — rather than for a disk
+large enough to never need them.
+
+More peers cost bandwidth proportionally, and `max_dynamic_peers` is what you turn down
+if upload is the constraint.
+
+## Build
 
 Clone the repository to `<your_dir>/proxima`, then from the repository root run:
 
@@ -91,14 +127,14 @@ This builds and installs both executables:
 
 Check it works: `proxi -h`, `proxi config -h`, `proxi snapshot -h`.
 
-## 2. Create the node configuration
+## Create the node configuration
 
 ```
 proxi config node
 ```
 
-This prompts for some entropy and writes `proxima.yaml` to the working directory.
-The entropy seeds the node's **libp2p host key and ID** — this key only secures
+This writes `proxima.yaml` to the working directory and generates the node's
+**libp2p host key and ID** from system entropy. That key only secures
 peer-to-peer communication; it does **not** control any tokens.
 
 The generated file contains sensible defaults: peering port `4000`, API port
@@ -107,12 +143,12 @@ The generated file contains sensible defaults: peering port `4000`, API port
 > If you plan to add a sequencer to this node later, generate the config with
 > `proxi config node --sequencer`. It adds a **disabled** sequencer section, so
 > the node still runs as a plain access node until you enable it. See
-> [`run_sequencer.md`](participate/run_sequencer.md).
+> [Running a sequencer node](participate/run_sequencer.md).
 
 ### Add a bootstrap peer
 
 A fresh node has no peers and cannot find the network on its own. Add at least
-one known testnet node as a **static peer** under `peering.peers` in
+one known node as a **static peer** under `peering.peers` in
 `proxima.yaml` — it is also used to bootstrap autopeering (Kademlia DHT):
 
 ```yaml
@@ -124,22 +160,13 @@ peering:
 
 Adjust the `api.port` / `peering.host.port` if those ports are taken on your
 machine. Other options are documented inline as comments and in
-[`node_config.md`](participate/node_config.md).
+[Node configuration reference](participate/node_config.md).
 
-## 3. Configure state sources (automatic snapshot download)
-
-<!-- TODO / REVISIT before publishing these docs to the public:
-     the whole snapshot download + sync process (sources, automatic
-     download/restore, verification) is still evolving and must be reviewed
-     and re-tested before release. -->
-> **⚠ Draft — to be revisited.** The snapshot download and sync process is still
-> evolving. This section must be reviewed and re-tested before these docs are
-> published publicly.
+## Configure state sources (automatic snapshot download)
 
 A new node needs an initial ledger state to start from. You no longer download a
-snapshot by hand — the node fetches one automatically when its state database is
-**missing or corrupted**. You only need to tell it where to look, via the
-top-level `sources` list in `proxima.yaml`:
+snapshot by hand — the node fetches one automatically. You only need to tell it
+where to look, via the top-level `sources` list in `proxima.yaml`:
 
 ```yaml
 sources:
@@ -147,15 +174,18 @@ sources:
   - "http://<ANOTHER_NODE_API>"
 ```
 
-On startup, if the `proximadb` state database is absent or corrupted, the node:
+The node restores from a snapshot when the `proximadb` state database is absent or
+corrupted — and also when the database is intact but has fallen too far behind the
+network to catch up, which is treated exactly like corruption. In those cases it:
 
-1. queries each source's snapshot info endpoint and picks the one with the
-   **newest** state (highest slot), skipping any source that is itself;
-2. downloads that snapshot into `snapshot.directory` (default: the working
-   directory) — but only if it is newer than any snapshot already on disk;
-3. restores the database from it (falling back to the newest **local** snapshot
-   if every download fails). If neither a download nor a local snapshot is
-   available, the node refuses to start.
+1. asks every source for its snapshot info, skipping itself and any source that
+   declines to serve one;
+2. prefers a snapshot that is **old enough** — so that a sequencer does not have to
+   wait out its start guard — and takes the newest one within that preference. It is
+   downloaded into `snapshot.directory` (default: the working directory), and a
+   downloaded snapshot takes priority over whatever is already on disk;
+3. restores the database from it, falling back to the newest **local** snapshot only
+   if every download fails. If neither is available, the node refuses to start.
 
 The same `sources` list is also used for ongoing branch-by-branch
 forward-sync, so configuring it serves both purposes — in fact, an empty `sources`
@@ -164,13 +194,13 @@ is what disables forward-sync. The remote nodes must have
 upgrade that has since activated is detected and discarded automatically.
 
 > Manual override (rarely needed): you may still drop a `*.snapshot` file into
-> `snapshot.directory` yourself — the node uses the newest of local vs. remote.
+> `snapshot.directory` yourself — it is used when no download succeeds.
 > To pull one by hand: `wget --content-disposition http://<NODE_API>/api/v1/get_snapshot`.
 > To check a local file is part of the network's latest reliable branch before
 > using it: `proxi snapshot check --api.node_url <NODE_API>` (and `proxi snapshot
 > info` prints a file's metadata offline).
 
-## 4. Run the node
+## Run the node
 
 **Keep your computer's clock synced to real time** (NTP). A single node can never
 harm the network, but a node whose clock is off by even a few seconds will
@@ -187,7 +217,7 @@ proxima
 ```
 
 On first start, with no database yet, the node downloads and restores a snapshot
-as described in step 3 — this can take several minutes. Interrupting it is safe:
+as described under *Configure state sources* — this can take several minutes. Interrupting it is safe:
 on the next start the node detects the incomplete restore and starts over. The
 node then syncs by pulling branches and their past cones along the heaviest chain
 from its peers.
@@ -197,7 +227,7 @@ from its peers.
 
 Stop the node safely with `Ctrl-C`.
 
-## 5. Confirm it is synced
+## Confirm it is synced
 
 Watch the log for lines like:
 
@@ -232,7 +262,7 @@ The node serves several read-only browser tools on its API port (default
 - **dagviz** (live MemDAG) — `/dagviz`. Real-time visualizer of the **in-memory**
   DAG as transactions arrive. It connects to the node's WebSocket vertex stream,
   so it requires streaming to be enabled in `proxima.yaml`
-  (`api.dag_streaming.enable: true`; see [`node_config.md`](participate/node_config.md)).
+  (`api.dag_streaming.enable: true`; see [Node configuration reference](participate/node_config.md)).
 
 - **Chain explorer** — `/chain_explorer`. Browser view of chained accounts
   (sequencers, delegations, foundries, …) in the latest reliable branch, with
@@ -275,7 +305,7 @@ journalctl -u proxima -f
 
 > If you run a **sequencer** on this node, note the constraint on the controller
 > key under systemd (no interactive passphrase prompt) — see
-> [`run_sequencer.md`](participate/run_sequencer.md).
+> [Running a sequencer node](participate/run_sequencer.md).
 
 ## Operational notes
 
@@ -287,10 +317,12 @@ journalctl -u proxima -f
   garbage and the database grows. Two ways to reclaim it:
   - *Automatic:* enable the `snapshot_restore` section in `proxima.yaml` to
     periodically restart and restore from the latest snapshot, keeping the
-    database compact (see [`node_config.md`](participate/node_config.md)).
+    database compact (see [Node configuration reference](participate/node_config.md)).
   - *Manual:* stop the node, delete the state DB (`proximadb`) directory, and
     restart. The node downloads the latest snapshot, syncs, and continues from
-    there — exactly the first-start flow (step 3 / step 4).
+    there — exactly the first-start flow of *Configure state sources* and *Run the node*.
+    You can but normally do not delete `proximadb.txstore`. 
+    It contains all transactions from which all history can be reconstructed and audited. 
 - **Crash safety.** The database stays consistent across crashes; a restart
   continues from the last committed branch, or re-restores from a snapshot if the
   database was corrupted.
