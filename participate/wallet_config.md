@@ -36,6 +36,7 @@ profile's API settings. The node itself is configured separately — see
 | `api.timeout_sec` | int | Optional HTTP client timeout (seconds)                          |
 | `tag_along.fee` | uint64 | Preferred tag-along fee; the sequencer's declared minimum wins if larger |
 | `tag_along.sequencer_id` | hex chain ID or `random` | Tag-along sequencer (`random` = pick an active one; falls back to default only when unset) |
+| `delegate.minimum_cut` | uint (promille) | Delegator cut this wallet requires from a delegation target. Default `900` |
 
 ---
 
@@ -96,8 +97,8 @@ api:
 ```
 
 > Cross-reference: `api.node_url`'s port must equal the node's `api.port`
-> (`proxima.yaml`). On the testnet, sequencer nodes serve the API on `:8000` and
-> access nodes on `:8001`.
+> (`proxima.yaml`). On the launch phase network, sequencer nodes serve the API on
+> `:8000` and access nodes on `:8001`.
 
 ---
 
@@ -181,6 +182,28 @@ Notes:
 
 ---
 
+## `delegate`
+
+What this wallet requires of a sequencer it delegates to.
+
+| Tag | Type | Default | Description |
+|-----|------|---------|-------------|
+| `delegate.minimum_cut` | uint, promille (0–1000) | `900` (`DefaultMinimumDelegatorCut`; the template writes it explicitly) | The share of a delegation's inflation that must go to the delegator, the rest being the target sequencer's own cut. Read by `GetMinimumDelegatorCut`; a value above 1000 is an error. |
+
+```yaml
+delegate:
+  minimum_cut: 900
+```
+
+It is the default of the `--cut` / `--minimum_cut` flags of `proxi node dlg`, and
+the floor `proxi node mine` applies when it picks a delegation target on its own.
+A sequencer whose own cut would leave the delegator less than this refuses the
+delegation, so setting it too high can leave the miner with no eligible target —
+in which case automatic delegation stops and the miner reports the widest cut the
+network currently offers. See [Mining](participate/mine.md).
+
+---
+
 ## Generating a wallet profile: `proxi config wallet`
 
 ```
@@ -201,6 +224,7 @@ ensures a key file exists:
      `wallet.sequencer_id:` left commented out
    - `api.node_url: http://127.0.0.1:8000`, plus the public nodes as commented hints
    - `tag_along.fee: 1` and `tag_along.sequencer_id: random`
+   - `delegate.minimum_cut: 900`
 
 The file is written with `0600` permissions. Explanatory comments are included
 only when the command is run verbosely (`-v`).
@@ -220,12 +244,18 @@ api:
     node_url: http://127.0.0.1:8000
     # hloc0: http://65.21.170.230:8001
     # oseq1: http://79.137.70.25:8001
-    # oloc2: http://51.254.47.76:8001
 
 tag_along:
     fee: 1
     sequencer_id: random
+
+delegate:
+    minimum_cut: 900
 ```
+
+The commented API endpoints are the public access points a wallet is pointed at.
+A node can be a static peer and a sync source without being one of them, so
+`proxima.yaml` may list more nodes than this.
 
 Out of the box the profile therefore tags along to whichever sequencer is
 active, at whatever fee that sequencer requires. Replace `random` with a chain

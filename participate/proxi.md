@@ -57,7 +57,7 @@ The generated `proxi.yaml` looks like this (with explanatory comments; the
 default_sequencer_id: 50726f78696d612e626f6f7473747261702e636861696e2e
 
 wallet:
-    key_file: proxi.key
+    key_file: proxima.key
     holder_id: dcc2f3be5c019d15108d6169d3f826ac20c73a31db8ad5c5d58e9ab01d3a903a
     # sequencer_id is the sequencer ID controlled by the private key of the wallet.
     # The controller wallet can withdraw tokens from the sequencer chain with command
@@ -65,17 +65,24 @@ wallet:
     # sequencer_id: <own sequencer ID>
 api:
     node_url: http://127.0.0.1:8000
+    # public access points, offered as hints:
+    # hloc0: http://65.21.170.230:8001
+    # oseq1: http://79.137.70.25:8001
 
 tag_along:
     # preferred tag-along fee, and which sequencer to tag along to
     fee: 1
     sequencer_id: random
+
+delegate:
+    # delegator cut required of a delegation target, in promille
+    minimum_cut: 900
 ```
 
 **You usually need to adjust the profile before using it** — in particular the API
 endpoint.
 
-`wallet.key_file` is the name of the key file that holds the private key. Keep this
+`wallet.key_file` is the name of the key file that holds the private key (`proxima.key` by default). Keep this
 file secret. The private key is **not** stored in `proxi.yaml`.
 
 `wallet.holder_id` is the identifier of the wallet account. It is the hash of the
@@ -94,7 +101,13 @@ it creates the chain; while it is unset, `default_sequencer_id` is used instead.
 `api.node_url` must contain the address of a node's API, in the form
 `http://<host>:<port>`. The generated profile points at a local node
 (`http://127.0.0.1:8000`). **Change it to the address of the node you want to use** —
-for example a public access node of the testnet.
+for example one of the public access points of the
+[launch phase network](participate/launch_network.md).
+
+`delegate.minimum_cut` is the delegator cut this wallet requires of any sequencer it
+delegates to, in promille — the share of the delegation's inflation that must come back
+to you. It is the default of the `--cut` flag of `proxi node dlg` and the floor
+`proxi node mine` uses when it picks a delegation target on its own.
 
 `tag_along.fee` and `tag_along.sequencer_id` describe the *tag-along* mechanism, which
 every token-sending command relies on. Each transaction you send carries a small extra
@@ -202,6 +215,13 @@ If the `-t` flag is omitted, the target defaults to the wallet's own account.
   account has accumulated many small outputs and you want to reduce the storage they
   occupy. The default is 100 inputs and the maximum is 256. Like any send, this still
   requires a tag-along fee.
+
+* `proxi node mine` competes for the mine chain, which is how tokens are acquired
+  during the launch phase — it needs no tokens to start. See
+  [Mining](participate/mine.md) for what it does with what it earns.
+
+* `proxi node compact scan` reports everything the account can consume, by category,
+  without building any transaction. Useful before compacting.
 
 * `proxi node utxo` lists the outputs (UTXOs) in the account. Add the global `-v` flag
   to show the parsed contents of each output.
