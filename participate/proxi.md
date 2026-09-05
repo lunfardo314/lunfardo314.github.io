@@ -36,7 +36,7 @@ where `<group>` is one of:
 * `proxi node` — commands that talk to a running node over its API. They all need a
   configuration profile and the address of a running node.
 
-### Create a wallet profile
+## Create a wallet profile
 
 The command `proxi config wallet` creates a new wallet. It:
 
@@ -129,7 +129,7 @@ Everything looks fine but the transaction never confirms. `random` avoids that b
 choosing from sequencers known to be alive; the generated profile uses it by default.
 Leaving `sequencer_id` empty falls back to `default_sequencer_id`.
 
-### How to read transaction and other IDs
+## How to read transaction and other IDs
 
 A **transaction ID** is 32 bytes. The first 5 bytes are the transaction's timestamp.
 The 6th byte holds the number of outputs the transaction produced, minus one. The
@@ -178,7 +178,7 @@ controls the chained account will be able to spend tokens.
 
 If the `-t` flag is omitted, the target defaults to the wallet's own account.
 
-### Some useful `proxi node` commands
+## Some useful `proxi node` commands
 
 * `proxi node lrb` displays information about the **latest reliable branch (LRB)**. The
   LRB is the ledger state that all current healthy ledger states agree on — in other
@@ -238,6 +238,6 @@ Beyond these, `proxi node` has commands for chains (`mkchain`, `killchain`, `cha
 and more. Run `proxi node -h` to see the full list, and `proxi node <command> -h` for
 the details of each.
 
-### Delegation
+## Delegation
 
 See [delegation](participate/delegate.md).
