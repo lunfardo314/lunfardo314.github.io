@@ -1,110 +1,129 @@
 # Launch phase network
 
-The Proxima testnet is an experimental network for testing the node software and the
-various aspects of the Proxima concept.
+The launch phase network is at least four or five sequencers and several public access
+nodes, run by the founder and by whoever joins during the launch phase. How the launch is
+phased, and what has to be true before Proxima can be called decentralized, is described in
+[The fair launch](overview/fair_launch.md).
 
-It normally runs at least 9 nodes, several of which are sequencers. Because the network
-is experimental and changes often, we usually keep control of it by holding the majority
-of the token supply. Whenever a change is incompatible with the previous version, the
-ledger is reset from genesis and everyone starts again from a fresh state.
+Note that the network can be stopped and reset at any time while it is still in its
+**centralized pre-launch phase**, without notice and as many times as it takes. The point
+of the exercise is to survive the centralized phase and come out of it decentralized.
+Until that happens, treat everything on the network as temporary — tokens included.
 
-### Other docs
+## Initial public access points
 
-Please read at least the basics on [proxi](participate/proxi.md) and [delegation](participate/delegate.md), along
-with any other available materials.
+* alpha — `http://65.21.170.230:8001`
+* beta — `http://79.137.70.25:8001`
 
-### Public access points
+Either can be used to reach the network from your wallet, and either can be listed as a
+trusted source for bootstrapping a new node, in the node's configuration.
 
-These are public API endpoints you can use from `proxi` (set one as `api.node_url` in your
-`proxi.yaml`) or for other purposes:
+## Other public access points
 
-* http://65.21.170.230:8001
-* http://79.137.70.25:8001
-* http://51.254.47.76:8001
+A couple of access points is a starting point, not a network. A handful of entry points that
+everyone depends on is exactly the shape the launch phase exists to grow out of, and it is
+the easiest thing for a newcomer to fix.
+
+**Run your own [access node](participate/run_access.md) and publish its address.** An
+access node needs no tokens, costs little to run, and every one of them makes the network
+harder to disrupt and easier for the next person to join. Publish the address wherever
+other participants will see it, and use your own node from your wallet instead of someone
+else's.
 
 ### Web tools
 
-Each public access node also serves a few read-only browser tools on its API port. Open
-them at `http://<access point>:8001/<path>` — for example
-`http://65.21.170.230:8001/chain_explorer`:
+Each public access node also serves a few read-only browser tools on its API port:
 
-* **Chain explorer** — `/chain_explorer`. A view of the _chained accounts_ (sequencers,
-  delegations, foundries) in the latest reliable branch, with the UTXOs of each chain.
-  A good starting point to see which sequencers are running and what delegations exist.
-* **DAG explorer** — `/dag_explorer`. An interactive view of the transaction DAG read from
-  the node's transaction store: browse by slot, search for a transaction, and inspect a
-  transaction together with its past cone.
-* **dagviz** — `/dagviz`. A real-time visualizer of the node's in-memory DAG as
-  transactions arrive. It needs transaction streaming to be enabled on that node, so it
-  may not be available on every access point.
-* **Peers** — `/peers`. An auto-refreshing dashboard of the node's peers (static or
-  dynamic, alive or dead, round-trip times).
+* **Launch phase monitor** — a high-level view of where the ledger and the network stand:
+  supply and distribution, fair-launch mining progress, and decentralization. Aggregates
+  only; per-chain and per-transaction browsing is in the explorers below.
+  Open it on [alpha](http://65.21.170.230:8001/monitor) or
+  [beta](http://79.137.70.25:8001/monitor).
+* **Chain explorer** — the _chained accounts_ (sequencers, delegations, foundries) in the
+  latest reliable branch, with the UTXOs of each chain. A good starting point to see which
+  sequencers are running and what delegations exist.
+  Open it on [alpha](http://65.21.170.230:8001/chain_explorer) or
+  [beta](http://79.137.70.25:8001/chain_explorer).
+* **DAG explorer** — an interactive view of the transaction DAG read from the node's
+  transaction store: browse by slot, search for a transaction, and inspect a transaction
+  together with its past cone.
+  Open it on [alpha](http://65.21.170.230:8001/dag_explorer) or
+  [beta](http://79.137.70.25:8001/dag_explorer).
+* **DAG visualizer** — a real-time visualizer of the **tangle**, the transaction DAG being
+  built by the node as transactions arrive. It needs transaction streaming to be enabled on
+  that node, so it may not be available on every access point.
+  Open it on [alpha](http://65.21.170.230:8001/dagviz) or
+  [beta](http://79.137.70.25:8001/dagviz).
+* **Peers** — an auto-refreshing dashboard of the node's peers: static or dynamic, alive or
+  dead, with round-trip times.
+  Open it on [alpha](http://65.21.170.230:8001/peers) or
+  [beta](http://79.137.70.25:8001/peers).
 
-### How to get tokens
+The same paths work on any access node, including your own.
 
-You get tokens from a **faucet** with:
+## How to get tokens
 
+By **mining**. During the launch phase this is the way in, and it is open to everyone: you
+do not need tokens to start, and nobody hands any out.
+
+```bash
+proxi node mine
 ```
-proxi node getfunds
-```
 
-The faucet sends a fixed amount of tokens to the account defined by the `proxi.yaml` in
-your current directory. There is a limit of one request per day per account. After
-requesting, check your balance with `proxi node balance`; the tokens usually arrive within
-15–30 seconds.
+You need a wallet, which may be empty; access to a node API — one of the access points
+above, or your own; and CPU cores. The tag-along fee a transit pays to a sequencer comes
+out of the reward rather than out of your balance, so nothing is required up front. The
+full guide, including the flags worth setting and what the miner does with the proceeds,
+is [Mining](participate/mine.md).
 
-The faucet location is configured in `proxi.yaml`:
+There is no faucet.
 
-```yaml
-faucet:
-    host: <faucet host>
-    port: 9500
-```
+## What can you do with your tokens?
 
-> Note: the public faucet is temporarily offline and will be re-enabled shortly. The
-> command and configuration above are stable and will not change.
+### Transfer tokens between accounts
 
-### What can you do with your tokens?
+Use `proxi node send` to send tokens between accounts (see the
+[`proxi` wallet](participate/proxi.md)). For this, `proxi.yaml` must be configured
+properly — in particular the _tag-along sequencer_ and the _tag-along fee_. List the
+available sequencers with `proxi node allchains -q` and pick one as your tag-along.
 
-#### Transfer tokens between accounts
+### Earn inflation by delegation
 
-Use `proxi node send` to send tokens between accounts (see the [proxi docs](participate/proxi.md)).
-For this, `proxi.yaml` must be configured properly — in particular the _tag-along
-sequencer_ and _tag-along fee_. List the available sequencers with
-`proxi node allchains -q` and pick one as your tag-along.
-
-#### Earn inflation by delegation
-
-Please read [delegation](participate/delegate.md). It is **strongly encouraged** to delegate all but a
-small reserve (say `100 or 1000 PROX`) of your tokens as soon as you receive them. List the
-sequencers available as delegation targets with `proxi node allchains -q`.
+Please read [delegation](participate/delegate.md). It is **strongly encouraged** to
+delegate all but a small reserve (say 100 or 1000 PROX) of your tokens as soon as you
+receive them. List the sequencers available as delegation targets with
+`proxi node allchains -q`.
 
 Delegated tokens contribute to the security of the network and, in return, earn you
 inflation. Tokens left idle in an ordinary account (an address of the form `a/<hex>`) earn
 nothing.
 
-#### Earn inflation by running a sequencer
+If you are mining, this happens by itself. By default `proxi node mine` delegates what it
+earns, each time to a sequencer drawn **at random** from those currently alive that leave
+you enough of the inflation cut. The draw is repeated for every delegation, so a miner
+spreads its tokens across the sequencers instead of piling them on one — which is exactly
+what the launch phase is trying to achieve. Use `--delegate=false` if you would rather
+place your tokens yourself.
+
+### Earn inflation by running a sequencer
 
 To run a sequencer you need two things:
 
-1. **An access node.**. This is an ordinary full node that keeps a valid copy of the ledger but
-   does not run a sequencer. It is easy to run and needs no tokens. It does not add to the
-   consensus security, but it does add to its decentralization by keeping a replica of the
-   ledger — the whole network can be recovered from a single node (plus the private keys
-   controlling the token accounts). See [Running an access node](participate/run_access.md).
-2. **A sequencer** configured on that access node (which then makes it a _sequencer node_).
-   Running a sequencer requires tokens. See [Running a node with a sequencer](participate/run_sequencer.md). 
+1. **An access node.** An ordinary full node that keeps a valid copy of the ledger but does
+   not run a sequencer. It is easy to run and needs no tokens. It does not add to the
+   consensus security, but it does add to decentralization by keeping a replica of the
+   ledger — the whole network can be recovered from a single node, plus the private keys
+   controlling the token accounts. See [Running an access node](participate/run_access.md).
+2. **A sequencer** configured on that access node, which then makes it a _sequencer node_.
+   Running a sequencer requires tokens. See
+   [Running a node with a sequencer](participate/run_sequencer.md).
+
 Sequencers generate inflation and so contribute to the network's security on behalf of the
 token holder. In addition to the usual inflation, a sequencer may receive a _branch
 inflation bonus_.
 
-### Disclaimer
+## Disclaimer
 
-We will do our best to help on the Proxima Discord channel `#testnet`, but please note our
-resources are very limited — we count on a growing community that helps each other.
-
-Please also note:
-
-* the tokens are not real and have no value; they are for testing only.
-* the Proxima software is experimental at this stage and certainly contains bugs. Do not
-  use it in production.
+We will do our best to help on the
+[Proxima Discord](https://discord.com/invite/UfFcFDy38j), but please note our resources are
+very limited — we count on a growing community that helps each other.
