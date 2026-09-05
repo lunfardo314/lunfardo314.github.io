@@ -316,7 +316,3 @@ uses the profile:
 A couple of subcommands take a YAML/flag input that is *not* part of the wallet
 profile: `proxi node fund --targets <file>` (default `distribute.yaml`) reads a
 list of `{target, amount}` entries for a multi-output send.
-
-> The `faucet.*` keys (`proxi node getfunds`) belong to the faucet client, which
-> is currently disabled in the build, so they are not part of the active wallet
-> profile.

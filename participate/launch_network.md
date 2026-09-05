@@ -76,8 +76,6 @@ out of the reward rather than out of your balance, so nothing is required up fro
 full guide, including the flags worth setting and what the miner does with the proceeds,
 is [Mining](participate/mine.md).
 
-There is no faucet.
-
 ## What can you do with your tokens?
 
 ### Transfer tokens between accounts
