@@ -18,7 +18,7 @@ implementation.
 
 > This file documents the **node** config only. The `proxi` CLI wallet reads a
 > separate `proxi.yaml` profile (`wallet.*`, `api.node_url`, `tag_along.*`, …),
-> documented in [`wallet_config.md`](participate/wallet_config.md).
+> documented in [Proxi wallet configuration](participate/wallet_config.md).
 
 ## Quick reference
 
@@ -151,6 +151,7 @@ a manual operator step.
 | `sequencer.force_activity` | bool | false | Always issue a branch + milestone regardless of throttle pressure. Use for bootstrap sequencers that must maintain liveness.                                                                     |
 | `sequencer.disable_throttle` | bool | false | Disable tag-along budget throttling entirely (budget stays at full 2/3 of consensus). Debugging only.                                                                                            |
 | `sequencer.produce_branches` | bool | false | Issue branch transactions and compete for the branch inflation bonus. **Default false: the sequencer never branches.** A non-branching sequencer still captures chain inflation, services tag-along + delegation freezing, and gets its milestones into the ledger state via other sequencers' branches; it stops raising its coverage once its own milestone reaches healthy coverage. Branching is opt-in because only a few branches per slot are needed — every extra branching sequencer adds load and bonus competition without adding security — and it costs CPU and latency headroom. The bootstrap sequencer always branches regardless of this flag. |
+| `sequencer.branch_deferral_ticks` | int | 12 | Hold back a branch that folded in fewer distinct sequencers than the node has recently seen active, so a peer's better branch for the same boundary has time to arrive; after this many ticks from the slot boundary it is submitted anyway. 12 ticks is about 1 s at the default 80 ms tick. `0` disables the deferral, and `force_activity` bypasses it. |
 | `sequencer.standalone` | bool | false | Bypass the libp2p connectivity check before submitting milestones. **ONLY** for single-node dev networks. Never enable on a networked sequencer — it permits one-sided forks during a partition. |
 | `sequencer.do_not_wait_for_sync_at_start` | bool | false | Start producing without waiting for the node to be synced. Default false, so the sequencer never builds milestones on a stale or abandoned lineage (which manufactures forks). It **must** be set for a genesis/bootstrap sequencer on an empty network, which can never become "synced" because it is the one creating the chain. Implied by `force_activity` and `standalone`. |
 | `sequencer.max_branches` | int | unlimited | Max branches to produce (testing). Values `>= 1` only.                                                                                                                                           |
