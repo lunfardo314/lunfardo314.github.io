@@ -40,8 +40,8 @@ where `<group>` is one of:
 
 The command `proxi config wallet` creates a new wallet. It:
 
-* asks you to type at least ten random characters, which it mixes with system
-  randomness to generate a private key;
+* generates an ED25519 private key from system entropy — or, if a key file is
+  already there, offers to reuse it instead;
 * saves the private key into a separate **key file** (a `.key` file). You may
   optionally protect this file with a passphrase;
 * creates the profile file `proxi.yaml`.
@@ -86,7 +86,7 @@ endpoint.
 file secret. The private key is **not** stored in `proxi.yaml`.
 
 `wallet.holder_id` is the identifier of the wallet account. It is the hash of the
-wallet's public key. The node uses it as a consistency check against the key file.
+wallet's public key. The wallet uses it as a consistency check against the key file.
 
 `default_sequencer_id` is used whenever a tag-along or own sequencer ID is not given
 explicitly. `proxi config wallet` sets it to
@@ -199,13 +199,17 @@ If the `-t` flag is omitted, the target defaults to the wallet's own account.
   also lists any *delegations* to sequencers.
 
 * `proxi node send <amount> -t "<target>"` sends tokens from the wallet to a target.
-  The target is an address (`a/<hex>`) or a chain (`c/<hex>`). For example:
+  The amount is in **motes**, the smallest unit — 1 PROX is 1,000,000 motes. The
+  target is an address (`a/<hex>`) or a chain (`c/<hex>`). For example:
 
   ```
-  proxi node send 1000 -t "a/370563b1f08fcc06fa250c59034acfd4ab5a29b60640f751d644e9c3b84004d0"
+  proxi node send 10000000 -t "a/370563b1f08fcc06fa250c59034acfd4ab5a29b60640f751d644e9c3b84004d0"
   ```
 
-  sends 1000 tokens. The transaction includes the tag-along output described above.
+  sends 10 PROX. Mind the **minimum storage deposit**: an ordinary output has to be
+  worth keeping in the ledger state, which for a plain `sigLock` output means at
+  least 9,250,000 motes. A smaller send is refused, so the amounts here are not
+  arbitrarily small. The transaction includes the tag-along output described above.
   The global `-v` (verbose) flag makes the command print the whole transaction, which
   is a good way to get acquainted with Proxima's transaction model. Run
   `proxi node send -h` to see advanced options (such as a deadline or an attached tag).
