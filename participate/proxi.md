@@ -36,7 +36,7 @@ where `<group>` is one of:
 * `proxi node` — commands that talk to a running node over its API. They all need a
   configuration profile and the address of a running node.
 
-### 1. Create a wallet profile
+### Create a wallet profile
 
 The command `proxi config wallet` creates a new wallet. It:
 
