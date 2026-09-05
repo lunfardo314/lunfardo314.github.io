@@ -26,7 +26,11 @@ sequencer per node**.
 > A sequencer is a token holder that puts **its own tokens** to work: its balance is
 > its **equity capital** — the owner's own investment in the business, which is both
 > what lets it operate and what makes it worth trusting. Nothing is staked, locked up
-> or handed to anyone: the tokens stay yours, on your own chain.
+> or handed to anyone: the tokens stay yours, on your own chain. The risk is yours in
+> the same way. A sequencer that is down contributes nothing to the consensus and earns
+> nothing on its balance, which is an opportunity cost — and worse, the advances it has
+> already paid its delegators become an outright loss, because a sequencer only earns
+> them back out of inflation it is no longer generating.
 >
 > The equity is what pays the **delegation advance**: a sequencer advances a
 > delegator's share of the inflation up front, so it can only take on as much
@@ -38,6 +42,11 @@ sequencer per node**.
 > scope of this page. What the balance does show is how much equity the operator has
 > committed to providing sequencing services to other token holders — skin in the
 > game — which is why delegators and users tend to prefer heavier sequencers.
+>
+> The analogy is not incidental. The Proxima ledger deliberately reproduces an
+> ordinary economic environment: sequencers are businesses running on their owners'
+> equity, delegators and senders are their clients, the profit margin is a price, and
+> what settles it is competition rather than a rule imposed from above.
 
 ## Prerequisites
 
