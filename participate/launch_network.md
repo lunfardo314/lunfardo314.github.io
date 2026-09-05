@@ -1,7 +1,7 @@
 # Launch phase network
 
 The launch phase network is at least four or five sequencers and several public access
-nodes, run by the founder and by whoever joins during the launch phase. How the launch is
+points, run by the founder and by whoever joins during the launch phase. How the launch is
 phased, and what has to be true before Proxima can be called decentralized, is described in
 [The fair launch](overview/fair_launch.md).
 
@@ -20,7 +20,7 @@ trusted source for bootstrapping a new node, in the node's configuration.
 
 ## Other public access points
 
-A couple of access points is a starting point, not a network. A handful of entry points that
+A couple of access points is a starting point. A handful of entry points that
 everyone depends on is exactly the shape the launch phase exists to grow out of, and it is
 the easiest thing for a newcomer to fix.
 
