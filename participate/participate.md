@@ -1,8 +1,14 @@
 # Join Proxima
 
+> **Pre-launch notice.** The network is in its centralized pre-launch phase. The founder can
+> stop or reset it at any time, without notice. Tokens mined or held on a pre-launch network
+> confer no rights, will not be carried over, and cease to exist when the network is reset.
+> Nothing is sold and nothing is promised; take part for the exercise. See
+> [Please read before taking part](README.md).
+
 Proxima is entering its **launch phase** — the stretch in which the ledger passes from one founder running it alone to a community of independent token holders running it together.
 
-The launch is a **fair launch**. There is no presale, no allocation, no investor round, no treasury. Six per cent of the supply is minted at genesis, as the bootstrap capital that gets the ledger moving. The other **94 % is mined**, with proof of work, by whoever competes for it: nobody hands those tokens out, a miner mints them by satisfying rules fixed at genesis. **Proxima is not a proof-of-work network.** The work distributes the supply and nothing else: it takes no part in the consensus, which is reached by token holders cooperating, and it ends for good once the mintable supply is exhausted. See [The fair launch](overview/fair_launch.md).
+The launch is a **fair launch**. There is no presale, no allocation to anyone but the founder, no investor round, no treasury. Six per cent of the supply is minted at genesis, as the bootstrap capital that gets the ledger moving. The other **94 % is mined**, with proof of work, by whoever competes for it: nobody hands those tokens out, a miner mints them by satisfying rules fixed at genesis. **Proxima is not a proof-of-work network.** The work distributes the supply and nothing else: it takes no part in the consensus, which is reached by token holders cooperating, and it ends for good once the mintable supply is exhausted. See [The fair launch](overview/fair_launch.md).
 
 Taking part is the point of it. Proxima is **permissionless**: the only participants are token holders, and anyone holding tokens can write to the ledger and take part in the consensus. There is no separate class of miners or validators to apply to. And Proxima is only as decentralized as its tokens are spread among independent holders who put them to work — so distribution is not a slogan beside the protocol, it is what makes the ledger secure. The aim of everything below is to decentralize Proxima and make it a community effort.
 

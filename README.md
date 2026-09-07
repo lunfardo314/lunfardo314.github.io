@@ -14,6 +14,22 @@ Currently available sub-sites:
 > nodes and sequencers, and many other things to do during the launch and decentralization
 > phase.
 
+> ### Please read before taking part
+>
+> - Proxima is experimental software, published under the MIT licence and provided as is,
+>   without warranty of any kind. Running it is the choice and the responsibility of whoever
+>   runs it.
+> - Nothing on this site is an offer, a sale, or financial, legal or investment advice.
+>   Nothing is sold, at any price, to anybody. There is no presale, no allocation, no
+>   fundraising, and no way to pay the founder for a token.
+> - PROX has no counterparty, no backing, and no promise of value, liquidity or a market.
+>   Anyone who mines or holds it does so at their own risk and on their own judgement.
+> - The network is in its **centralized pre-launch phase**. The founder can stop or reset it
+>   at any time, without notice. Tokens on a pre-launch network confer no rights, will not be
+>   carried over, and cease to exist when the network is reset.
+> - The founder undertakes nothing: no obligation to start, continue, maintain or restart any
+>   network. Where this site and the code disagree, the code is authoritative.
+
 --- 
 
 **Reading this with an LLM or a coding agent?** Start from

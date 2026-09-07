@@ -52,44 +52,23 @@ However, if some validators decide to leave for any reason (even at great cost),
 The essential aspect of PBFT PoS is that it remains only *conditionally decentralized* and "quasi-permissionless" even after the bootstrap phase: the committee is a permissioned structure by its nature. Even with random rotation procedures, the committee must be proposed somehow by somebody, and then the committee itself must reach full consensus on its composition. This means another layer of trust assumptions in the system.
 
 ## Bootstrap of Proxima
-There is no committee in Proxima. Sequencers do not care about each other's state and opinions; they just follow the biggest ledger coverage rule. It is a [Nakamoto consensus](https://medium.com/@lunfardo/on-definition-of-nakamoto-consensus-be8f4b84c899). Becoming a sequencer is as permissionless as the market of tokens is open, liquid, and permissionless. After somebody acquires tokens, no need for any permission to be a sequencer or any other chosen role. Censoring someone's possession of tokens is not possible too.
+There is no committee in Proxima. Sequencers do not care about each other's state and opinions; they just follow the biggest ledger coverage rule. It is a [Nakamoto consensus](https://medium.com/@lunfardo/on-definition-of-nakamoto-consensus-be8f4b84c899). Whoever holds tokens can run a sequencer or delegate to one; no permission is needed for any role, and nobody can censor someone's possession of tokens.
 
-So, we need (permissionless) liquidity of the token for the existence of the distributed ledger: the same thing in PoW, PoS, and Proxima.
+A consensus weighted by token holdings cannot start from zero holdings, the way a PoW chain starts from zero hashrate. At slot zero somebody has to hold the coverage that commits the first ledger states. So the genesis ledger state mints an initial supply, 6% of the target supply, controlled by the founder. Nothing of it is sold, allocated or distributed to anybody: it exists so that ledger states can be committed while nobody else holds tokens, and it is meant to be outgrown.
 
-Proxima needs some tokens "pre-mined" in the initial supply. The creator of the ledger must create some $N$ tokens at the beginning and then distribute (usually sell) them to initial token holders, which will become first sequencers or delegators to first sequencers.
+The other 94% is held by nobody at genesis. It is minted one transaction at a time by whoever produces a valid proof of work on an open mine chain, with at least 99% of each reward paid to the key that signed it. There is no sale, no presale, no airdrop, no whitelist. See [Mining](participate/mine.md) for the rules and [Tokens and supply](overview/2-tokens-and-supply.md) for the numbers.
 
-So, at the very inception, the situation in Proxima is strongly similar to PoS: it is trust-based and centralized coordination among initial participants of the future ledger, a community, which follow social consensus among them.  
+This makes the inception of Proxima honest about what it is: centralized. While the founder holds enough of the supply to commit ledger states alone, the ledger runs because the founder runs it and can be stopped or reset by the founder. What ends that phase is mining: as mined tokens are put to work, the founder's share stops being enough to commit ledger states alone, and eventually the ledger runs without the founder at all. Nobody has to grant anything for this to happen, and the founder cannot redirect a mined token or take it back.
 
-Proxima explicitly emphasizes **social consensus** and **cooperation** (as opposed to competition) in the community of token holders as fundamental principle of the existence of the Proxima's ledger. The protocol provides technical means of coordinating that social consensus.
+After that, anybody with a CPU can mine, and anybody holding tokens can run a sequencer (think miner) or delegate to one. The rules are the same for everybody; the outcomes are not, exactly as in PoW mining.
 
-The way the network is launched will also protect it from the hostile takeovers in the initial phases: one cannot influence the network without committing to it long term by buying tokens. So, the price barrier is set by those who are already committed.
-
-At the inception, it is trust-based and coordinated in centralized or conditionally decentralized manner. However, after inception, when the liquid market of tokens appear, the situation becomes radically different from PBFT PoS and becomes equivalent to PoW. The system becomes fully permissionless due to assumed liquidity of the token. 
-Anybody who can buy tokens (think ASICs) can run a sequencer (think miner) and earn inflation.
-
-This is what we mean by *Proxima is as permissionless as Bitcoin*. At the inception phase, however, Bitcoin and other PoW are somewhat different from Proxima.
+This is what we mean by *Proxima is as permissionless as Bitcoin*. At the inception phase Bitcoin and Proxima differ in one respect: Bitcoin's founder held the hashrate, Proxima's founder holds the tokens. Both positions are temporary and both dissolve by others joining.
 
 One may see Proxima at inception as less permissionless and less fair than Bitcoin. We can live with that, given the significant differences in the underlying tech and its operating costs. Besides, inception is just a short moment in the long history of the ledger, so initial distribution does not matter in the long term, provided the distributed ledger survives until then.
-
-<p style="text-align:center;"><img src="../static/img/boot.png">
 
 ## Conclusions
 - The long-term development of the network is market-driven, permissionless and decentralized, equally for PoW and Proxima.
 - At the inception, the relationship between the initiators of the network is trust-based and centrally coordinated in any case, even in PoW.
 - In PoW, inception is permissionless to a significant extent, so it is perceived as fair.
-- In Proxima, like in PoS, it requires initial distribution of tokens, which may or may not be perceived as fair.
-- Naturally, the initial supply is distributed to the initial set of token holders by selling it. This fact itself creates liquidity and commitment from the very beginning.
-
-## Variations
-What could be alternatives or variations of the PoS-style of genesis inception in Proxima?
-
-The sensitive part is the fairness of the initial distribution. Note that even merits-based distribution of the initial supply may be perceived as unfair by some. In the initial phase, some people may feel the initial distribution as unfair because nobody sold tokens to them at an acceptable price. Or something else. Meanwhile, in PoW, "open doors policy" is perceived as fair to many of those informed. However, it may look less fair to those with big merits and contributions in the phase which precedes the genesis.
-
-The above hints about the "impossibility of perfection" situation.
-
-Mitigation of the problem would be creating a liquid market as early as possible. For example, it could be some kind of open and permissionless sale of the initial supply. This would work if the initial sale were truly open and transparent, without any bias or censorship. However, it is not easy to guarantee that.
-
-Another range of options is to consider truly random (and therefore perceived as fair) distribution of initial supply among anybody informed.
-
-The implementation may range from using the PoW mining principle (on another blockchain or standalone) for the randomization and commitment ("proof of cost"), to other principles such as *verifiably random function* for pure non-playable randomized distribution.
-
+- In Proxima, the initial supply is held by the founder because the consensus needs coverage from slot zero; the rest of the supply is mined, permissionlessly, by proof of work.
+- Nothing is sold. The founder's share is outgrown by mining, and the ledger passes out of the founder's hands by itself.

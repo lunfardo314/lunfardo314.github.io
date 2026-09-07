@@ -1,5 +1,11 @@
 # Delegation
 
+> **Pre-launch notice.** The network is in its centralized pre-launch phase. The founder can
+> stop or reset it at any time, without notice. Tokens mined or held on a pre-launch network
+> confer no rights, will not be carried over, and cease to exist when the network is reset.
+> Nothing is sold and nothing is promised; take part for the exercise. See
+> [Please read before taking part](README.md).
+
 _Delegation_ is a way to take part in Proxima's _cooperative consensus_ and earn
 inflation on your tokens **without running a sequencer yourself**.
 

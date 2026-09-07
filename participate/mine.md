@@ -1,5 +1,11 @@
 # Mining
 
+> **Pre-launch notice.** The network is in its centralized pre-launch phase. The founder can
+> stop or reset it at any time, without notice. Tokens mined or held on a pre-launch network
+> confer no rights, will not be carried over, and cease to exist when the network is reset.
+> Nothing is sold and nothing is promised; take part for the exercise. See
+> [Please read before taking part](README.md).
+
 Most of Proxima's tokens do not exist yet. At genesis only 6% of the final supply is
 created; the other 94% is **mined**, one reward at a time, by anyone who cares to
 compete for it. Mining is how a newcomer with no tokens gets tokens.
