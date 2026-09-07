@@ -80,4 +80,4 @@ Secondary material — skip these when context is short.
 - [Multi-state database](https://lunfardo314.github.io/multistate/multistate.md): how the ledger state is stored and indexed. Not linked from the site navigation.
 - [Chain constraint source](https://lunfardo314.github.io/ledgerdocs/chain.md): the verbatim EasyFL source of the `chain` constraint. Not linked from the site navigation; the code is authoritative.
 - [Chain lock source](https://lunfardo314.github.io/ledgerdocs/chain_lock.md): the verbatim EasyFL source of the `chainLock` lock. Not linked from the site navigation; the code is authoritative.
-- [The fair launch](https://lunfardo314.github.io/overview/fair_launch.md): a placeholder — the page is not written yet. Read `participate/mine.md` instead.
+- [The fair launch](https://lunfardo314.github.io/overview/fair_launch.md): the launch design and plan — the two phases, the bootstrap capital, the mine chain, the transition, risks, and the no-offer statement.
