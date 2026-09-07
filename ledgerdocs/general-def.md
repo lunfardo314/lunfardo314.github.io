@@ -42,7 +42,7 @@ At genesis, several fixed values must be set — such as the initial token suppl
 Each constant is a parameterless EasyFL function whose name is prefixed with `const`. Some are hard-coded; others are filled in from the genesis configuration when the ledger is created. Examples:
 
 ```
-func constInitialSupply : u64/1000000000000000
+func constInitialSupply : u64/60000000000000
 func constMaxNumberOfEndorsements : u64/8
 func constPreBranchConsolidationTicks : u64/25
 func constMaxTickValuePerSlot : u64/127

@@ -158,6 +158,11 @@ Start the node as usual:
 proxima
 ```
 
+A sequencer node serves the same public API as an access node, on all interfaces by
+default. Firewall the API port on a sequencer node, or set `api.disable: true` in
+`proxima.yaml`, and point your wallet at an access node instead: the node that holds
+the controller key should not be the one taking requests from strangers.
+
 The log shows the sequencer configuration on startup. It typically takes ~10–15
 seconds (to fill its tip pool) before the sequencer begins issuing transactions
 and earning inflation, including the branch inflation bonus when it wins a branch.

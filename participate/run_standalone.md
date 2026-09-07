@@ -93,8 +93,10 @@ Genesis distribution — the supply is split three ways:
   `initialSupply - 1 - 50,000,000` motes;
 - **1 mote sits in your ED25519 sigLock account** (the genesis dust output), just
   enough that the wallet always has an output to build a first transaction from;
-- **50,000,000 motes (50 PROX) go to the fair-launch mine chain**, which exists on a
-  standalone ledger exactly as it does on a public one.
+- **50,000,000 motes (50 PROX) sit on the fair-launch mine chain output**, which exists
+  on a standalone ledger exactly as it does on a public one. That is the output's own
+  balance, not the mineable amount: the 940,000,000 PROX that mining can create do not
+  exist yet and are minted transit by transit.
 
 ## Run the node
 

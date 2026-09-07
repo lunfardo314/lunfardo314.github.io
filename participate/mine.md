@@ -74,7 +74,7 @@ It runs until you stop it, or until the chain is exhausted. Useful options:
 |------|---------|
 | `--workers N` | Parallel mining workers. Defaults to the number of CPUs. |
 | `--count N` | Stop after N transits. Default 0 — keep going. |
-| `--fee M` | Tag-along fee in motes, taken out of the reward. Default 0 uses the sequencer minimum; the miner caps it at 1% of the reward. |
+| `--fee M` | Tag-along fee in motes, taken out of the reward. Default 0 uses the sequencer minimum. The ledger rules cap it at 1% of the reward; at least 99% always goes to your key. |
 | `--stream URL,…` | Additional node endpoints to receive mining transactions from. **Worth setting** — see below. |
 | `--no-stream` | Do not subscribe to the stream at all. Slower, and you will usually lose. |
 | `--refetch N` | Seconds to mine one target before re-stamping it. Default 0 — adaptive to the measured hashrate. |
