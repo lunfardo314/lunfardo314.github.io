@@ -97,8 +97,7 @@ api:
 ```
 
 > Cross-reference: `api.node_url`'s port must equal the node's `api.port`
-> (`proxima.yaml`). On the launch phase network, sequencer nodes serve the API on
-> `:8000` and access nodes on `:8001`.
+> (`proxima.yaml`). The public access nodes serve the API on `:8001`.
 
 ---
 

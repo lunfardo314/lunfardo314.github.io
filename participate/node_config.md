@@ -69,8 +69,8 @@ mnemonic and `<multiaddr>` has the form
 ```yaml
 peering:
   host:
-    id_private_key: da3a99f3a43bdcfa10da986d548e2de1ecf285c8a093849924a41cf72513be5797d3142a5af76d4be9de683d8f492dce2110936d553415102be768cf4df8cacc
-    id: 12D3KooWL32QkXc8ZuraMJkLaoZjRXBkJVjRz7sxGWYwmzBFig3M
+    id_private_key: <64-byte ed25519 hex>
+    id: 12D3KooW...
     port: 4000
   peers:
     hloc0: /ip4/65.21.170.230/udp/4001/quic-v1/p2p/12D3KooWG8zty1Yfbxw4mpiLW6Eoh6wTpPNdqn2B3f22XqArLsnT
