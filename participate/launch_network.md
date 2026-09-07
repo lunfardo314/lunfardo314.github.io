@@ -14,13 +14,14 @@ Until that happens, treat everything on the network as temporary — tokens incl
 
 * alpha — `http://65.21.170.230:8001`
 * beta — `http://79.137.70.25:8001`
+* gamma — `http://51.254.47.76:8001`
 
-Either can be used to reach the network from your wallet, and either can be listed as a
+Any of them can be used to reach the network from your wallet, and any can be listed as a
 trusted source for bootstrapping a new node, in the node's configuration.
 
 ## Other public access points
 
-A couple of access points is a starting point. A handful of entry points that
+Three access points is a starting point. A handful of entry points that
 everyone depends on is exactly the shape the launch phase exists to grow out of, and it is
 the easiest thing for a newcomer to fix.
 
