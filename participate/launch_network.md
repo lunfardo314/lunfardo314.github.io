@@ -85,16 +85,16 @@ Use `proxi node send` to send tokens between accounts (see the
 properly — in particular the _tag-along sequencer_ and the _tag-along fee_. List the
 available sequencers with `proxi node allchains -q` and pick one as your tag-along.
 
-### Earn inflation by delegation
+### Delegating your tokens
 
-Please read [delegation](participate/delegate.md). It is **strongly encouraged** to
-delegate all but a small reserve (say 100 or 1000 PROX) of your tokens as soon as you
-receive them. List the sequencers available as delegation targets with
-`proxi node allchains -q`.
+Please read [delegation](participate/delegate.md). Tokens only count for the consensus
+while they are put to work, so the usual choice is to delegate all but a small reserve
+(say 100 or 1000 PROX) once you receive them. List the sequencers available as delegation
+targets with `proxi node allchains -q`.
 
-Delegated tokens contribute to the security of the network and, in return, earn you
-inflation. Tokens left idle in an ordinary account (an address of the form `a/<hex>`) earn
-nothing.
+Delegated tokens contribute to the security of the network and receive inflation for it,
+which is what keeps a holding from being diluted. Tokens left idle in an ordinary account
+(an address of the form `a/<hex>`) receive nothing.
 
 If you are mining, this happens by itself. By default `proxi node mine` delegates what it
 earns, each time to a sequencer drawn **at random** from those currently alive that leave
@@ -103,7 +103,7 @@ spreads its tokens across the sequencers instead of piling them on one — which
 what the launch phase is trying to achieve. Use `--delegate=false` if you would rather
 place your tokens yourself.
 
-### Earn inflation by running a sequencer
+### Running a sequencer
 
 To run a sequencer you need two things:
 

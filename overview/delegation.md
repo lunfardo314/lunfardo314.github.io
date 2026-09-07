@@ -58,7 +58,7 @@ guarantees the delegator a genuine opportunity to take the funds back.
 ## The cut, and the advance
 
 The split of the inflation is set by the **inflation cut** — the delegator's share, in
-promille, so `1000` is 100%. Each sequencer advertises a **profit margin** it must keep,
+promille, so `1000` is 100%. Each sequencer advertises a **margin** it must keep,
 and can accept a delegation only if the requested cut still leaves it that margin.
 Delegators want a larger cut, sequencers want their margin, and the two settle against
 each other in an open market. A delegator who finds a margin too high moves to another
@@ -76,13 +76,13 @@ actually generates. If it earns less than it advanced, it absorbs the difference
 
 Two consequences follow. A sequencer must hold enough **free balance** to fund the
 advances it offers, so one that cannot afford the advance for a given amount and cut
-simply will not accept the delegation. And the profit margin is not rent — it is the
+simply will not accept the delegation. And the margin is not rent — it is the
 price of carrying that risk.
 
 ## Getting the tokens back
 
 There are two paths, and they are not equivalent: one is normal and depends on the
-sequencer, the other is guaranteed and does not.
+sequencer, the other is enforced by the ledger rules and does not.
 
 ### Asking the sequencer — the usual way
 
@@ -105,7 +105,7 @@ tokens do not cover is authorised by a signed **allowance** and comes out of the
 delegated balance itself. Early release is therefore always available, whatever the
 wallet holds; the wallet need only cover the request's tag-along fee.
 
-### The safe revocation window — the guarantee
+### The safe revocation window — the fallback the rules enforce
 
 The fallback needs no cooperation at all. When the freeze period ends the delegation
 unlocks by itself, and for the following 60 slots **only the owner** may act on the
@@ -113,8 +113,9 @@ output — the sequencer cannot re-freeze it, and cannot do anything else with i
 
 This is the path that matters when a sequencer is offline, unresponsive or hostile. It is
 expected to be rare, precisely because the ordinary path works and refusing costs the
-sequencer more than it gains. But it is what makes delegation safe *without* trusting
-anyone: the worst case is not losing the tokens, it is waiting until the freeze expires.
+sequencer more than it gains. But it is what lets delegation rest on ledger rules rather than on trust
+in anyone: as long as the consensus is honest, the worst case is not losing the tokens, it is
+waiting until the freeze expires.
 
 And waiting is all it costs, because **the return has already been paid**. A sequencer
 that goes down, or that ignores a stop request, cannot claw back the advance: it is
@@ -158,9 +159,9 @@ one chain to manage instead of two, and no new chain to pay for.
 
 ## What this achieves
 
-* A token holder can put capital to work by choosing a sequencer, and keeps **full
-  liquidity** of the delegated funds — comparable to liquid staking in proof-of-stake
-  systems, but without handing over control.
+* A token holder can put capital to work by choosing a sequencer, and keeps control of
+  the delegated funds, with liquidity limited only by the freeze period — comparable to
+  liquid staking in proof-of-stake systems, but without handing over control.
 * A sequencer counts the coverage of frozen tokens in every slot without moving the UTXO,
   which gives the network **high liveness** and lets participation scale with the number
   of accounts rather than collapse under it.

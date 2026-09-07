@@ -202,8 +202,8 @@ upgrade that has since activated is detected and discarded automatically.
 
 ## Run the node
 
-**Keep your computer's clock synced to real time** (NTP). A single node can never
-harm the network, but a node whose clock is off by even a few seconds will
+**Keep your computer's clock synced to real time** (NTP). A single node cannot do much
+harm to the network, but a node whose clock is off by even a few seconds will
 struggle to keep up with the network consensus, so it is in the operator's own
 interest to stay as close to global clock time as possible. This matters most for
 **sequencer nodes** (which issue transactions) and for nodes that **serve wallets
@@ -323,6 +323,6 @@ journalctl -u proxima -f
     there — exactly the first-start flow of *Configure state sources* and *Run the node*.
     You can but normally do not delete `proximadb.txstore`. 
     It contains all transactions from which all history can be reconstructed and audited. 
-- **Crash safety.** The database stays consistent across crashes; a restart
-  continues from the last committed branch, or re-restores from a snapshot if the
-  database was corrupted.
+- **Crash safety.** The database is designed to stay consistent across crashes; a
+  restart continues from the last committed branch, or re-restores from a snapshot if
+  the database was corrupted.

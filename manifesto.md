@@ -15,7 +15,7 @@ True decentralization therefore requires returning this power to users, the only
 Decentralization is not a voting structure or a validator set — it is the unconditional ability of every participant to directly extend the canonical ledger.
 
 Authority is fragility; **only universal write access and the elimination of discretionary roles provides lasting decentralization**.
-Minimalism is essential because only simple systems can be proven correct. Formal verification replaces governance; correctness becomes a theorem, not a vote. Incentives must align without creating operator classes. Fairness must persist for decades, not merely at launch.
+Minimalism is essential because only simple systems can hope to be proven correct. The aim is for formal verification to replace governance: correctness as a theorem, not a vote. Incentives must align without creating operator classes. Fairness must persist for decades, not merely at launch.
 
 ## Architectural Principles
 
@@ -32,16 +32,16 @@ Sequencers do not write on behalf of users; they assist propagation and cooperat
 
 UTXO determinism eliminates MEV at the base layer.
 
-Sybil resistance is built directly into the ledger. Influence emerges from token ownership rather than proof-of-cost or privileged roles. Total system cost remains bounded and independent of market cap. Fairness is driven by the permissionless liquidity of the token and by ongoing token-holder participation.
+Sybil resistance is built directly into the ledger. Influence emerges from token ownership rather than proof-of-cost or privileged roles. Total system cost remains bounded and independent of market cap. Fairness is driven by permissionless participation, the open movement of the token, and ongoing token-holder involvement.
 
-The protocol is verifiable: its properties can be formally proven (e.g., with TLA+) directly from the ledger’s immutable constraint layer, within clearly stated system-wide assumptions. Governance is not part of the protocol: only backward-compatible, formally proven refinements are allowed.
+The protocol is designed to be verifiable: its properties are meant to be formally provable (e.g., with TLA+) directly from the ledger’s immutable constraint layer, within clearly stated system-wide assumptions. No such proof exists yet. Governance is not part of the protocol: only backward-compatible, formally proven refinements are allowed.
 
 ## Paradigm & Vision
 
 Traditional blockchains rely on single-leader steps, authority roles, global mempools, and competitive races. They incur escalating costs, centralization pressures, and execution-heavy complexity. Proxima replaces all of this with cooperative consensus, multi-leader DAG structure, deterministic validity, and constraint-level simplicity. It is a fundamentally different architecture, not a refinement of existing ones.
 At its core, **Proxima re-centers the ledger around writers rather than operators: every user extends the DAG directly.**
 
-Built on this paradigm, Proxima becomes a possible foundation for a **global Digital Gold Standard** — a neutral, incorruptible reserve asset usable by centralized and decentralized entities, humans and AI agents alike.  
+Built on this paradigm, Proxima aims to be a possible foundation for a **global Digital Gold Standard** — a neutral base asset usable by centralized and decentralized entities, humans and AI agents alike. Whether it becomes one is for its holders to decide, not for this document to promise.  
 These participants operate on layer 2, can trustlessly transact over the base layer, and are synchronously and asynchronously composable into sophisticated dApps and full ecosystems.
 
 Its aims are sustainable security cost, enduring fairness, deterministic ordering, no MEV, no operator classes, and universal write access.

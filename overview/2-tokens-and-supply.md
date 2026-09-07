@@ -59,11 +59,13 @@ practical side of taking part.
 Alongside mining, the ledger creates tokens through **inflation**. Inflation is how the
 consensus pays for itself, and the rule governing it is short:
 
-> **Every token holder is entitled to inflation rewards for contributing to the
-> consensus. Tokens that participate earn; tokens that sit still do not.**
+> **The ledger rules mint inflation for tokens that contribute to the consensus.
+> Tokens that participate receive it; tokens that sit still do not, and are diluted by
+> those that do.**
 
-Nobody is excluded and nobody needs permission — the entitlement follows from holding
-tokens and putting them to work. But it is payment for *contribution*, not for ownership,
+Nobody is excluded and nobody needs permission — it follows from holding tokens and
+putting them to work. It is a disincentive to sit still rather than a yield: the inflation
+a working holding collects only protects it from being diluted. But it is payment for *contribution*, not for ownership,
 and the difference is the whole point.
 
 ### Not the inflation you are used to
@@ -82,9 +84,10 @@ Proxima's inflation is neither a policy nor a tax. It is:
 - **merit-based** — earned by contributing to the consensus, in proportion to the
   contribution actually made;
 - **predictable** — fixed by formula and computable in advance by anyone, with no
-  schedule that can be revised and no discretion to exercise;
-- **trustless** — defined by ledger rules that no authority controls, enforced by every
-  node independently.
+  schedule that can be revised and no discretion to exercise, once the ledger rules are
+  final. On a pre-launch network the founder can still reset the ledger, rules included;
+- **trustless** — defined by ledger rules that no authority controls once the network is
+  decentralized, enforced by every node independently.
 
 There are two independent kinds.
 
@@ -100,9 +103,9 @@ through, not for existing: a chain left untouched for a hundred slots and then m
 earns one slot's worth, and the rest is never minted. Constant movement is the behaviour
 being paid for.
 
-The rate starts at roughly **10% a year** and declines slowly and permanently as the
-ledger's total supply grows. Nothing about it is random and nothing about it is a
-competition: it is the base return on capital that is being put to work.
+The rate starts at roughly **10% a year**, measured in tokens, and declines slowly and
+permanently with ledger time. Nothing about it is random and nothing about it is a
+competition: it is the base rate of inflation on capital that is being put to work.
 
 The important qualifier is that **only chained accounts earn it**. Tokens sitting in an
 ordinary output earn nothing at all, however many there are, and a holder who leaves them

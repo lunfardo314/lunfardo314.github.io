@@ -89,7 +89,7 @@ It runs until you stop it, or until the chain is exhausted. Useful options:
 ## The reward, and how it changes
 
 For roughly the first 46 days the reward _A_ is flat at **500 PROX** per transit. After
-slot 388,125 it grows by 464 motes per slot, so a transit mined later is worth slightly
+slot 388,125 it grows by 464 motes per slot, so a transit mined later pays slightly
 more than one mined earlier.
 
 At the pace transits actually land — about 4.5 slots each — the whole mintable supply is

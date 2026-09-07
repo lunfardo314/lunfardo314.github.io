@@ -59,7 +59,7 @@ An ordered four-page spine, then reference pages behind it.
 
 - [Join Proxima](https://lunfardo314.github.io/participate/participate.md): the entry point — who can take part and how.
 - [Launch phase network](https://lunfardo314.github.io/participate/launch_network.md): what the launch phase network is and how to reach it.
-- [Delegation](https://lunfardo314.github.io/participate/delegate.md): how to delegate tokens and earn from it without running anything.
+- [Delegation](https://lunfardo314.github.io/participate/delegate.md): how to put tokens to work by delegating them, without running anything.
 - [Mining](https://lunfardo314.github.io/participate/mine.md): the fair launch — at genesis only 6% of the final supply exists; the rest is mined.
 - [proxi CLI wallet](https://lunfardo314.github.io/participate/proxi.md): the command-line wallet and tool.
 - [Running an access node](https://lunfardo314.github.io/participate/run_access.md): the simplest node configuration, with no sequencer.

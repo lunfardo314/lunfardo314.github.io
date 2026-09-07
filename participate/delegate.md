@@ -6,13 +6,14 @@
 > Nothing is sold and nothing is promised; take part for the exercise. See
 > [Please read before taking part](README.md).
 
-_Delegation_ is a way to take part in Proxima's _cooperative consensus_ and earn
-inflation on your tokens **without running a sequencer yourself**.
+_Delegation_ is a way to take part in Proxima's _cooperative consensus_ and receive
+inflation on your tokens **without running a sequencer yourself**. Inflation is paid only
+to tokens that take part; a holding that sits still is diluted by those that do.
 
 You hand your tokens to a _sequencer_ of your choice. It uses them to generate inflation
 and shares that inflation with you; you keep ownership throughout.
 
-**Your tokens cannot be stolen.** A delegation is a **covenant**: the tokens sit in a
+**The ledger rules do not let the sequencer take your tokens.** A delegation is a **covenant**: the tokens sit in a
 chained account carrying constraints that spell out what each side may do with them, and
 every node checks those constraints before accepting a transaction. A transaction that let
 the sequencer walk off with your tokens is not one an honest node rejects — it is not a
@@ -112,12 +113,12 @@ The cut is given in _promille_ (parts per thousand): `1000` means 100%, `900` me
 and so on. You choose it with the `--cut` flag; the default is `900` (90% to you, the
 rest to the sequencer).
 
-Each sequencer advertises a **profit margin**, also in promille — the minimum it wants
+Each sequencer advertises a **margin**, also in promille — the minimum it wants
 to keep for itself. A sequencer can only accept a delegation whose cut leaves it at least
 its margin. In other words, the largest cut a sequencer will grant is
-`1000 − profit margin`. Ask for more than that and the sequencer rejects the delegation.
+`1000 − margin`. Ask for more than that and the sequencer rejects the delegation.
 
-### What you actually get: the market dynamics
+### What you actually get
 
 What you ask for is not always what you are paid. Besides its margin, a sequencer carries
 a **`greedy`** flag, off by default, and it decides how the sequencer treats a request for
@@ -146,7 +147,7 @@ greedy sequencer it earns you less. And the flag only matters below the limit: a
 exactly `1000 − margin` and greedy and non-greedy sequencers pay you the same.
 
 Check both numbers before you commit: `proxi node delegate target_info <sequencer ID>`
-prints the sequencer's profit margin and its `Greedy` setting.
+prints the sequencer's margin and its `Greedy` setting.
 
 #### Where the price settles
 
@@ -171,12 +172,12 @@ delegation market is the one Proxima is trying to reach anyway.
 To make delegation attractive, the sequencer does not wait until the end to pay your
 share. The moment it freezes your tokens, it adds your projected share of the inflation
 to the delegation output straight away. This prepayment is called the **delegation
-advance** — the sequencer's own investment in your delegation.
+advance** — the sequencer's own outlay on your delegation.
 
 So the sequencer carries the risk: if it or the network goes down during the freeze, you
-already hold your cut. Its profit margin reflects that risk and its running costs.
+already hold your cut. Its margin reflects that risk and its running costs.
 
-The sequencer then earns that money back (plus its margin) from the real inflation the
+The sequencer then recovers the advance (plus its margin) from the real inflation the
 frozen tokens generate over the freeze period. For this to work the sequencer must
 actually hold enough free balance to pay the advance. A sequencer that cannot afford the
 advance for the amount and cut you asked for will not take the delegation.
@@ -184,8 +185,8 @@ advance for the amount and cut you asked for will not take the delegation.
 This advance is also why taking your tokens back _early_ may cost you — see "Taking your
 tokens back" below.
 
-**Delegation economics is entirely market-driven: delegators want as big cut as possible,
-sequencers want their profit, both compete with their peers in the permissionless free market.**
+**Nothing sets the cut from above: delegators want as big a cut as possible, sequencers
+want their margin, and each side competes with its peers.**
 
 ## Checking a sequencer before you delegate
 
@@ -193,7 +194,7 @@ You do not need to delegate blindly. Two commands inspect a target first, and ne
 needs your private key:
 
 * `proxi node delegate target_info <sequencer ID>` shows everything about a target: its
-  balances and how much it has available for advances, its parameters (profit margin,
+  balances and how much it has available for advances, its parameters (margin,
   minimum fee), and the current delegation epoch and its boundaries.
 * `proxi node delegate estimate <sequencer ID> <amount>` estimates whether that sequencer
   can afford the advance for a given amount and cut. Add `--cut <promille>` to test a

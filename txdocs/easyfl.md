@@ -21,7 +21,7 @@ Such a language meets the following set of requirements:
 * Extensibility with higher-level concepts through the language itself 
 * Standard library of concepts
 * Bounded computational model with no need for gas budgeting, non-Turing complete and verification-oriented
-* Formal verifiability with systems like TLA+
+* Designed for formal verification with systems like TLA+
 * Easiness for reasoning and validity verification by AI agents
 * Low difficulty converting to circuits for zk-based validity proofs
 

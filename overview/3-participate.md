@@ -4,9 +4,9 @@ Proxima has no class of miners or validators to apply to join. There are only to
 holders, and the consensus is whatever they do. That makes "how do I take part" a real
 question with several answers, and this page is about choosing between them.
 
-Two roles put tokens to work and earn inflation for it: delegating, and running a
-sequencer. Running an access node is a third role — necessary infrastructure, but it
-earns nothing. Handing tokens to a custodian is a fourth option, the one many holders
+Two roles put tokens to work and receive inflation for it, which is what keeps a
+holding from being diluted: delegating, and running a sequencer. Running an access node is a third role — necessary infrastructure, but it
+receives nothing. Handing tokens to a custodian is a fourth option, the one many holders
 will actually take and the only one that asks you to trust somebody.
 
 Mining sits apart from all of them. It is not a role in the running system but a
@@ -14,13 +14,13 @@ Mining sits apart from all of them. It is not a role in the running system but a
 and finished once it is.
 
 The practical guides for each live in [Join Proxima](participate/participate.md). This
-page is about what each role *is*, what it costs and what it returns.
+page is about what each role *is*, what it costs and what it does for you.
 
 ## Putting tokens to work
 
 ### Delegation
 
-Delegation is the option for a holder who wants the return without the operation. You
+Delegation is the option for a holder who wants the inflation share without the operation. You
 hand tokens to a sequencer of your choosing; it uses them to generate inflation and pays
 you the agreed share. You keep ownership throughout.
 
@@ -33,9 +33,8 @@ transaction that honest nodes reject; it is not a valid transaction anywhere. Wh
 trust the sequencer for is narrow: to keep generating inflation while it holds your
 tokens, and to honour a request to release them early.
 
-The split is set when you delegate. Sequencers advertise a profit margin — the minimum
-they keep — and compete on it. The sequencer also pays your projected share **up front**,
-when it first freezes the delegation, so the return does not depend on the sequencer
+The split is set when you delegate. Sequencers advertise the minimum cut they keep and compete on it. The sequencer also pays your projected share **up front**,
+when it first freezes the delegation, so your share does not depend on the sequencer
 staying healthy for the whole period.
 
 Delegation costs one transaction and no infrastructure. For most holders it is the right
@@ -65,15 +64,15 @@ it likes, and it is a self-interested player like everyone else. Proxima ships a
 reference implementation, but it is only that — other implementations are expected, and
 nothing in the ledger privileges ours.
 
-A sequencer earns from four sources: chain inflation on its own capital, the branch bonus
+A sequencer receives inflation from four sources: chain inflation on its own tokens, the branch bonus
 when it wins one, tag-along fees from users whose transactions it pulls in, and the
 margin it keeps on delegations. Against that it runs infrastructure, and it must hold
 free balance to pay delegation advances up front.
 
-Those advances are paid before the inflation that repays them has been earned, so a
-sequencer that goes offline has still paid: the delegator's return is already secured and
-the risk sits with the sequencer, not the delegator. It is a business with real costs and
-risks, which is why the margin exists.
+Those advances are paid before the inflation that repays them has been generated, so a
+sequencer that goes offline has still paid: the delegator's share is already secured and
+the risk sits with the sequencer, not the delegator. Running one has real costs and
+risks, which is why the cut exists.
 
 A sequencer node is not a separate species of node. It is a full node — the same one
 described under [running a full (access) node](#running-a-full-access-node) below — with
@@ -87,8 +86,8 @@ theirs as well.
 
 In practice many holders will not delegate or sequence but **deposit** — handing tokens
 to a custodian, most likely a crypto exchange or a layer-2 chain settled on Proxima. The
-custodian generates inflation on the pooled deposits and pays interest, keeping a margin,
-with rates set by competition much as in banking.
+custodian generates inflation on the pooled deposits and passes part of it on, keeping
+the rest, on terms of its own.
 
 <p style="text-align:center;"><img src="../static/img/custody.png">
 
@@ -98,13 +97,13 @@ is the whole point. A custodian holds your tokens; a sequencer you delegate to n
 does. Deposits carry counterparty risk and require the same kind of trust a bank does.
 
 The risk narrows if the custodian is itself a decentralized or zk-proven system rather
-than a company, but it does not vanish. Delegation exists precisely so that earning
-inflation does not require making this trade.
+than a company, but it does not vanish. Delegation exists precisely so that putting
+tokens to work does not require making this trade.
 
 **For now this route is not recommended.** Custody is worth exactly what the custodian is
 worth, and Proxima is new: the ecosystem of reputable, well-established custodians that
 would make the choice a reasonable one does not exist yet. Until it does, delegation
-offers the same return with none of the counterparty risk, and there is little reason to
+does the same with none of the counterparty risk, and there is little reason to
 prefer a deposit over it.
 
 ## Mining: a way in, while it lasts
@@ -149,7 +148,7 @@ matters more the larger the ledger's history grows.
 
 It earns **no inflation**, because inflation pays for contribution to the consensus, and
 an access node validates and relays rather than issuing transactions of its own. Running
-one is infrastructure, not an investment — the natural first step for a developer, and
+one is infrastructure, not a way to put tokens to work — the natural first step for a developer, and
 what anyone building on Proxima will want in front of them.
 
 [Running an access node](participate/run_access.md) covers it.
@@ -173,7 +172,7 @@ different sequencers, which is the straightforward defence.
 
 | If you | The answer is |
 |--------|---------------|
-| hold tokens and want a return without running anything | **delegate** |
+| hold tokens and want them working without running anything | **delegate** |
 | want to take an active part and can run infrastructure | **run a sequencer** |
 | are building on Proxima, or want to support the network | **run an access node** |
 | want convenience and accept counterparty risk | **deposit with a custodian** — not recommended yet |

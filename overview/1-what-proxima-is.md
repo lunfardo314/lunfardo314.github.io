@@ -89,23 +89,23 @@ that does not use proof of work: probabilistic, and with many leaders rather tha
 The philosophy of Proxima is **social agreement**, **equity** and **cooperation** among
 those who hold a stake in the ledger.
 
-Following Bitcoin's example, we see Proxima as **peer-to-peer gold**: a verifiable,
+Following Bitcoin's example, Proxima aims to be **peer-to-peer gold**: a verifiable,
 trustless and fully decentralized platform for *digital scarcity*. The aim is to be the
 enabling layer beneath derived ideas such as money, cash, payments — or even jewelry —
 rather than to be all of those things itself.
 
 Those derived concepts are better built as layer-2 systems that maintain a trustless,
-provable equivalence with the base asset, using it as universal collateral.
+provable equivalence with the base asset.
 
 ## Where to go next
 
 This page is the first of the overview. It is meant to be read on its own; everything
 below is optional and can be taken in any order.
 
-- [Tokens and supply](overview/2-tokens-and-supply.md) — where PROX comes from, and what
-  holding it earns.
+- [Tokens and supply](overview/2-tokens-and-supply.md) — where PROX comes from, and how
+  inflation works.
 - [Taking part](overview/3-participate.md) — delegating, sequencing and the other ways in:
-  what each costs and returns.
+  what each costs and does.
 - [How transactions work](overview/4-transactions.md) — chains, covenants and where
   inflation actually comes from.
 - [UTXO ledger](overview/utxo_ledger.md) — how transactions, conflicts and the tangle

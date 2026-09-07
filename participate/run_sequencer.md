@@ -8,7 +8,7 @@ toward the sequencer's coverage). Pulling those transactions in is how ordinary
 transactions reach the ledger, and the tag-along fees plus token inflation are the
 sequencer's reward.
 
-Sequencers are profit-seeking, but a sequencer only profits when it **cooperates**
+Sequencers act in their own interest, but a sequencer only comes out ahead when it **cooperates**
 with the others — converging on the ledger state with the biggest coverage. That
 emergent cooperation *is* Proxima's decentralized consensus: **sequencers make the
 consensus**.
@@ -24,29 +24,27 @@ The node core supports multiple sequencers, but the current version allows **one
 sequencer per node**.
 
 > A sequencer is a token holder that puts **its own tokens** to work: its balance is
-> its **equity capital** — the owner's own investment in the business, which is both
 > what lets it operate and what makes it worth trusting. Nothing is staked, locked up
 > or handed to anyone: the tokens stay yours, on your own chain. The risk is yours in
-> the same way. A sequencer that is down contributes nothing to the consensus and earns
-> nothing on its balance, which is an opportunity cost — and worse, the advances it has
-> already paid its delegators become an outright loss, because a sequencer only earns
-> them back out of inflation it is no longer generating.
+> the same way. A sequencer that is down contributes nothing to the consensus and
+> receives no inflation on its balance, so it is diluted like any idle holding — and
+> worse, the advances it has already paid its delegators become an outright loss,
+> because a sequencer only recovers them out of inflation it is no longer generating.
 >
-> The equity is what pays the **delegation advance**: a sequencer advances a
+> The balance is what pays the **delegation advance**: a sequencer advances a
 > delegator's share of the inflation up front, so it can only take on as much
 > delegated capital as its own balance can afford.
 >
 > A bigger balance does not by itself make a sequencer more competitive. What
 > decides that is how close it sits to the network's *centre of mass*, where mass
 > is balance plus frozen coverage and distance is round-trip time — beyond the
-> scope of this page. What the balance does show is how much equity the operator has
+> scope of this page. What the balance does show is how much the operator has
 > committed to providing sequencing services to other token holders — skin in the
 > game — which is why delegators and users tend to prefer heavier sequencers.
 >
-> The analogy is not incidental. The Proxima ledger deliberately reproduces an
-> ordinary economic environment: sequencers are businesses running on their owners'
-> equity, delegators and senders are their clients, the profit margin is a price, and
-> what settles it is competition rather than a rule imposed from above.
+> The ledger deliberately leaves this to competition: a sequencer's cut is a price
+> it publishes, delegators and senders choose among sequencers, and nothing sets the
+> balance from above.
 
 ## Prerequisites
 
