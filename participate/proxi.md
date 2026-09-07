@@ -26,7 +26,8 @@ Most `proxi` commands have the form `proxi <group> <subcommand> <arguments and f
 where `<group>` is one of:
 
 * `proxi config` — creates wallet and node configuration profiles
-* `proxi init` — initializes a node database (genesis)
+* `proxi init` — creates the genesis snapshot of a new ledger (see
+  [Creating a new ledger](#creating-a-new-ledger) below)
 * `proxi util` — small helper commands (key generation, parsing, and similar)
 * `proxi db` — commands that read or change the node's database files **directly**,
   bypassing the node. They will fail if the node is running. Direct access to the
@@ -241,3 +242,32 @@ the details of each.
 ## Delegation
 
 See [delegation](participate/delegate.md).
+
+## Creating a new ledger
+
+You do not need this to join the running network. It is for starting a **new ledger
+from scratch**, for example a private test network.
+
+```bash
+proxi init genesis
+```
+
+It reads the wallet's private key, which becomes the genesis controller, and writes a
+**genesis snapshot** (`*.snapshot`) into the current directory (another directory with
+`-o <dir>`). The genesis time is the moment the command runs. Any node that starts
+without a database and finds the snapshot in its snapshot directory restores its
+ledger from it.
+
+The command asks for a **ledger description**: a short free text, up to 255 bytes,
+that is written into the ledger identity and stays with the ledger for its whole life.
+Press Enter to keep the default text. The description can also be passed with
+`-d "<text>"`; with the global `-f` flag the question is skipped and the flag value,
+or the default, is used. The same description is shown in the launch phase monitor
+of every node, next to the hash of the ledger constraint library.
+
+Before writing anything, the command prints the ledger constants, the library hash and
+the ID of the bootstrap sequencer, and asks for confirmation.
+
+`proxi config node --standalone` writes a genesis snapshot of its own, with a generated
+description, so a standalone developer node does not need `proxi init genesis`. See
+[Running a standalone developer node](participate/run_standalone.md).
