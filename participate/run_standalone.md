@@ -27,6 +27,9 @@ first (`go install -v` in `proxima/` and `proxima/proxi/`), then check `proxi -h
 proxi config wallet
 ```
 
+(Add `-v` to either config command on this page to keep the explanatory comments in the
+generated file; the settings are the same.)
+
 This single command creates **both** the ED25519 key and the wallet profile. It
 generates the key from system entropy, writes it to `proxima.key` (a small JSON
 keystore), and writes the profile to `proxi.yaml` (the default profile name is

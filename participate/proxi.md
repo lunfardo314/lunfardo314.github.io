@@ -50,7 +50,10 @@ The command `proxi config wallet` creates a new wallet. It:
 By default the profile is named `proxi`. You can pass a different name, for example
 `proxi config wallet myname`, which creates `myname.yaml`.
 
-The generated `proxi.yaml` looks like this (with explanatory comments; the
+The profile is written without its explanatory comments. Add `-v` to keep them
+(`proxi config wallet -v`); the settings are the same either way.
+
+The generated `proxi.yaml` looks like this when created with `-v` (the
 `holder_id` value below is just an example — yours will differ):
 
 ```yaml

@@ -88,6 +88,7 @@ REST and WebSocket API server.
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | `api.port` | int | — | Port the API server listens on. |
+| `api.host` | string | "" (all interfaces) | Address the API server binds to. Set `127.0.0.1` behind a reverse proxy, so only the proxy reaches the node directly (see [Running an access node](participate/run_access.md)). |
 | `api.disable` | bool | false | Disable the API server entirely (it is **enabled** by default). |
 
 ```yaml
@@ -490,9 +491,20 @@ The `proxi config node` command writes a fresh `proxima.yaml` (and, with
 `proxi/config_cmd/node_config.template`. It refuses to overwrite an existing
 `proxima.yaml` — except the edit mode below.
 
-It prompts for at least 10 random seed characters to derive the peering host
-key/ID. Fixed defaults baked into the generated file: peering `port: 4000`,
-`api.port: 8000`, `max_dynamic_peers: 10`, `allow_local_ips: false`.
+The peering host key and ID are generated from system entropy. Fixed defaults
+baked into the generated file: peering `port: 4000`, `api.port: 8000`,
+`max_dynamic_peers: 10`, `allow_local_ips: false`.
+
+The file is written without its explanatory comments, so it stays short. Add
+`-v` to get the fully commented version, with every option explained in place:
+
+```
+proxi config node -v
+```
+
+Both forms produce the same settings; `-v` only keeps the comments. Options
+that are off by default appear in both as commented-out lines, ready to
+uncomment.
 
 ### Flags
 

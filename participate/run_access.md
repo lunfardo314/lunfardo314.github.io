@@ -137,6 +137,17 @@ This writes `proxima.yaml` to the working directory and generates the node's
 **libp2p host key and ID** from system entropy. That key only secures
 peer-to-peer communication; it does **not** control any tokens.
 
+The file is written without its explanatory comments, so it stays short. Add
+`-v` to get the fully commented version, with every option explained in place:
+
+```
+proxi config node -v
+```
+
+Both forms produce the same settings; `-v` only keeps the comments. Options
+that are off by default appear in both as commented-out lines, ready to
+uncomment.
+
 The generated file contains sensible defaults: peering port `4000`, API port
 `8000`, autopeering up to 10 dynamic peers, and an **empty** static-peers list.
 
@@ -326,3 +337,109 @@ journalctl -u proxima -f
 - **Crash safety.** The database is designed to stay consistent across crashes; a
   restart continues from the last committed branch, or re-restores from a snapshot if
   the database was corrupted.
+
+## If the API is public: put a reverse proxy in front of it
+
+The node's API has no rate limit and no authentication. A node whose port is
+reachable from the internet, for example one listed as a public access point,
+should not expose it directly: one client can keep it busy with state scans, and
+a few endpoints describe the node's peers. The usual answer is nginx in front of
+the node, with the node itself listening only on the loopback interface.
+
+1. Move the node's API to loopback, on a port of its own, in `proxima.yaml`:
+
+   ```yaml
+   api:
+     host: 127.0.0.1
+     port: 18001
+   ```
+
+   `api.host` is empty by default, meaning all interfaces. Restart the node.
+
+2. Install nginx and give it this configuration, for example as
+   `/etc/nginx/conf.d/proxima.conf`. It serves the public port `8001`, forwards
+   to the node on `18001`, blocks the endpoints that map the network, limits
+   heavy calls to 10 per minute per client and everything else to 20 per second,
+   and passes the two websocket streams through.
+
+   ```nginx
+   limit_req_zone  $binary_remote_addr zone=api:10m   rate=20r/s;
+   limit_req_zone  $binary_remote_addr zone=heavy:10m rate=10r/m;
+   limit_conn_zone $binary_remote_addr zone=conn:10m;
+   limit_req_status  429;
+   limit_conn_status 429;
+
+   upstream proxima_api {
+       server 127.0.0.1:18001;
+       keepalive 16;
+   }
+
+   server {
+       listen 8001;
+       listen [::]:8001;
+       server_name _;
+
+       client_max_body_size  4m;
+       proxy_connect_timeout 5s;
+       proxy_send_timeout    30s;
+       proxy_read_timeout    30s;
+       proxy_buffering       off;
+       proxy_http_version    1.1;
+       proxy_set_header Host              $http_host;
+       proxy_set_header X-Real-IP         $remote_addr;
+       proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+       limit_conn conn 20;
+
+       # endpoints that describe the network: not for strangers
+       location = /api/v1/peers_info               { return 403; }
+       location = /api/v1/get_connectivity_map     { return 403; }
+       location = /api/v1/get_connectivity_matrix  { return 403; }
+       location = /peers                           { return 403; }
+       location = /netviz                          { return 403; }
+       location ^~ /api/v1/txlog/                  { return 403; }
+
+       # state scans, script evaluation, explorers, snapshot download
+       location ~ ^/(api/v1/(eval|get_inactive|get_all_chains|get_sequencers|get_cleanable_outputs|get_snapshot|get_branch_list|get_mainchain|dag_explorer/.*|chain_explorer/.*)|txapi/v1/compile_script)$ {
+           limit_req zone=heavy burst=10 nodelay;
+           proxy_pass http://proxima_api;
+       }
+
+       # websocket streams (the miner subscribes here)
+       location /wsapi/ {
+           limit_conn conn 3;
+           # headers set here replace the ones above, and the node checks a
+           # browser's Origin against Host, port included: repeat Host with $http_host
+           proxy_set_header Host       $http_host;
+           proxy_set_header Upgrade    $http_upgrade;
+           proxy_set_header Connection "upgrade";
+           proxy_read_timeout 1h;
+           proxy_send_timeout 1h;
+           proxy_pass http://proxima_api;
+       }
+
+       location / {
+           limit_req zone=api burst=40 nodelay;
+           proxy_pass http://proxima_api;
+       }
+   }
+   ```
+
+   To exempt your own machines from the limits, add a `geo` block mapping their
+   addresses to an empty key and use it in the zones; the nginx documentation
+   covers it under `limit_req_zone`.
+
+3. `sudo nginx -t`, then start nginx. Check from another machine:
+
+   ```
+   curl -s -o /dev/null -w "%{http_code}\n" http://<ip>:8001/api/v1/sync_info    # 200
+   curl -s -o /dev/null -w "%{http_code}\n" http://<ip>:8001/api/v1/peers_info   # 403
+   for i in $(seq 25); do curl -s -o /dev/null -w "%{http_code} " http://<ip>:8001/api/v1/get_inactive; done; echo
+   ```
+
+   The last line prints a run of `200` followed by `429`. Open `/dagviz` in a
+   browser as well: a websocket that connects from `curl` but not from a browser
+   means the `Host` header is not reaching the node with its port.
+
+Anything on the machine that used `http://127.0.0.1:8001` keeps working through
+nginx. This does not add HTTPS; that needs a domain name and a certificate, which
+`certbot --nginx` sets up in one step once the name exists.

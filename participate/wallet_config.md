@@ -209,6 +209,15 @@ network currently offers. See [Mining](participate/mine.md).
 proxi config wallet [<profile name>]      # default name: proxi → proxi.yaml
 ```
 
+The profile is written without its explanatory comments. Add `-v` to keep them:
+
+```
+proxi config wallet -v
+```
+
+The settings are the same either way; `-v` only keeps the comments, with every
+option explained in place.
+
 Writes a new `<name>.yaml` profile (refuses to overwrite an existing one) and
 ensures a key file exists:
 
