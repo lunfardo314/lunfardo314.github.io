@@ -39,13 +39,14 @@ To produce a valid transit you must find a **nonce** that makes the finished tra
 hash to a value with at least _K_ trailing zero bits. That much is familiar.
 
 What is different is that the hash covers the **signature**. Changing the nonce changes
-the signature, so every single attempt costs one ed25519 signing operation. You cannot
-grind hashes cheaply, and there is no shortcut for specialised hardware — the work is
-deliberately CPU-bound and roughly equal per core on ordinary machines. A general-purpose
-computer is competitive.
+the signature, so every attempt needs the miner's own private key. That is what the design
+buys: the work cannot be pooled or delegated. A pool would have to hold your key, and with
+it your reward.
 
-This also makes pooling unattractive: the work cannot be split into shares that a pool
-operator can verify cheaply, because each attempt requires the miner's own key.
+It does not buy independence from hardware. The inner loop is elliptic-curve arithmetic and
+hashing, which a GPU runs in parallel several times faster than a CPU, and dedicated hardware
+could go further. A general-purpose computer can mine, but expect to be outpaced by anyone
+who brings a GPU. Difficulty adapts to whatever hashrate shows up.
 
 ## What you need
 
@@ -57,7 +58,7 @@ operator can verify cheaply, because each attempt requires the miner's own key.
   tag-along sequencer.
 * Access to a node API — your own [access node](participate/run_access.md), or a public
   one.
-* CPU cores. That is the whole of the hardware story.
+* CPU cores. The `proxi` miner runs on the CPU; a GPU miner is faster.
 
 This is the point of mining in a fair launch: it is the one way into Proxima that does
 not ask you to already hold tokens.

@@ -277,17 +277,17 @@ early and a smaller share late.
 varies a nonce in the input's unlock parameters, which changes the transaction id, the
 signature, and the hash.
 
-Every attempt requires a **fresh Ed25519 signature under the miner's own key**. Three
-consequences:
+Every attempt requires an **Ed25519 signature under the miner's own key**. One consequence,
+and one limit:
 
 - **Not outsourceable.** The private key sits inside the hot loop. Hand it to a pool and you
   hand over the reward: the covenant forces ≥ 99 % of every payout to the signing key. Mining
   pools — the largest source of concentration in every proof-of-work chain launched so far —
   have no foothold here.
-- **ASIC-hostile.** The inner loop is a signature, not a bare hash. Special hardware can shave
-  a constant off it; it cannot build the orders-of-magnitude moat a bare hash invites.
-- **CPU-egalitarian.** Flat marginal cost per attempt, no economy of scale, no discount for
-  size.
+- **Not hardware-neutral.** The inner loop is elliptic-curve arithmetic and hashing. A GPU
+  runs it in parallel several times faster than a CPU, and dedicated hardware could go
+  further. The signature buys non-outsourceability, not equality between machines; difficulty
+  adapts to whatever hashrate arrives.
 
 Call it **proof-of-signing-work**.
 
@@ -512,9 +512,9 @@ Stated because they are real, not because they are resolved:
 - **Scalability of participation.** Many holders delegating to many sequencers is a regime the
   network has not been run in. How many delegations a sequencer can carry, and how that behaves
   as holders and sequencers multiply, has been modelled and needs measuring.
-- **Early concentration.** Whoever shows up first with CPU takes a large share of the first
-  weeks' emission — expect the largest single actor somewhere around a third to a half of
-  month-one emission. Non-outsourceability and the absence of an ASIC moat limit how large, the
+- **Early concentration.** Whoever shows up first with the most hashrate takes a large share
+  of the first weeks' emission — expect the largest single actor somewhere around a third to a
+  half of month-one emission. Non-outsourceability limits how large, the
   flat opening reward keeps the first weeks from being disproportionately valuable, and the
   ~14-month tail dilutes what remains. It will not be even. **Fair launch means equal rules,
   not equal outcomes.**
