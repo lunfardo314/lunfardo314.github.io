@@ -37,7 +37,7 @@ func self : atPath(at)
 ```
 
 ## Ledger constants
-At genesis, several fixed values must be set — such as the initial token supply and the genesis public key. These immutable values are known as ledger constants and are encoded directly into the JSON ledger definitions file.
+At genesis, several fixed values must be set — such as the initial token supply and the genesis controller's signature. These immutable values are known as ledger constants and are encoded directly into the JSON ledger definitions file.
 
 Each constant is a parameterless EasyFL function whose name is prefixed with `const`. Some are hard-coded; others are filled in from the genesis configuration when the ledger is created. Examples:
 
@@ -51,7 +51,7 @@ func constTransactionPace : u64/...                  // ticks, from genesis conf
 func constTransactionPaceSequencer : u64/...         // ticks, from genesis config
 func constTickDuration : u64/...                     // nanoseconds per tick, from genesis config
 func constGenesisTimeUnix : u64/...                  // Unix reference time, from genesis config
-func constGenesisControllerPublicKey : 0x...         // genesis token holder public key
+func constGenesisControllerSignature : 0x...         // genesis controller's signature, includes the public key
 ```
 Other constants include `constAttachmentCostBudget`, `constTxIDStateTTLSlots`, `constBootstrapChainID`, `constHealthyCoverageNumerator` / `constHealthyCoverageDenominator` and `constDescription`.
 
@@ -61,7 +61,7 @@ Other constants include `constAttachmentCostBudget`, `constTxIDStateTTLSlots`, `
 
 While the ledger is agnostic about the real clock, sharing the correspondence between ledger time and the real-world clock between nodes is critical to cooperative consensus: token holders must coordinate under roughly the same clock assumptions to interact effectively.
 
-The `constGenesisControllerPublicKey` is the public key of the genesis token holder. This key is embedded in the genesis output's lock and remains on the ledger for the lifetime of the ledger, even after token ownership changes.
+The `constGenesisControllerSignature` is the genesis controller's signature of `concat(constDescription, constGenesisTimeUnix)`, in the same format as a transaction signature: a signature type byte, the signature itself and the signer's public key. The public key is the one whose address receives the genesis output. The signature proves that the holder of that key created these ledger definitions, so the ledger cannot be attributed to someone who did not sign it. Any node or wallet can check it: `validSignature(concat(constDescription, constGenesisTimeUnix), constGenesisControllerSignature)` must be true. It remains on the ledger for its lifetime, even after token ownership changes.
 
 ## Helper functions
 Besides embedded functions and ledger constraints, the Proxima ledger includes many helper functions defined in EasyFL. A few examples are provided here.
