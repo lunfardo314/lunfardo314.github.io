@@ -273,23 +273,25 @@ early and a smaller share late.
 
 ### The proof of work
 
-`blake2b` of the **whole signed transaction** must end in at least `K` zero bits. The miner
-varies a nonce in the input's unlock parameters, which changes the transaction id, the
-signature, and the hash.
+The work function is a **verifiable random function** (a VRF, RFC 9381) under the miner's own
+key. The miner varies a nonce; for each nonce the VRF turns the predecessor output, the target
+slot and the nonce into one 64-byte output, and that output must end in at least `K` zero
+bits. The winning transit carries the VRF proof next to the nonce, and the covenant verifies
+the proof under the key that signs the transaction.
 
-Every attempt requires an **Ed25519 signature under the miner's own key**. One consequence,
-and one limit:
+A VRF differs from a hash in one way that matters here: for a given key and message there is
+exactly **one** output, and producing it needs the private key. One consequence, and one limit:
 
 - **Not outsourceable.** The private key sits inside the hot loop. Hand it to a pool and you
   hand over the reward: the covenant forces ≥ 99 % of every payout to the signing key. Mining
   pools — the largest source of concentration in every proof-of-work chain launched so far —
   have no foothold here.
-- **Not hardware-neutral.** The inner loop is elliptic-curve arithmetic and hashing. A GPU
-  runs it in parallel several times faster than a CPU, and dedicated hardware could go
-  further. The signature buys non-outsourceability, not equality between machines; difficulty
-  adapts to whatever hashrate arrives.
+- **Not hardware-neutral.** Each attempt is one elliptic-curve scalar multiplication plus
+  hashing. A GPU runs that in parallel several times faster than a CPU, and dedicated hardware
+  could go further. The VRF buys non-outsourceability, not equality between machines;
+  difficulty adapts to whatever hashrate arrives.
 
-Call it **proof-of-signing-work**.
+Call it **key-bound proof of work**.
 
 ### Difficulty and competition
 

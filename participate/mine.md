@@ -33,20 +33,23 @@ The chain carries a counter of how much remains to be minted. It starts at 940,0
 PROX and falls with every transit. When it reaches zero, mining is over and the supply is
 complete at 1,000,000,000 PROX.
 
-## Proof of signing work
+## Key-bound proof of work
 
-To produce a valid transit you must find a **nonce** that makes the finished transaction
-hash to a value with at least _K_ trailing zero bits. That much is familiar.
+To produce a valid transit you must find a **nonce** such that a value derived from it has at
+least _K_ trailing zero bits. That much is familiar.
 
-What is different is that the hash covers the **signature**. Changing the nonce changes
-the signature, so every attempt needs the miner's own private key. That is what the design
-buys: the work cannot be pooled or delegated. A pool would have to hold your key, and with
-it your reward.
+What is different is how the value is derived. It is not a plain hash but the output of a
+**verifiable random function** under your own private key, computed over the mine output you
+are extending, the target slot and the nonce. For a given key and message there is exactly one
+such output, and only the key holder can produce it. So every attempt needs your key, and the
+winning transaction carries a short proof that the covenant checks under the key that signed
+it. That is what the design buys: the work cannot be pooled or delegated. A pool would have
+to hold your key, and with it your reward.
 
-It does not buy independence from hardware. The inner loop is elliptic-curve arithmetic and
-hashing, which a GPU runs in parallel several times faster than a CPU, and dedicated hardware
-could go further. A general-purpose computer can mine, but expect to be outpaced by anyone
-who brings a GPU. Difficulty adapts to whatever hashrate shows up.
+It does not buy independence from hardware. Each attempt is an elliptic-curve computation
+that a GPU runs in parallel several times faster than a CPU, and dedicated hardware could go
+further. A general-purpose computer can mine, but expect to be outpaced by anyone who brings
+a GPU. Difficulty adapts to whatever hashrate shows up.
 
 ## What you need
 
