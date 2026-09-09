@@ -1,4 +1,12 @@
 The site is dedicated to the [Proxima project](https://github.com/lunfardo314/proxima).
+
+> ### Network status: **down**
+>
+> The pre-launch network is stopped for a reset and a release. When it starts
+> again, this section will say **Open**, with the genesis time, the ledger
+> definitions hash and the ledger description, and a link to the network
+> monitor. Until then there is nothing to join, mine or sync to.
+
 Currently available sub-sites:
 
 - [Proxima manifesto](manifesto.md)
