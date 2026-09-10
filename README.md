@@ -1,11 +1,20 @@
 The site is dedicated to the [Proxima project](https://github.com/lunfardo314/proxima).
 
-> ### Network status: **down**
+> ### Network status: **running** (take 0)
 >
-> The pre-launch network is stopped for a reset and a release. When it starts
-> again, this section will say **Open**, with the genesis time, the ledger
-> definitions hash and the ledger description, and a link to the network
-> monitor. Until then there is nothing to join, mine or sync to.
+> The pre-launch network is running. This is its centralized phase: it can be
+> stopped and reset at any time, without notice, and tokens on it are temporary.
+>
+> - Ledger description: `Proxima ledger take 0`
+> - Genesis time (slot 0): `2026-09-10 06:35:05 UTC` (Unix `1789022105`)
+> - Ledger definitions hash: `aee726b6bb2e29bf37277ed0cf14f04e239b2d2050e19be9f0b8a6bae824cccf`
+> - Genesis controller public key: `872c48cbadfa6bc86d7046bf74e6c38be243fb30cebc4a9cbeaa33fc34e3bdd2`
+> - Genesis file (slot 0 snapshot, 137 KB):
+>   [s0-0-030000000000000000000000000000000000000000000000000000.snapshot](https://lunfardo314.github.io/static/genesis/s0-0-030000000000000000000000000000000000000000000000000000.snapshot),
+>   SHA-256 `367cfdf637bf7491779496f20f2a2b2262f386d4cf4316297b93c6995293a163`
+> - [Network monitor](http://65.21.170.230:8001/monitor)
+>
+> How to join: [Join the Proxima effort](participate/participate.md).
 
 Currently available sub-sites:
 
