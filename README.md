@@ -1,6 +1,6 @@
 The site is dedicated to the [Proxima project](https://github.com/lunfardo314/proxima).
 
-> ### Network status: **running** (take 0)
+> ### Network status: **running**
 >
 > The pre-launch network is running. This is its centralized phase: it can be
 > stopped and reset at any time, without notice, and tokens on it are temporary.
