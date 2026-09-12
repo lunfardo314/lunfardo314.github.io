@@ -264,7 +264,12 @@ proxi node killchain <delegation ID>
 ```
 
 This ends the delegation and returns the whole balance to an ordinary `sigLock` output in
-your wallet.
+your wallet. Several delegations can be ended at once, in one transaction, by listing
+their IDs:
+
+```
+proxi node killchain <delegation ID> <delegation ID> ...
+```
 
 **While it is frozen**, you can ask the sequencer to release it early:
 
@@ -275,6 +280,17 @@ proxi node delegate askstop <delegation ID>
 This sends a securely authenticated stop request. An honest sequencer unfreezes the
 delegation right away, moving it to `on hold`. (The shorter alias is
 `proxi node delegate stop`.)
+
+If you have many frozen delegations, one command sends stop requests for several of them
+in a single transaction:
+
+```
+proxi node delegate askstop all [max]
+```
+
+It picks the frozen delegations that will unfreeze soonest, up to `max` of them (50 if
+not given, at most 100), and asks you once to confirm the total. `askstop all 1` stops
+only the one that unfreezes first.
 
 Because the sequencer already paid you the advance up front, releasing early before it has
 earned that money back would leave it out of pocket. To make the request fair, `askstop`
@@ -299,7 +315,8 @@ immediately re-freezing them, guaranteeing you a chance to do as you wish.
 Whenever the delegation is not frozen (`unlockable by the owner` or `on hold`) you can:
 
 * **End it** — `proxi node killchain <delegation ID>` returns all the funds to an ordinary
-  address-locked output in your wallet.
+  address-locked output in your wallet. Give several IDs to end several delegations in
+  one transaction.
 * **Continue it** — `proxi node delegate chain <delegation ID> [--cut <promille>]
   [-q <sequencer ID>] [--add <amount>]` re-delegates the same chain to the same or a
   different sequencer, optionally moving more tokens in at the same time.
