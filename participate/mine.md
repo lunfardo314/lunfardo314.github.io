@@ -81,7 +81,7 @@ It runs until you stop it, or until the chain is exhausted. Useful options:
 | `--fee M` | Tag-along fee in motes, taken out of the reward. Default 0 uses the sequencer minimum. The ledger rules cap it at 1% of the reward; at least 99% always goes to your key. |
 | `--stream URL,…` | Additional node endpoints to receive mining transactions from. **Worth setting** — see below. |
 | `--no-stream` | Do not subscribe to the stream at all. Slower, and you will usually lose. |
-| `--refetch N` | Seconds to mine one target before re-stamping it. Default 0 — adaptive to the measured hashrate. |
+| `--refetch N` | Seconds to mine one target before re-stamping it. Default 0 — adaptive to the measured hashrate. Whatever the window, a target is re-stamped as soon as the clock leaves its slot, since every later slot is one bit easier. |
 | `--compact-at P` | Sweep accumulated payout outputs into one once P have piled up. Default 10. |
 | `--delegate=false` | Only mine and tidy up; do not put the rewards to work. |
 | `--delegate-amount D` | Motes put into one delegation. Default 0 — ten mine rewards. |
