@@ -4,16 +4,255 @@
   <meta charset="UTF-8">
   <title>Proxima Documentation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ffffff">
+  <script>
+    (function () {
+      try {
+        var savedTheme = localStorage.getItem('proxima-docs-theme');
+        if (savedTheme === 'dark' || savedTheme === 'light') {
+          document.documentElement.dataset.theme = savedTheme;
+        }
+      } catch (error) {
+        // Private browsing modes can make localStorage unavailable.
+      }
+    }());
+  </script>
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/themes/vue.css">
-  <link rel="icon" href="static/img/proxima-centaur-min-onlight.svg">
+  <link id="site-favicon" rel="icon" href="static/img/proxima-centaur-min-onlight.svg">
   <style>
-    /* Sidebar masthead: the logo lockup carries the name, so the docsify site
-       name is reduced to the word that qualifies it. */
-    .app-name-link .brand { display: block; width: 200px; max-width: 100%; height: auto; margin: 0 auto 2px; }
-    .app-name-link .brand-sub {
-      display: block; font-size: 14px; font-weight: 400; color: #7f8c98;
-      letter-spacing: 0.09em; text-transform: uppercase;
+    :root {
+      color-scheme: light;
+      --site-bg: #ffffff;
+      --site-surface: #ffffff;
+      --site-sidebar-bg: #f8f9fa;
+      --site-text: #34495e;
+      --site-heading: #2c3e50;
+      --site-muted: #7f8c98;
+      --site-border: #eaecef;
+      --site-code-bg: #f0f2f4;
+      --site-quote-bg: #f8f9fa;
+      --site-accent: #42b983;
+      --site-control-bg: #ffffff;
+      --site-control-text: #34495e;
+      --site-control-shadow: rgba(31, 35, 40, 0.12);
     }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme]) {
+        color-scheme: dark;
+        --site-bg: #111827;
+        --site-surface: #172033;
+        --site-sidebar-bg: #0d1422;
+        --site-text: #d5deeb;
+        --site-heading: #f3f6fa;
+        --site-muted: #a8b4c3;
+        --site-border: #2b384b;
+        --site-code-bg: #202b3d;
+        --site-quote-bg: #182437;
+        --site-accent: #63d6a0;
+        --site-control-bg: #1d2a3d;
+        --site-control-text: #f3f6fa;
+        --site-control-shadow: rgba(0, 0, 0, 0.28);
+      }
+    }
+
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --site-bg: #111827;
+      --site-surface: #172033;
+      --site-sidebar-bg: #0d1422;
+      --site-text: #d5deeb;
+      --site-heading: #f3f6fa;
+      --site-muted: #a8b4c3;
+      --site-border: #2b384b;
+      --site-code-bg: #202b3d;
+      --site-quote-bg: #182437;
+      --site-accent: #63d6a0;
+      --site-control-bg: #1d2a3d;
+      --site-control-text: #f3f6fa;
+      --site-control-shadow: rgba(0, 0, 0, 0.28);
+    }
+
+    html[data-theme="light"] {
+      color-scheme: light;
+    }
+
+    body,
+    #app,
+    .main,
+    .content {
+      background: var(--site-bg);
+      color: var(--site-text);
+    }
+
+    body {
+      transition: background-color 160ms ease, color 160ms ease;
+    }
+
+    .sidebar,
+    .sidebar-nav {
+      background: var(--site-sidebar-bg);
+    }
+
+    .sidebar {
+      border-right-color: var(--site-border);
+    }
+
+    .sidebar-toggle {
+      background-color: var(--site-sidebar-bg) !important;
+    }
+
+    .sidebar-toggle span {
+      background-color: var(--site-accent) !important;
+    }
+
+    .app-name,
+    .app-name-link,
+    .sidebar-nav > ul > li > a,
+    .sidebar-nav > ul > li > ul > li > a,
+    .sidebar-nav > ul > li > ul > li > ul > li > a {
+      color: var(--site-text);
+    }
+
+    .app-name-link .brand {
+      display: block;
+      width: 200px;
+      max-width: 100%;
+      height: auto;
+      margin: 0 auto 2px;
+    }
+
+    html[data-theme="dark"] .app-name-link .brand {
+      content: url("static/img/proxima-lockup-ondark.svg");
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme]) .app-name-link .brand {
+        content: url("static/img/proxima-lockup-ondark.svg");
+      }
+    }
+
+    .app-name-link .brand-sub {
+      display: block;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--site-muted);
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .sidebar-nav > ul > li > a:hover,
+    .sidebar-nav > ul > li > ul > li > a:hover,
+    .sidebar-nav > ul > li > ul > li > ul > li > a:hover,
+    .sidebar-nav > ul > li.active > a,
+    .sidebar-nav > ul > li > ul > li.active > a {
+      color: var(--site-accent);
+    }
+
+    .markdown-section {
+      color: var(--site-text);
+    }
+
+    .markdown-section h1,
+    .markdown-section h2,
+    .markdown-section h3,
+    .markdown-section h4,
+    .sidebar-nav > p,
+    .markdown-section strong,
+    .markdown-section th {
+      color: var(--site-heading);
+    }
+
+    .markdown-section a,
+    .markdown-section a:hover,
+    .anchor span {
+      color: var(--site-accent);
+    }
+
+    .markdown-section code,
+    .markdown-section pre > code,
+    .markdown-section pre {
+      background: var(--site-code-bg);
+      color: var(--site-text);
+    }
+
+    .markdown-section blockquote {
+      background: var(--site-quote-bg);
+      border-left-color: var(--site-accent);
+      color: var(--site-text);
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .markdown-section table tr,
+    .markdown-section table td,
+    .markdown-section table th {
+      border-color: var(--site-border);
+    }
+
+    .markdown-section table tr:nth-child(2n) {
+      background: var(--site-quote-bg);
+    }
+
+    .markdown-section hr {
+      border-bottom-color: var(--site-border);
+    }
+
+    .search,
+    .search .search input {
+      background: var(--site-sidebar-bg);
+    }
+
+    .search .search input {
+      border-color: var(--site-border);
+      color: var(--site-text);
+    }
+
+    .search .search input::placeholder {
+      color: var(--site-muted);
+    }
+
+    .search .search .search-key {
+      color: var(--site-muted);
+    }
+
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      width: 100%;
+      box-sizing: border-box;
+      margin: 28px 0 12px;
+      padding: 7px 11px;
+      border: 1px solid var(--site-border);
+      border-radius: 999px;
+      background: var(--site-control-bg);
+      box-shadow: 0 2px 8px var(--site-control-shadow);
+      color: var(--site-control-text);
+      cursor: pointer;
+      font: inherit;
+      font-size: 13px;
+      line-height: 1;
+      visibility: hidden;
+    }
+
+    .sidebar .theme-toggle {
+      visibility: visible;
+    }
+
+    .theme-toggle:hover,
+    .theme-toggle:focus-visible {
+      border-color: var(--site-accent);
+      color: var(--site-accent);
+      outline: none;
+    }
+
+    .theme-toggle-icon {
+      font-size: 15px;
+      line-height: 1;
+    }
+
     body {
       font-size: 18px;
     }
@@ -27,7 +266,56 @@
 </head>
 <body>
   <div id="app">Loading…</div>
+  <button class="theme-toggle" type="button" aria-pressed="false">
+    <span class="theme-toggle-icon" aria-hidden="true">☾</span>
+    <span class="theme-toggle-label">Dark mode</span>
+  </button>
   <script>
+    (function () {
+      var storageKey = 'proxima-docs-theme';
+      var root = document.documentElement;
+      var button = document.querySelector('.theme-toggle');
+      var favicon = document.querySelector('#site-favicon');
+      var mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+      function isDark() {
+        return root.dataset.theme === 'dark'
+          || (!root.dataset.theme && mediaQuery.matches);
+      }
+
+      function updateThemeControls() {
+        var dark = isDark();
+        button.setAttribute('aria-pressed', dark ? 'true' : 'false');
+        button.querySelector('.theme-toggle-icon').textContent = dark ? '☀' : '☾';
+        button.querySelector('.theme-toggle-label').textContent = dark ? 'Light mode' : 'Dark mode';
+        button.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+        button.title = dark ? 'Switch to light mode' : 'Switch to dark mode';
+        favicon.href = dark
+          ? 'static/img/proxima-centaur-ondark.svg'
+          : 'static/img/proxima-centaur-min-onlight.svg';
+        document.querySelector('meta[name="theme-color"]').content = dark ? '#111827' : '#ffffff';
+      }
+
+      button.addEventListener('click', function () {
+        var nextTheme = isDark() ? 'light' : 'dark';
+        root.dataset.theme = nextTheme;
+        try {
+          localStorage.setItem(storageKey, nextTheme);
+        } catch (error) {
+          // The toggle still works for this page when localStorage is unavailable.
+        }
+        updateThemeControls();
+      });
+
+      if (mediaQuery.addEventListener) {
+        mediaQuery.addEventListener('change', function () {
+          if (!root.dataset.theme) updateThemeControls();
+        });
+      }
+
+      updateThemeControls();
+    }());
+
     window.MathJax = {
       tex: {
         inlineMath: [['$', '$'], ['\\(', '\\)']],
@@ -43,6 +331,17 @@
           + '<span class="brand-sub">documents</span>',
       loadSidebar: true,
       subMaxLevel: 3,
+      plugins: [
+        function (hook) {
+          hook.doneEach(function () {
+            var toggle = document.querySelector('.theme-toggle');
+            var sidebar = document.querySelector('.sidebar');
+            if (toggle && sidebar && toggle.parentNode !== sidebar) {
+              sidebar.appendChild(toggle);
+            }
+          });
+        }
+      ],
       afterEach: function () {
         if (window.MathJax && window.MathJax.typesetPromise) {
           window.MathJax.typesetPromise();
