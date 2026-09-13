@@ -81,7 +81,8 @@ is [Mining](participate/mine.md).
 
 ### Transfer tokens between accounts
 
-Use `proxi node send` to send tokens between accounts (see the
+Use `proxi node send_to_wallet` to send tokens to an address and
+`proxi node send_to_chain` to send them to a chain (see the
 [`proxi` wallet](participate/proxi.md)). For this, `proxi.yaml` must be configured
 properly — in particular the _tag-along sequencer_ and the _tag-along fee_. List the
 available sequencers with `proxi node allchains -q` and pick one as your tag-along.

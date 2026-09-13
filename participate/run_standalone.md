@@ -143,13 +143,12 @@ sequencer and compacts its payouts, which exercises those paths as well; pass
 
 With the node running and the account funded, the typical frontend-testing loop:
 
-Send tokens to your own address (creates another UTXO):
+Send tokens to your own address (creates another UTXO). The holder ID is the one
+you put under `wallet.holder_id` in `proxi.yaml`, without any prefix:
 
 ```
-proxi node send 500000000
+proxi node send_to_wallet 500000000 <your account holder ID>
 ```
-
-`send` without `-t` targets the wallet's own account by default.
 
 Show the wallet balance:
 
