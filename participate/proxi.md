@@ -175,12 +175,15 @@ Addresses are used in the `sigLock` spending condition of the UTXO.
 Chain IDs may also be used in `chainLock` UTXO spending condition, that is a spend target different from usual `sigLock`. 
 In tha case it is written as `c/<chain ID hex>`.
 
-Both forms may be used as send targets in the `proxi node send` and `proxi node seq withdraw` commands with the flag `-t` or `--target`
+Both forms may be used as targets in commands that take the flag `-t` or `--target`, such as `proxi node seq withdraw`
 - `-t a/<holder ID hex>` means tokens are sent to the address. These will be spendable with the private key of the holder
 - `-t c/<chain ID>` means tokens in the UTXO are sent to the chain and will belong to the _chained account_. The private key that
 controls the chained account will be able to spend tokens.
 
 If the `-t` flag is omitted, the target defaults to the wallet's own account.
+
+The plain send commands `proxi node send_to_wallet` and `proxi node send_to_chain` do not use `-t`: each takes the
+bare hex ID, without the `a/` or `c/` prefix, because the command itself says what kind of target it is.
 
 ## Some useful `proxi node` commands
 
@@ -202,21 +205,40 @@ If the `-t` flag is omitted, the target defaults to the wallet's own account.
   the sum of tokens in ordinary outputs plus the balances held in chains. The command
   also lists any *delegations* to sequencers.
 
-* `proxi node send <amount> -t "<target>"` sends tokens from the wallet to a target.
-  The amount is in **motes**, the smallest unit — 1 PROX is 1,000,000 motes. The
-  target is an address (`a/<hex>`) or a chain (`c/<hex>`). For example:
+* `proxi node send_to_wallet <amount> <holder ID>` sends tokens from the wallet to an
+  address. The amount is in **motes**, the smallest unit — 1 PROX is 1,000,000 motes.
+  The holder ID is the 32-byte hex without the `a/` prefix. For example:
 
   ```
-  proxi node send 10000000 -t "a/370563b1f08fcc06fa250c59034acfd4ab5a29b60640f751d644e9c3b84004d0"
+  proxi node send_to_wallet 10000000 370563b1f08fcc06fa250c59034acfd4ab5a29b60640f751d644e9c3b84004d0
   ```
 
-  sends 10 PROX. Mind the **minimum storage deposit**: an ordinary output has to be
+  sends 10 PROX. Before building the transaction the command asks the node whether
+  that holder already owns anything in the ledger. If not, it warns and asks you to
+  confirm, with *no* as the default answer: a mistyped holder ID is an unknown holder
+  too, and tokens sent to it are lost. If the target really is a brand-new wallet,
+  answer *yes*. Such a wallet can spend only after this transfer has settled, because
+  the node ignores transactions signed by a holder it does not know yet. With the
+  `-f` (force) flag the command prints the warning and proceeds without asking.
+
+* `proxi node send_to_chain <amount> <chain ID>` sends tokens from the wallet to a
+  chain. The chain ID is the 24-byte hex without the `$/` or `c/` prefix. The tokens
+  become spendable by whoever controls the chain. The chain must already exist in the
+  ledger; otherwise the transfer is refused, because tokens locked to a chain nobody
+  controls cannot be recovered.
+
+  Both commands mind the **minimum storage deposit**: an ordinary output has to be
   worth keeping in the ledger state, which for a plain `sigLock` output means at
   least 9,250,000 motes. A smaller send is refused, so the amounts here are not
   arbitrarily small. The transaction includes the tag-along output described above.
   The global `-v` (verbose) flag makes the command print the whole transaction, which
   is a good way to get acquainted with Proxima's transaction model. Run
-  `proxi node send -h` to see advanced options (such as a deadline or an attached tag).
+  `proxi node send_to_wallet -h` to see advanced options (such as a deadline or an
+  attached tag); `send_to_chain` accepts the same ones.
+
+  The older `proxi node send <amount> -t "<target>"` still works but is deprecated and
+  prints a notice pointing at the two commands above. It is hidden from the command
+  list.
 
 * `proxi node compact [<max inputs>]` gathers up to `<max inputs>` of the account's
   outputs into a single output by sending them to yourself. This is useful when the
