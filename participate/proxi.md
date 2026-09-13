@@ -175,15 +175,18 @@ Addresses are used in the `sigLock` spending condition of the UTXO.
 Chain IDs may also be used in `chainLock` UTXO spending condition, that is a spend target different from usual `sigLock`. 
 In tha case it is written as `c/<chain ID hex>`.
 
-Both forms may be used as targets in commands that take the flag `-t` or `--target`, such as `proxi node seq withdraw`
-- `-t a/<holder ID hex>` means tokens are sent to the address. These will be spendable with the private key of the holder
-- `-t c/<chain ID>` means tokens in the UTXO are sent to the chain and will belong to the _chained account_. The private key that
-controls the chained account will be able to spend tokens.
-
+Commands that take the flag `-t` or `--target`, such as `proxi node seq withdraw`, expect an address:
+`-t a/<holder ID hex>` means tokens are sent to the address and will be spendable with the private key of the holder.
 If the `-t` flag is omitted, the target defaults to the wallet's own account.
 
 The plain send commands `proxi node send_to_wallet` and `proxi node send_to_chain` do not use `-t`: each takes the
 bare hex ID, without the `a/` or `c/` prefix, because the command itself says what kind of target it is.
+
+`proxi` never produces an output locked with `chainLock`. Tokens locked to a chain are lost for good if the chain
+is deleted, and nothing stops the controller of a chain from deleting it. When you send tokens to a chain, `proxi`
+produces a **tag-along** output instead. The chain can take it within the tag-along window of 30 slots (5 minutes),
+which a sequencer does automatically. After the window your wallet can reclaim it with `proxi node compact`. After
+390 slots (about an hour) anyone may sweep it, so reclaim what a chain did not take.
 
 ## Some useful `proxi node` commands
 
@@ -222,15 +225,17 @@ bare hex ID, without the `a/` or `c/` prefix, because the command itself says wh
   `-f` (force) flag the command prints the warning and proceeds without asking.
 
 * `proxi node send_to_chain <amount> <chain ID>` sends tokens from the wallet to a
-  chain. The chain ID is the 24-byte hex without the `$/` or `c/` prefix. The tokens
-  become spendable by whoever controls the chain. The chain must already exist in the
-  ledger; otherwise the transfer is refused, because tokens locked to a chain nobody
-  controls cannot be recovered.
+  chain, typically a sequencer. The chain ID is the 24-byte hex without the `$/` or
+  `c/` prefix. The output is a tag-along to that chain, as explained above, not a
+  `chainLock`. The chain must already exist in the ledger; otherwise the transfer is
+  refused. If the chain is not a sequencer, the command warns and asks for
+  confirmation, because nothing picks the tag-along up automatically and `proxi`
+  has no command to claim it on a chain's behalf.
 
-  Both commands mind the **minimum storage deposit**: an ordinary output has to be
-  worth keeping in the ledger state, which for a plain `sigLock` output means at
+  A send to a wallet minds the **minimum storage deposit**: an ordinary output has to
+  be worth keeping in the ledger state, which for a plain `sigLock` output means at
   least 9,250,000 motes. A smaller send is refused, so the amounts here are not
-  arbitrarily small. The transaction includes the tag-along output described above.
+  arbitrarily small. The transaction includes the tag-along fee output described above.
   The global `-v` (verbose) flag makes the command print the whole transaction, which
   is a good way to get acquainted with Proxima's transaction model. Run
   `proxi node send_to_wallet -h` to see advanced options (such as a deadline or an
