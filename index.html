@@ -126,6 +126,12 @@
       content: url("static/img/proxima-lockup-ondark.svg");
     }
 
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme]) .app-name-link .brand {
+        content: url("static/img/proxima-lockup-ondark.svg");
+      }
+    }
+
     .app-name-link .brand-sub {
       display: block;
       font-size: 14px;
@@ -174,6 +180,8 @@
       background: var(--site-quote-bg);
       border-left-color: var(--site-accent);
       color: var(--site-text);
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
 
     .markdown-section table tr,
@@ -229,7 +237,7 @@
       visibility: hidden;
     }
 
-    .sidebar-nav .theme-toggle {
+    .sidebar .theme-toggle {
       visibility: visible;
     }
 
@@ -327,9 +335,9 @@
         function (hook) {
           hook.doneEach(function () {
             var toggle = document.querySelector('.theme-toggle');
-            var sidebarNav = document.querySelector('.sidebar-nav');
-            if (toggle && sidebarNav && !sidebarNav.contains(toggle)) {
-              sidebarNav.appendChild(toggle);
+            var sidebar = document.querySelector('.sidebar');
+            if (toggle && sidebar && toggle.parentNode !== sidebar) {
+              sidebar.appendChild(toggle);
             }
           });
         }
