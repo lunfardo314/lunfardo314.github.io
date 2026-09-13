@@ -61,9 +61,12 @@ work, is in [Cooperative consensus](overview/consensus.md).
 ## How it compares
 
 Against **proof of work**: Proxima is permissionless in the same sense — anyone may
-join, and nothing needs anyone's approval. But it spends no energy on mining races, and
-its costs per transaction are low and bounded. How a system with no mining can still be
-bootstrapped from nothing is treated in
+join, and nothing needs anyone's approval. During the fair launch, anyone can mine the
+unissued 94% of the supply with proof of work, but that work only distributes tokens; it
+does not participate in consensus. Once the mintable supply is exhausted, there are no
+mining races, and Proxima's costs per transaction remain low and bounded. The bootstrap
+tradeoff — founder-held bootstrap capital at genesis, followed by permissionless mining
+that grows the distributed supply — is treated in
 [Being permissionless. Bootstrap](overview/permissionless.md).
 
 Against **proof of stake**: Proxima resists Sybil attacks the same way, by weighing
@@ -80,9 +83,10 @@ assumptions along with a great deal of machinery.
 [Safety and liveness](overview/safety_liveness.md) sets out what the design guarantees
 and what it does not.
 
-Proxima is therefore neither a proof-of-work system nor a BFT-based proof-of-stake one.
-It is a [Nakamoto consensus](https://medium.com/@lunfardo/on-definition-of-nakamoto-consensus-be8f4b84c899)
-that does not use proof of work: probabilistic, and with many leaders rather than one.
+Proxima is therefore neither a proof-of-work consensus system nor a BFT-based proof-of-stake
+one. It is a [Nakamoto consensus](https://medium.com/@lunfardo/on-definition-of-nakamoto-consensus-be8f4b84c899)
+with many leaders rather than one, and with proof of work used only temporarily to distribute
+the launch supply.
 
 ## The vision
 
