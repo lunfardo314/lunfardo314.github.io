@@ -201,13 +201,13 @@
     }
 
     .theme-toggle {
-      position: fixed;
-      top: 16px;
-      right: 24px;
-      z-index: 20;
-      display: inline-flex;
+      display: flex;
       align-items: center;
+      justify-content: center;
       gap: 7px;
+      width: 100%;
+      box-sizing: border-box;
+      margin: 28px 0 12px;
       padding: 7px 11px;
       border: 1px solid var(--site-border);
       border-radius: 999px;
@@ -218,6 +218,11 @@
       font: inherit;
       font-size: 13px;
       line-height: 1;
+      visibility: hidden;
+    }
+
+    .sidebar-nav .theme-toggle {
+      visibility: visible;
     }
 
     .theme-toggle:hover,
@@ -230,13 +235,6 @@
     .theme-toggle-icon {
       font-size: 15px;
       line-height: 1;
-    }
-
-    @media (max-width: 768px) {
-      .theme-toggle {
-        top: 10px;
-        right: 12px;
-      }
     }
 
     body {
@@ -317,6 +315,17 @@
           + '<span class="brand-sub">documents</span>',
       loadSidebar: true,
       subMaxLevel: 3,
+      plugins: [
+        function (hook) {
+          hook.doneEach(function () {
+            var toggle = document.querySelector('.theme-toggle');
+            var sidebarNav = document.querySelector('.sidebar-nav');
+            if (toggle && sidebarNav && !sidebarNav.contains(toggle)) {
+              sidebarNav.appendChild(toggle);
+            }
+          });
+        }
+      ],
       afterEach: function () {
         if (window.MathJax && window.MathJax.typesetPromise) {
           window.MathJax.typesetPromise();
