@@ -4,6 +4,7 @@ Join Proxima
 - [The `proxi` wallet](participate/proxi.md)
 - [Wallet configuration](participate/wallet_config.md)
 - [Mining](participate/mine.md)
+- [Active tokens](participate/active_tokens.md)
 - [Delegation](participate/delegate.md)
 - [Running an access node](participate/run_access.md)
 - [Running a sequencer node](participate/run_sequencer.md)

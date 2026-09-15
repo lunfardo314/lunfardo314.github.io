@@ -81,6 +81,16 @@ tag_along:
 delegate:
     # delegator cut required of a delegation target, in promille
     minimum_cut: 900
+
+consolidate:
+    # settings of 'proxi node consolidate'; see the Active tokens page
+    threshold_prox: 1000
+    minimum_balance_prox: 100
+    max_inputs: 30
+    compact_at: 10
+    send_to_sequencer:
+    autodelegate:
+    max_delegations: 10
 ```
 
 **You usually need to adjust the profile before using it** — in particular the API
@@ -254,6 +264,13 @@ which a sequencer does automatically. After the window your wallet can reclaim i
 * `proxi node mine` competes for the mine chain, which is how tokens are acquired
   during the launch phase — it needs no tokens to start. See
   [Mining](participate/mine.md) for what it does with what it earns.
+
+* `proxi node consolidate` runs permanently in the background, on the same profile as
+  a miner. Every 10 seconds it looks at the account and, once enough small outputs have
+  piled up, sweeps them into one transaction that sends everything above a kept minimum
+  to a sequencer or into a delegation, as configured in the `consolidate` section of the
+  profile. It works with any mining software, since it only looks at the wallet. See
+  [Active tokens](participate/active_tokens.md) for why, and for the settings.
 
 * `proxi node compact scan` reports everything the account can consume, by category,
   without building any transaction. Useful before compacting.
