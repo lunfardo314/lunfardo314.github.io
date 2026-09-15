@@ -37,6 +37,13 @@ profile's API settings. The node itself is configured separately — see
 | `tag_along.fee` | uint64 | Preferred tag-along fee; the sequencer's declared minimum wins if larger |
 | `tag_along.sequencer_id` | hex chain ID or `random` | Tag-along sequencer (`random` = pick an active one; falls back to default only when unset) |
 | `delegate.minimum_cut` | uint (promille) | Delegator cut this wallet requires from a delegation target. Default `900` |
+| `consolidate.threshold_prox` | uint (PROX) | `proxi node consolidate` acts once the consumable balance exceeds this, over at least two outputs. Default `1000` |
+| `consolidate.minimum_balance_prox` | uint (PROX) | Balance the consolidator always keeps in the wallet on plain outputs. Default `100` |
+| `consolidate.max_inputs` | int | Outputs one consolidating transaction consumes (2–256). Default `30` |
+| `consolidate.compact_at` | int | Fold the outputs into one once this many have piled up, even below the threshold. Default `10` |
+| `consolidate.send_to_sequencer` | `own`, hex chain ID or empty | Where the consolidator sends what is above the minimum. Default empty |
+| `consolidate.autodelegate` | `random`, hex chain ID or empty | Delegation target when `send_to_sequencer` is empty. Default empty |
+| `consolidate.max_delegations` | int | Cap on the consolidator's own delegations. Default `10` |
 
 ---
 
@@ -203,6 +210,43 @@ network currently offers. See [Mining](participate/mine.md).
 
 ---
 
+## `consolidate`
+
+Settings of `proxi node consolidate`, the permanent process that sweeps the outputs
+scattered over the wallet and puts what is above a kept minimum back into consensus.
+Every key has a command-line flag of the same name that overrides it. See
+[Active tokens](participate/active_tokens.md) for what the process does and why.
+
+| Tag | Type | Default | Description |
+|-----|------|---------|-------------|
+| `consolidate.threshold_prox` | uint, PROX | `1000` | The consolidator acts once the consumable balance exceeds this and is spread over at least two outputs; a single large output is left alone. Must be at least `minimum_balance_prox`. Flag `--threshold-prox`. |
+| `consolidate.minimum_balance_prox` | uint, PROX | `100` | Balance always kept in the wallet on plain outputs; only what is above it moves. Must be at least the storage deposit of one output, about 9.25 PROX. Flag `--minimum-balance-prox`. |
+| `consolidate.max_inputs` | int, 2–256 | `30` | Most outputs one consolidating transaction consumes, smallest first; the rest wait for a later pass. Flag `--max-inputs`. |
+| `consolidate.compact_at` | int | `10` | Fold the outputs into one as soon as this many have piled up, even below the threshold; in that case nothing leaves the wallet. Flag `--compact-at`. |
+| `consolidate.send_to_sequencer` | `own`, chain ID or empty | empty | `own` sends everything above the minimum to `wallet.sequencer_id`, which must be controlled by this wallet; a sequencer ID sends it to that sequencer; empty disables sending. Flag `--send-to-sequencer`. |
+| `consolidate.autodelegate` | `random`, chain ID or empty | empty | Applies only when `send_to_sequencer` is empty. `random` delegates to an active sequencer drawn afresh on every action, a sequencer ID always delegates to that one, empty only folds the outputs into one. Flag `--autodelegate`. |
+| `consolidate.max_delegations` | int | `10` | Cap on the consolidator's own delegations; at the cap an existing one is topped up instead. Flag `--max-delegations`. |
+
+```yaml
+consolidate:
+  threshold_prox: 1000
+  minimum_balance_prox: 100
+  max_inputs: 30
+  compact_at: 10
+  send_to_sequencer:
+  autodelegate:
+  max_delegations: 10
+```
+
+The amounts here are in **PROX**, unlike every other amount `proxi` takes, which is in
+motes. The generated profile leaves both destinations empty, since it cannot know
+whether the wallet controls a sequencer: with neither set the process only folds
+scattered outputs into one, so set one of the two to put the tokens to work. The
+tag-along target and its fee come from `tag_along` and are resolved again before every
+transaction; the cut a delegation target must leave comes from `delegate.minimum_cut`.
+
+---
+
 ## Generating a wallet profile: `proxi config wallet`
 
 ```
@@ -259,6 +303,15 @@ tag_along:
 
 delegate:
     minimum_cut: 900
+
+consolidate:
+    threshold_prox: 1000
+    minimum_balance_prox: 100
+    max_inputs: 30
+    compact_at: 10
+    send_to_sequencer:
+    autodelegate:
+    max_delegations: 10
 ```
 
 The commented API endpoints are the public access points a wallet is pointed at.

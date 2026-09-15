@@ -83,6 +83,14 @@ It runs until you stop it, or until the chain is exhausted. Useful options:
 | `--stream URL,…` | Additional node endpoints to receive mining transactions from. **Worth setting** — see below. |
 | `--no-stream` | Do not subscribe to the stream at all. Slower, and you will usually lose. |
 | `--refetch N` | Seconds to mine one target before re-stamping it. Default 0 — adaptive to the measured hashrate. Whatever the window, a target is re-stamped as soon as the clock leaves its slot, since every later slot is one bit easier. |
+
+The flags below drive the miner's built-in tidy-up of its payouts. **They are deprecated**:
+that job now belongs to `proxi node consolidate`, a separate process that works with any
+miner, and the built-in tidy-up will be removed from the miner. See
+[Active tokens](participate/active_tokens.md).
+
+| Flag | Meaning |
+|------|---------|
 | `--compact-at P` | Sweep accumulated payout outputs into one once P have piled up. Default 10. |
 | `--delegate=false` | Only mine and tidy up; do not put the rewards to work. |
 | `--delegate-amount D` | Motes put into one delegation. Default 0 — ten mine rewards. |
@@ -141,7 +149,20 @@ what it has seen.
 ## What happens to what you mine
 
 Every confirmed transit leaves a payout output in your wallet. Left alone these
-accumulate, and every output is permanent state that every node on the network carries.
+accumulate: the tokens sit outside consensus and are diluted, and every output is
+permanent state that every node on the network carries.
+
+**The way to deal with it is `proxi node consolidate`**, a separate process you run in
+the background on the same wallet profile. It sweeps the payouts and either sends them to
+your own sequencer or delegates them, and it does so whatever mining software produced
+them. How to run it, and why idle tokens lose value, is on the
+[Active tokens](participate/active_tokens.md) page.
+
+> **Deprecated.** The rest of this section describes the tidy-up built into
+> `proxi node mine` itself. It still runs, but it is superseded by the consolidator and
+> will be removed. Until then, do not run the consolidator beside `proxi node mine` on
+> the same wallet: the two would spend the same outputs.
+
 So the miner cleans up after itself:
 
 * **Compaction** runs unconditionally: once enough payout outputs have accumulated, they
