@@ -77,6 +77,7 @@ It runs until you stop it, or until the chain is exhausted. Useful options:
 | Flag | Meaning |
 |------|---------|
 | `--workers N` | Parallel mining workers. Defaults to the number of CPUs. |
+| `--max-hashrate-khs X` | Upper limit on the mining speed of this process, all workers together, in thousands of attempts per second (KH/s). Fractions are allowed, e.g. `2.5`. Default 0 — no limit. Use it when the machine has other work to do: the workers pause between attempts, so the processor load drops with the limit. The miner prints its measured speed while it works, which tells you what your machine does without a limit. |
 | `--nonce-start N` | First nonce of every round. Default 0 — a fresh random start per round, so several processes mining under one key search different nonces instead of repeating each other. |
 | `--count N` | Stop after N transits. Default 0 — keep going. |
 | `--fee M` | Tag-along fee in motes, taken out of the reward. Default 0 uses the sequencer minimum. The ledger rules cap it at 1% of the reward; at least 99% always goes to your key. |
