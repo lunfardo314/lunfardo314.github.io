@@ -295,9 +295,18 @@ the topic-aware `LogTopicf`/`WarnTopicf` calls.
 | `logger.verbosity` | int | 0 | Global verbosity for all topics. `0` = essential, `1` = normal, `2` = verbose. |
 | `logger.topics` | map `<topic>: <level>` | empty | Per-topic verbosity overrides. |
 
-Known topics (default level in parentheses): `lifecycle` (0), `tag_along`
-(0: failures, 1: additions/transient), `freeze_delegation` (1), `branch_attach`
-(1), `seq_attach` (1), `branch_commit` (1), `poker` (2).
+Known topics, with the level a message needs in parentheses: `lifecycle` (0),
+`tag_along` (0: permanent failures, 1: additions, transient failures and skipped
+or failed delegation freezes), `freeze_delegation` (1: each delegation frozen),
+`branch_attach` (1), `seq_attach` (1), `branch_commit` (1), `rate_control` (1),
+`sync` (1), `poker` (2).
+
+A sequencer always logs the transactions it submits (`SUBMIT SEQ TX`,
+`SUBMIT BRANCH`). These lines are not behind a topic and need no setting.
+
+The generated config sets `branch_commit: 1`. With `--standalone` it also sets
+`tag_along: 1` and `freeze_delegation: 1`, so a dev network shows what its
+sequencer does with tag-along outputs and delegations.
 
 ```yaml
 logger:
@@ -512,7 +521,7 @@ uncomment.
 |------|--------|
 | (none) | Base node config: `peering`, `api`, `snapshot`, `snapshot_restore`, `logger`, `metrics`, plus commented-out `workflow`, `health_relief`, `sources`, `sync` and `memory` blocks. No sequencer section. |
 | `--sequencer` | Add a **disabled** sequencer section with a placeholder `chain_id` (`<sequencer id hex encoded>`) and `enable: false`. If `proxima.yaml` already exists, this is **edit mode**: only the `sequencer:` section is added/replaced, the rest of the file is untouched. |
-| `--standalone` | Fresh single-node dev network: an **enabled** bootstrap sequencer (`name: boot`, `enable: true`, `chain_id` = the fixed bootstrap sequencer ID `50726f78696d61…636861696e2e`, `standalone: true`), plus an enabled `txlogger` section and an enabled `api.dag_streaming` block (the DAG visualizer is the main way to watch a single node, so its connection TTL is set long). Also reads the wallet key and writes a **genesis snapshot** into the current directory. Cannot be combined with the existing-file edit mode. |
+| `--standalone` | Fresh single-node dev network: an **enabled** bootstrap sequencer (`name: boot`, `enable: true`, `chain_id` = the fixed bootstrap sequencer ID `50726f78696d61…636861696e2e`, `standalone: true`), plus an enabled `txlogger` section, the `tag_along` and `freeze_delegation` log topics at level 1, and an enabled `api.dag_streaming` block (the DAG visualizer is the main way to watch a single node, so its connection TTL is set long). Also reads the wallet key and writes a **genesis snapshot** into the current directory. Cannot be combined with the existing-file edit mode. |
 | `--trace` | Also include the `trace_tags` block and an enabled `txlogger` section. |
 | `--name <1-6 chars>` | Sequencer name, used with `--sequencer`/`--standalone` (defaults to `boot` under `--standalone`). |
 
@@ -604,6 +613,10 @@ logger:
   output: proxima.log
   previous: save
   keep_latest_logs: 2
+  topics:
+    branch_commit: 1
+    tag_along: 1         # tag-along outputs the sequencer takes or rejects
+    freeze_delegation: 1 # delegations the sequencer freezes
 
 metrics:
   enable: false
