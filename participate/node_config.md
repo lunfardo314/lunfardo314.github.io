@@ -594,6 +594,10 @@ peering:
 
 api:
   port: 8000
+  dag_streaming:         # the DAG visualizer is the main way to watch a single node
+    enable: true
+    max_connections: 5
+    connection_ttl_minutes: 120   # long, so a visualizer tab stays connected
 
 snapshot:
   enable: false
