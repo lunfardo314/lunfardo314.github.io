@@ -281,7 +281,7 @@ The node serves several read-only browser tools on its API port (default
 
 - **Holders browser** — `/holders`. The capital per holder in the latest
   reliable branch, sorted by total or by idle holdings, where idle is neither in
-  a sequencer chain nor delegated. Off by default, since it walks the whole UTXO
+  a sequencer chain nor frozen in a delegation. Off by default, since it walks the whole UTXO
   set: enable it with `api.get_holders.enable: true` (see
   [Node configuration reference](participate/node_config.md)).
 

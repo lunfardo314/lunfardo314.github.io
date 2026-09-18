@@ -219,7 +219,8 @@ which a sequencer does automatically. After the window your wallet can reclaim i
   also lists any *delegations* to sequencers.
 
 * `proxi node holders` lists, per holder ID, the total capital in the LRB and the
-  *idle* part of it, which is neither in a sequencer chain nor delegated. A plain
+  *idle* part of it, which is neither in a sequencer chain nor frozen in a delegation:
+  a delegation that is not frozen earns nothing, so it counts as idle. A plain
   output belongs to its holder, a delegation to its master; outputs under any other
   lock are totalled separately, so the rows add up to the supply. Sorted by total,
   `-i` sorts by idle. The node answers only when its configuration enables
