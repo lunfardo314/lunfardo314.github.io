@@ -127,6 +127,26 @@ rather than in.
 | `api.mining_streaming.disable` | bool | false | Disable the mining transaction stream on this node. |
 | `api.mining_streaming.max_connections` | int | 50 | Max simultaneous connections. `<= 0` → default. |
 
+### `api.get_holders` (holders browser)
+
+The `/holders` page and the `get_holders` endpoint behind it, which
+`proxi node holders` calls. Both list the capital per holder in the latest
+reliable branch by walking its whole UTXO set, so they are **off by default**:
+one request costs a full state scan.
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| `api.get_holders.enable` | bool | false | Serve the `/holders` page and the `get_holders` endpoint. |
+| `api.get_holders.max_utxos` | int | 100000 | UTXOs one scan walks at most. The node clamps it to 1,000,000. A request may lower it, never raise it; a scan that hits the cap is marked truncated. |
+
+```yaml
+api:
+  port: 8000
+  get_holders:
+    enable: true
+    max_utxos: 100000
+```
+
 ---
 
 ## `sequencer`

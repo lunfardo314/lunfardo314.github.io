@@ -279,6 +279,12 @@ The node serves several read-only browser tools on its API port (default
   (sequencers, delegations, foundries, …) in the latest reliable branch, with
   per-chain UTXOs.
 
+- **Holders browser** — `/holders`. The capital per holder in the latest
+  reliable branch, sorted by total or by idle holdings, where idle is neither in
+  a sequencer chain nor delegated. Off by default, since it walks the whole UTXO
+  set: enable it with `api.get_holders.enable: true` (see
+  [Node configuration reference](participate/node_config.md)).
+
 - **Peer browser** — `/peers`. Auto-refreshing dashboard of the node's peers
   (static / dynamic, alive / dead, round-trip times). The same data is available
   as JSON at `/api/v1/peers_info`.
@@ -399,7 +405,7 @@ the node, with the node itself listening only on the loopback interface.
        location ^~ /api/v1/txlog/                  { return 403; }
 
        # state scans, script evaluation, explorers, snapshot download
-       location ~ ^/(api/v1/(eval|get_inactive|get_all_chains|get_sequencers|get_cleanable_outputs|get_snapshot|get_branch_list|get_mainchain|dag_explorer/.*|chain_explorer/.*)|txapi/v1/compile_script)$ {
+       location ~ ^/(api/v1/(eval|get_inactive|get_holders|get_all_chains|get_sequencers|get_cleanable_outputs|get_snapshot|get_branch_list|get_mainchain|dag_explorer/.*|chain_explorer/.*)|txapi/v1/compile_script)$ {
            limit_req zone=heavy burst=10 nodelay;
            proxy_pass http://proxima_api;
        }

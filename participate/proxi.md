@@ -218,6 +218,15 @@ which a sequencer does automatically. After the window your wallet can reclaim i
   the sum of tokens in ordinary outputs plus the balances held in chains. The command
   also lists any *delegations* to sequencers.
 
+* `proxi node holders` lists, per holder ID, the total capital in the LRB and the
+  *idle* part of it, which is neither in a sequencer chain nor delegated. A plain
+  output belongs to its holder, a delegation to its master; outputs under any other
+  lock are totalled separately, so the rows add up to the supply. Sorted by total,
+  `-i` sorts by idle. The node answers only when its configuration enables
+  `api.get_holders` (see the [node configuration reference](participate/node_config.md)),
+  because the scan walks the whole UTXO set. The same view is served as the `/holders`
+  page of such a node.
+
 * `proxi node send_to_wallet <amount> <holder ID>` sends tokens from the wallet to an
   address. The amount is in **motes**, the smallest unit — 1 PROX is 1,000,000 motes.
   The holder ID is the 32-byte hex without the `a/` prefix. For example:
