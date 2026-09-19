@@ -69,9 +69,9 @@ It does not matter which mining software you use, the official one from the Prox
 repository or an optimized one of your own. The consolidator never looks at the miner; it
 only looks at the wallet, so it works either way.
 
-> The official `proxi node mine` still tidies up its own payouts. Do not run the
-> consolidator beside it on the same wallet until that built-in tidy-up has been retired,
-> since two processes spending the same outputs get in each other's way.
+> The official `proxi node mine` still tidies up its own payouts by default. When the
+> consolidator runs on the same wallet, start the miner with `--disable_consolidation`,
+> so that only one process spends the wallet's outputs.
 
 ## Running the consolidator
 
@@ -102,10 +102,9 @@ chosen in the wallet profile:
   sequencer's capital and earn inflation without a cut. Before each transfer the
   consolidator checks that the sequencer is really controlled by this wallet and is
   currently active;
-* **into a delegation**: `autodelegate: random` draws an active sequencer at random on
-  every action, so your tokens spread across sequencers, and `autodelegate: <sequencer ID>`
-  always delegates to that one. Up to `max_delegations` delegations are created; at the cap
-  an existing one is topped up instead;
+* **into a delegation**: `autodelegate: random` draws an active sequencer on every
+  action, `autodelegate: <sequencer ID>` always delegates to that one. How the draw and
+  the delegations work is described below;
 * **nowhere**: with both settings empty the tokens stay in the wallet, folded into a single
   output. Better than a pile, but still diluted, so set one of the two above.
 
@@ -113,6 +112,43 @@ Sending takes precedence over delegating. If the chosen destination cannot be us
 now, for example the target sequencer has not produced anything recently, the consolidator
 says so and folds the outputs into one instead. It never silently turns a transfer into a
 delegation.
+
+## How it delegates
+
+**A price taker.** A sequencer publishes the share of the inflation it keeps for itself.
+The consolidator accepts that: every delegation it makes or renews requires exactly what
+its target leaves. It does not read `delegate.minimum_cut`, and a delegation it made is
+never refused by its target as unprofitable.
+
+**A random draw weighted by what the sequencer leaves.** With `autodelegate: random` the
+target is drawn among the sequencers active in the last few slots, and the draw favours
+the ones that leave delegators more: a sequencer keeping 40% is drawn 600 times for every
+1000 times one keeping nothing is drawn, and a sequencer keeping everything is never
+drawn. So capital flows towards the better offers without abandoning the others.
+
+**Two numbers shape the delegation set:** how many delegations to have, and how large
+one should be. The defaults are **5 delegations of 10,000 PROX**. The consolidator grows
+one delegation to that size before starting the next, up to that number; from then on
+it tops up the smallest one. Only a delegation the wallet can spend right now is topped
+up: one that is not frozen, or whose freeze has run out. If every delegation is frozen
+and the count is full, the consolidator asks one target to release a delegation (the
+one closest to thawing) and tops it up on a later pass.
+
+**It tidies what is already there.** Before sweeping anything, every pass looks at the
+delegations the wallet can spend right now and does one of two things, paying the fee
+out of the delegation itself:
+
+* with more delegations than the target number, the smallest one is folded into the
+  largest one, which is delegated again with the combined balance;
+* a delegation whose target has gone quiet, or now keeps more than the delegation
+  leaves it (its target refuses to renew it), or is not the sequencer you configured,
+  or has sat unfrozen for longer than an epoch, is delegated again to a fresh target.
+
+Delegations made by an earlier version of the consolidator, by `proxi node mine`, or by
+hand are treated the same way, so a wallet with a pile of small or stalled delegations is
+brought to the target count and put back to work without any action on your part.
+Frozen delegations are never touched: they are earning, and they belong to their target
+until they thaw.
 
 **Configuration.** A section of the wallet profile, created by `proxi config wallet` with
 all keys commented and both destinations empty. Every key has a command-line flag of the
@@ -133,8 +169,10 @@ consolidate:
     send_to_sequencer:
     # applies only when send_to_sequencer is empty: 'random' or a sequencer ID
     autodelegate:
-    # cap on your own delegations; at the cap an existing one is topped up
-    max_delegations: 10
+    # number of delegations to build up to
+    target_delegations: 5
+    # size a delegation is grown to before the next one is started, in PROX
+    target_delegation_prox: 10000
 ```
 
 | Key | Flag | Default | Meaning |
@@ -145,13 +183,14 @@ consolidate:
 | `compact_at` | `--compact-at` | 10 | Fold the outputs into one once this many have piled up, even below the threshold. |
 | `send_to_sequencer` | `--send-to-sequencer` | empty | `own`, a sequencer ID, or empty. |
 | `autodelegate` | `--autodelegate` | empty | `random`, a sequencer ID, or empty. Ignored while `send_to_sequencer` is set. |
-| `max_delegations` | `--max-delegations` | 10 | Cap on your own delegations. |
+| `target_delegations` | `--target-delegations` | 5 | Number of delegations to build up to; beyond it existing ones are topped up, extra ones are folded together. The older name `max_delegations` is still read when this key is absent. |
+| `target_delegation_prox` | `--target-delegation-prox` | 10000 | Size a delegation is grown to before the next one is started, in PROX. |
 
-The tag-along fee and its target come from the `tag_along` section of the profile, and the
-smallest cut a delegation target must leave you from `delegate.minimum_cut`, as for every
-other wallet command. Both are read again before every transaction, so a sequencer changing
-its fee or going quiet does not leave the consolidator building transactions nobody picks
-up.
+The tag-along fee and its target come from the `tag_along` section of the profile, as for
+every other wallet command, and are read again before every transaction, so a sequencer
+changing its fee or going quiet does not leave the consolidator building transactions
+nobody picks up. `delegate.minimum_cut` is not read: the consolidator takes the cut each
+sequencer offers.
 
 **What you see.** At startup a banner with the settings in force: the account, the
 minimum, when it acts, the destination and the tag-along target. Then one line per event:

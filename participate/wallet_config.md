@@ -224,8 +224,9 @@ Every key has a command-line flag of the same name that overrides it. See
 | `consolidate.max_inputs` | int, 2–256 | `30` | Most outputs one consolidating transaction consumes, smallest first; the rest wait for a later pass. Flag `--max-inputs`. |
 | `consolidate.compact_at` | int | `10` | Fold the outputs into one as soon as this many have piled up, even below the threshold; in that case nothing leaves the wallet. Flag `--compact-at`. |
 | `consolidate.send_to_sequencer` | `own`, chain ID or empty | empty | `own` sends everything above the minimum to `wallet.sequencer_id`, which must be controlled by this wallet; a sequencer ID sends it to that sequencer; empty disables sending. Flag `--send-to-sequencer`. |
-| `consolidate.autodelegate` | `random`, chain ID or empty | empty | Applies only when `send_to_sequencer` is empty. `random` delegates to an active sequencer drawn afresh on every action, a sequencer ID always delegates to that one, empty only folds the outputs into one. Flag `--autodelegate`. |
-| `consolidate.max_delegations` | int | `10` | Cap on the consolidator's own delegations; at the cap an existing one is topped up instead. Flag `--max-delegations`. |
+| `consolidate.autodelegate` | `random`, chain ID or empty | empty | Applies only when `send_to_sequencer` is empty. `random` delegates to an active sequencer drawn on every action, weighted by the share of the inflation it leaves delegators; a sequencer ID always delegates to that one; empty only folds the outputs into one. Flag `--autodelegate`. |
+| `consolidate.target_delegations` | int | `5` | Number of delegations the consolidator builds up to; beyond it existing ones are topped up and extra ones folded together. The older key `max_delegations` is read when this one is absent. Flag `--target-delegations`. |
+| `consolidate.target_delegation_prox` | uint, PROX | `10000` | Size a delegation is grown to before the next one is started. Flag `--target-delegation-prox`. |
 
 ```yaml
 consolidate:
@@ -235,7 +236,8 @@ consolidate:
   compact_at: 10
   send_to_sequencer:
   autodelegate:
-  max_delegations: 10
+  target_delegations: 5
+  target_delegation_prox: 10000
 ```
 
 The amounts here are in **PROX**, unlike every other amount `proxi` takes, which is in
@@ -243,7 +245,8 @@ motes. The generated profile leaves both destinations empty, since it cannot kno
 whether the wallet controls a sequencer: with neither set the process only folds
 scattered outputs into one, so set one of the two to put the tokens to work. The
 tag-along target and its fee come from `tag_along` and are resolved again before every
-transaction; the cut a delegation target must leave comes from `delegate.minimum_cut`.
+transaction. The consolidator does not read `delegate.minimum_cut`: each delegation it
+makes requires exactly the cut its target sequencer leaves.
 
 ---
 
@@ -311,7 +314,8 @@ consolidate:
     compact_at: 10
     send_to_sequencer:
     autodelegate:
-    max_delegations: 10
+    target_delegations: 5
+    target_delegation_prox: 10000
 ```
 
 The commented API endpoints are the public access points a wallet is pointed at.

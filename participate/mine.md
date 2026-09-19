@@ -84,6 +84,7 @@ It runs until you stop it, or until the chain is exhausted. Useful options:
 | `--stream URL,…` | Additional node endpoints to receive mining transactions from. **Worth setting** — see below. |
 | `--no-stream` | Do not subscribe to the stream at all. Slower, and you will usually lose. |
 | `--refetch N` | Seconds to mine one target before re-stamping it. Default 0 — adaptive to the measured hashrate. Whatever the window, a target is re-stamped as soon as the clock leaves its slot, since every later slot is one bit easier. |
+| `--disable_consolidation` | Only mine. The payouts stay in the wallet as they are mined; nothing is compacted or delegated by the miner. **Use it when `proxi node consolidate` runs on the same wallet**, so the two do not spend the same outputs. |
 
 The flags below drive the miner's built-in tidy-up of its payouts. **They are deprecated**:
 that job now belongs to `proxi node consolidate`, a separate process that works with any
@@ -140,8 +141,14 @@ takes to mine a step — and would keep winning. Proxima closes that gap two way
 * Nodes **stream mining transactions** to miners as they arrive, so a competitor's win
   reaches you in a gossip hop rather than in a confirmation. Your miner verifies every
   transit it receives from its raw bytes before building on it.
-* When two transits compete for the same step, the tie-break is **the most proof of
-  work** — never whichever was seen first. Nothing is preferred merely for being yours.
+* When two transits compete for the same step, every miner and every sequencer rank
+  them the same way: the one stamped at the **older slot** wins, because it had to meet
+  the higher difficulty, and between equal slots the one with the **smaller VRF output**,
+  a value fixed by the key and the message that nobody can choose. Sequencers hold the
+  competing transits until the end of the slot before picking one, so a transit that
+  arrives a little later is judged by the rule, not by who was seen first. Nothing is
+  preferred merely for being yours, and your chance of winning a contested step is your
+  share of the hashrate, as before.
 
 Because the stream matters this much, pass `--stream` with a couple of independent node
 endpoints. Subscribing to several means no single node can slow you down by withholding
@@ -160,9 +167,10 @@ them. How to run it, and why idle tokens lose value, is on the
 [Active tokens](participate/active_tokens.md) page.
 
 > **Deprecated.** The rest of this section describes the tidy-up built into
-> `proxi node mine` itself. It still runs, but it is superseded by the consolidator and
-> will be removed. Until then, do not run the consolidator beside `proxi node mine` on
-> the same wallet: the two would spend the same outputs.
+> `proxi node mine` itself. It still runs by default, but it is superseded by the
+> consolidator and will be removed. Until then, when the consolidator runs on the same
+> wallet start the miner with `--disable_consolidation`, so the two do not spend the
+> same outputs.
 
 So the miner cleans up after itself:
 
