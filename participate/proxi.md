@@ -135,8 +135,9 @@ A sequencer refuses anything under its declared minimum, so `tag_along.fee` is a
 preference that matters only when it is the larger of the two — raise it to outbid
 other senders, since a sequencer serves its backlog biggest-fee-first.
 
-`tag_along.sequencer_id` takes a chain ID or the literal `random`, which picks a
-sequencer that has been active within the last slot and fails if none is. Naming a
+`tag_along.sequencer_id` takes a chain ID or the literal `random`, which draws a
+sequencer active within the last five slots, favouring the ones asking a lower fee
+and holding a larger balance, and fails if none is active. Naming a
 sequencer explicitly is the common source of a puzzling failure: if the ID is wrong,
 or that sequencer has stopped, `proxi` builds a transaction tagged along to nobody.
 Everything looks fine but the transaction never confirms. `random` avoids that by

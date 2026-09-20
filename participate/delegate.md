@@ -209,8 +209,12 @@ The simplest form picks a good target for you automatically:
 proxi node delegate amount <amount>
 ```
 
-This selects a sequencer at random, weighted so that less-loaded sequencers are more
-likely — the preferred default, as it spreads delegations across the network.
+This draws a sequencer at random among the active ones that leave at least your cut,
+biased by a rating on several criteria: the share of the inflation it leaves delegators
+(more is better, counted twice), its own balance (more is better) and the ratio of what
+is delegated to it over its own balance (less is better). Better rated sequencers are
+drawn more often, but every eligible one keeps a chance, which spreads delegations
+across the network. `proxi node seq_rating` prints the current rating.
 
 To choose the target and terms yourself:
 

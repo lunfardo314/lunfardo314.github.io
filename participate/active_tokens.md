@@ -120,11 +120,17 @@ The consolidator accepts that: every delegation it makes or renews requires exac
 its target leaves. It does not read `delegate.minimum_cut`, and a delegation it made is
 never refused by its target as unprofitable.
 
-**A random draw weighted by what the sequencer leaves.** With `autodelegate: random` the
-target is drawn among the sequencers active in the last few slots, and the draw favours
-the ones that leave delegators more: a sequencer keeping 40% is drawn 600 times for every
-1000 times one keeping nothing is drawn, and a sequencer keeping everything is never
-drawn. So capital flows towards the better offers without abandoning the others.
+**A random draw biased by a rating.** With `autodelegate: random` the target is drawn
+among the sequencers active in the last few slots. The draw is not uniform: the sequencers
+are rated on several criteria and the better rated are drawn more often, though every
+sequencer leaving delegators anything keeps a chance. The criteria are
+
+* the share of the inflation it leaves delegators (more is better, counted twice);
+* its own balance (more is better);
+* the ratio of what is delegated to it over its own balance (less is better, so the
+  crowded ones are drawn less).
+
+`proxi node seq_rating` prints the current rating and each sequencer's draw chance.
 
 **Two numbers shape the delegation set:** how many delegations to have, and how large
 one should be. The defaults are **5 delegations of 10,000 PROX**. The consolidator grows

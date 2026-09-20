@@ -160,12 +160,14 @@ tag_along:
 ```
 
 This is a **complete specification of the target**, not an absent one — it never
-falls back to `default_sequencer_id`. `proxi` picks uniformly among the
-sequencers that are currently **active**, meaning their latest known milestone
-is no more than one slot old, and fails with an error when none is:
+falls back to `default_sequencer_id`. `proxi` draws among the sequencers that are
+currently **active**, meaning their latest settled milestone is no more than five
+slots old, biased by a rating on two criteria: the minimum fee the sequencer asks
+(less is better, counted twice) and its own balance (more is better). It fails
+with an error when none is active:
 
 ```
-no sequencer has been active in the last 1 slot(s): cannot pick a tag-along target at random
+no sequencer has a settled milestone in the last 5 slot(s): cannot pick a tag-along target at random
 ```
 
 That is the point of the setting: naming a fixed sequencer that has since gone
@@ -175,8 +177,8 @@ live target or tells you the network has none.
 Notes:
 
 - Activity is judged in **ledger time** (the slot of the sequencer's latest
-  milestone against the current slot), not by how recently the node happened to
-  hear from it.
+  settled milestone against the slot of the node's latest reliable branch), not
+  by how recently the node happened to hear from it.
 - The choice is made **once per `proxi` run** and reused for the whole command,
   so a command that prices the fee and then builds the output cannot end up
   addressing two different sequencers. Consecutive commands may well pick
@@ -224,7 +226,7 @@ Every key has a command-line flag of the same name that overrides it. See
 | `consolidate.max_inputs` | int, 2–256 | `30` | Most outputs one consolidating transaction consumes, smallest first; the rest wait for a later pass. Flag `--max-inputs`. |
 | `consolidate.compact_at` | int | `10` | Fold the outputs into one as soon as this many have piled up, even below the threshold; in that case nothing leaves the wallet. Flag `--compact-at`. |
 | `consolidate.send_to_sequencer` | `own`, chain ID or empty | empty | `own` sends everything above the minimum to `wallet.sequencer_id`, which must be controlled by this wallet; a sequencer ID sends it to that sequencer; empty disables sending. Flag `--send-to-sequencer`. |
-| `consolidate.autodelegate` | `random`, chain ID or empty | empty | Applies only when `send_to_sequencer` is empty. `random` delegates to an active sequencer drawn on every action, weighted by the share of the inflation it leaves delegators; a sequencer ID always delegates to that one; empty only folds the outputs into one. Flag `--autodelegate`. |
+| `consolidate.autodelegate` | `random`, chain ID or empty | empty | Applies only when `send_to_sequencer` is empty. `random` delegates to an active sequencer drawn on every action, biased by a rating on the share of the inflation it leaves, its balance and how much is already delegated to it (see [Active tokens](participate/active_tokens.md)); a sequencer ID always delegates to that one; empty only folds the outputs into one. Flag `--autodelegate`. |
 | `consolidate.target_delegations` | int | `5` | Number of delegations the consolidator builds up to; beyond it existing ones are topped up and extra ones folded together. The older key `max_delegations` is read when this one is absent. Flag `--target-delegations`. |
 | `consolidate.target_delegation_prox` | uint, PROX | `10000` | Size a delegation is grown to before the next one is started. Flag `--target-delegation-prox`. |
 
