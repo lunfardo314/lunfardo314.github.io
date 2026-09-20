@@ -276,12 +276,13 @@ which a sequencer does automatically. After the window your wallet can reclaim i
   during the launch phase — it needs no tokens to start. See
   [Mining](participate/mine.md) for what it does with what it earns.
 
-* `proxi node consolidate` runs permanently in the background, on the same profile as
-  a miner. Every 10 seconds it looks at the account and, once enough small outputs have
-  piled up, sweeps them into one transaction that sends everything above a kept minimum
-  to a sequencer or into a delegation, as configured in the `consolidate` section of the
-  profile. It works with any mining software, since it only looks at the wallet. See
-  [Active tokens](participate/active_tokens.md) for why, and for the settings.
+* `proxi node consolidate` runs permanently in the background on a wallet profile,
+  typically a miner's. Every 10 seconds it looks at the account and, once enough small
+  outputs have piled up, sweeps them into one transaction that sends everything above a
+  kept minimum to a sequencer or into a delegation, as configured in the `consolidate`
+  section of the profile. It only looks at the wallet, so it works with any mining
+  software and for any wallet. See [The wallet consolidator](participate/consolidate.md)
+  for the settings, and [Active tokens](participate/active_tokens.md) for why.
 
 * `proxi node compact scan` reports everything the account can consume, by category,
   without building any transaction. Useful before compacting.

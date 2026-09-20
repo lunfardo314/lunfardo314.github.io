@@ -217,7 +217,7 @@ network currently offers. See [Mining](participate/mine.md).
 Settings of `proxi node consolidate`, the permanent process that sweeps the outputs
 scattered over the wallet and puts what is above a kept minimum back into consensus.
 Every key has a command-line flag of the same name that overrides it. See
-[Active tokens](participate/active_tokens.md) for what the process does and why.
+[The wallet consolidator](participate/consolidate.md) for what the process does.
 
 | Tag | Type | Default | Description |
 |-----|------|---------|-------------|
@@ -226,7 +226,7 @@ Every key has a command-line flag of the same name that overrides it. See
 | `consolidate.max_inputs` | int, 2–256 | `30` | Most outputs one consolidating transaction consumes, smallest first; the rest wait for a later pass. Flag `--max-inputs`. |
 | `consolidate.compact_at` | int | `10` | Fold the outputs into one as soon as this many have piled up, even below the threshold; in that case nothing leaves the wallet. Flag `--compact-at`. |
 | `consolidate.send_to_sequencer` | `own`, chain ID or empty | empty | `own` sends everything above the minimum to `wallet.sequencer_id`, which must be controlled by this wallet; a sequencer ID sends it to that sequencer; empty disables sending. Flag `--send-to-sequencer`. |
-| `consolidate.autodelegate` | `random`, chain ID or empty | empty | Applies only when `send_to_sequencer` is empty. `random` delegates to an active sequencer drawn on every action, biased by a rating on the share of the inflation it leaves, its balance and how much is already delegated to it (see [Active tokens](participate/active_tokens.md)); a sequencer ID always delegates to that one; empty only folds the outputs into one. Flag `--autodelegate`. |
+| `consolidate.autodelegate` | `random`, chain ID or empty | empty | Applies only when `send_to_sequencer` is empty. `random` delegates to an active sequencer drawn on every action, biased by a rating on the share of the inflation it leaves, its balance and how much is already delegated to it (see [The wallet consolidator](participate/consolidate.md)); a sequencer ID always delegates to that one; empty only folds the outputs into one. Flag `--autodelegate`. |
 | `consolidate.target_delegations` | int | `5` | Number of delegations the consolidator builds up to; beyond it existing ones are topped up and extra ones folded together. The older key `max_delegations` is read when this one is absent. Flag `--target-delegations`. |
 | `consolidate.target_delegation_prox` | uint, PROX | `10000` | Size a delegation is grown to before the next one is started. Flag `--target-delegation-prox`. |
 

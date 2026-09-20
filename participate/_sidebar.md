@@ -5,6 +5,7 @@ Join Proxima
 - [Wallet configuration](participate/wallet_config.md)
 - [Mining](participate/mine.md)
 - [Active tokens](participate/active_tokens.md)
+- [The wallet consolidator](participate/consolidate.md)
 - [Delegation](participate/delegate.md)
 - [Running an access node](participate/run_access.md)
 - [Running a sequencer node](participate/run_sequencer.md)

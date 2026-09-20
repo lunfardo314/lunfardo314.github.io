@@ -89,7 +89,7 @@ It runs until you stop it, or until the chain is exhausted. Useful options:
 The flags below drive the miner's built-in tidy-up of its payouts. **They are deprecated**:
 that job now belongs to `proxi node consolidate`, a separate process that works with any
 miner, and the built-in tidy-up will be removed from the miner. See
-[Active tokens](participate/active_tokens.md).
+[The wallet consolidator](participate/consolidate.md).
 
 | Flag | Meaning |
 |------|---------|
@@ -163,8 +163,8 @@ permanent state that every node on the network carries.
 **The way to deal with it is `proxi node consolidate`**, a separate process you run in
 the background on the same wallet profile. It sweeps the payouts and either sends them to
 your own sequencer or delegates them, and it does so whatever mining software produced
-them. How to run it, and why idle tokens lose value, is on the
-[Active tokens](participate/active_tokens.md) page.
+them. How to run it is on [The wallet consolidator](participate/consolidate.md) page, and
+why idle tokens lose value on [Active tokens](participate/active_tokens.md).
 
 > **Deprecated.** The rest of this section describes the tidy-up built into
 > `proxi node mine` itself. It still runs by default, but it is superseded by the
