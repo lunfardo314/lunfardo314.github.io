@@ -40,9 +40,7 @@ seen, this way:
 
 Every holder can act on that: delegate where the terms are fair, move when they are not,
 run a sequencer when it pays. Sequencers have to mind the same market with their
-settings, the profit cut and the fees first of all. Priced above the market a sequencer
-carries nothing; priced below it, it runs at a loss and stops. The equilibrium is the
-community's and market's to find, not the founder's.
+settings, the profit cut and the fees first of all.
 
 > Proxima cannot tell holders what to do with their tokens. It only gives incentives for
 > the cooperative behavior that leads to the most value for everybody. That also means
