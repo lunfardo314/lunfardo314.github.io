@@ -203,12 +203,11 @@ delegate:
   minimum_cut: 900
 ```
 
-It is the default of the `--cut` / `--minimum_cut` flags of `proxi node dlg`, and
-the floor `proxi node mine` applies when it picks a delegation target on its own.
-A sequencer whose own cut would leave the delegator less than this refuses the
-delegation, so setting it too high can leave the miner with no eligible target —
-in which case automatic delegation stops and the miner reports the widest cut the
-network currently offers. See [Mining](participate/mine.md).
+It is the default of the `--cut` / `--minimum_cut` flags of `proxi node dlg`. A
+sequencer whose own cut would leave the delegator less than this refuses the
+delegation; a new sequencer keeps `100` promille unless its operator sets another, so
+the defaults meet. The consolidator does not read this key: it takes the cut each
+sequencer offers. See [The wallet consolidator](participate/consolidate.md).
 
 ---
 
@@ -221,7 +220,7 @@ Every key has a command-line flag of the same name that overrides it. See
 
 | Tag | Type | Default | Description |
 |-----|------|---------|-------------|
-| `consolidate.threshold_prox` | uint, PROX | `1000` | The consolidator acts once the consumable balance exceeds this and is spread over at least two outputs; a single large output is left alone. Must be at least `minimum_balance_prox`. Flag `--threshold-prox`. |
+| `consolidate.threshold_prox` | uint, PROX | `300` | The consolidator acts once the consumable balance exceeds this and is spread over at least two outputs; a single large output is left alone. Must be at least `minimum_balance_prox`. Flag `--threshold-prox`. |
 | `consolidate.minimum_balance_prox` | uint, PROX | `100` | Balance always kept in the wallet on plain outputs; only what is above it moves. Must be at least the storage deposit of one output, about 9.25 PROX. Flag `--minimum-balance-prox`. |
 | `consolidate.max_inputs` | int, 2–256 | `30` | Most outputs one consolidating transaction consumes, smallest first; the rest wait for a later pass. Flag `--max-inputs`. |
 | `consolidate.compact_at` | int | `10` | Fold the outputs into one as soon as this many have piled up, even below the threshold; in that case nothing leaves the wallet. Flag `--compact-at`. |
@@ -232,7 +231,7 @@ Every key has a command-line flag of the same name that overrides it. See
 
 ```yaml
 consolidate:
-  threshold_prox: 1000
+  threshold_prox: 300
   minimum_balance_prox: 100
   max_inputs: 30
   compact_at: 10
@@ -310,7 +309,7 @@ delegate:
     minimum_cut: 900
 
 consolidate:
-    threshold_prox: 1000
+    threshold_prox: 300
     minimum_balance_prox: 100
     max_inputs: 30
     compact_at: 10

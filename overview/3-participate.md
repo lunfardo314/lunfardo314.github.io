@@ -38,7 +38,8 @@ when it first freezes the delegation, so your share does not depend on the seque
 staying healthy for the whole period.
 
 Delegation costs one transaction and no infrastructure. For most holders it is the right
-answer, and it is the one the miner takes automatically with what it mines.
+answer, and it is the one the wallet consolidator takes automatically with what a miner
+mines.
 
 [Delegation and liveness](overview/delegation.md) explains the mechanism;
 [the delegation guide](participate/delegate.md) covers the commands.
@@ -119,7 +120,8 @@ launch moves tokens out of the founder's hands, and it stops for good once the m
 supply is exhausted. After that the ways to take part are the ones above.
 
 What a miner does with the proceeds is the part that lasts. Mined tokens sitting idle
-earn nothing, which is why the miner delegates its rewards by default.
+earn nothing, which is why a miner runs the wallet consolidator beside the miner, and
+why the consolidator delegates the rewards by default.
 
 See [Tokens and supply](overview/2-tokens-and-supply.md) for what is being competed for
 and [Mining](participate/mine.md) for running the miner.
@@ -179,7 +181,8 @@ different sequencers, which is the straightforward defence.
 | hold no tokens and want in | **mine** — while the launch lasts, then pick a row above |
 
 Delegating and sequencing are not exclusive, and neither excludes mining: a miner that
-delegates its rewards is already doing both, which is what a miner does by default.
+delegates its rewards is already doing both, which is what the consolidator beside the
+miner does by default.
 
 ## Where to go next
 

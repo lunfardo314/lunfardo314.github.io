@@ -24,9 +24,9 @@ wallet whose surplus keeps earning. Miners are the common case, and it does not 
 mining software they use, the official one from the Proxima repository or an optimized one
 of their own.
 
-> The official `proxi node mine` still tidies up its own payouts by default. When the
-> consolidator runs on the same wallet, start the miner with `--disable_consolidation`,
-> so that only one process spends the wallet's outputs.
+> `proxi node mine` only mines and leaves every payout where it lands. The consolidator,
+> run beside it on the same wallet profile, is what puts the payouts to work; see
+> [Mining](participate/mine.md).
 
 ## Running the consolidator
 
@@ -40,7 +40,7 @@ incoming payment is, and tag-along fee outputs the wallet once sent to a sequenc
 never took them. Nothing else is touched. It consumes the smallest outputs first, up to a cap per transaction, and
 whatever does not fit is picked up on a later pass.
 
-**When it acts.** Two settings decide it. The **threshold**, 1000 PROX by default, is the
+**When it acts.** Two settings decide it. The **threshold**, 300 PROX by default, is the
 balance worth acting on: the consolidator acts once the consumable outputs hold more than
 that and there are at least two of them, since one large output is not scattered and is
 left alone. Independently of the balance, it acts once a set number of outputs have piled
@@ -90,10 +90,18 @@ sequencer leaving delegators anything keeps a chance. The criteria are
 **Two numbers shape the delegation set:** how many delegations to have, and how large
 one should be. The defaults are **5 delegations of 10,000 PROX**. The consolidator grows
 one delegation to that size before starting the next, up to that number; from then on
-it tops up the smallest one. Only a delegation the wallet can spend right now is topped
-up: one that is not frozen, or whose freeze has run out. If every delegation is frozen
-and the count is full, the consolidator asks one target to release a delegation (the
-one closest to thawing) and tops it up on a later pass.
+it tops up the smallest one. How the tokens are added depends on the delegation's state.
+One the wallet can spend right now, because it is not frozen or its freeze has run out,
+is re-delegated by the wallet with the added amount, for the tag-along fee. A frozen one
+is topped up **through its target**: the consolidator sends the amount to the target
+sequencer as a top-up request, and the sequencer adds it to the delegation in place,
+within a tick, with the freeze and the share unchanged and your advance on the added
+tokens paid up front. A top-up request pays no fee, and a sequencer takes one only from
+a minimum amount, 100 PROX unless it set more. If the delegation the rule picks cannot be
+reached this pass, because its target is quiet, the amount is under the target's
+minimum, or the target now keeps more than the delegation leaves it, the consolidator
+falls through to the next delegation in the order, then to a new one, so the payouts
+never wait on one delegation.
 
 **It tidies what is already there.** Before sweeping anything, every pass looks at the
 delegations the wallet can spend right now and does one of two things, paying the fee
@@ -103,7 +111,10 @@ out of the delegation itself:
   largest one, which is delegated again with the combined balance;
 * a delegation whose target has gone quiet, or now keeps more than the delegation
   leaves it (its target refuses to renew it), or is not the sequencer you configured,
-  or has sat unfrozen for longer than an epoch, is delegated again to a fresh target.
+  or has sat unfrozen for longer than an epoch, is delegated again to a fresh target;
+  one too small to be delegated again on its own is folded into the largest delegation
+  the wallet can spend, or, when there is none, ended and its balance returned to the
+  wallet, where the next sweep picks it up.
 
 Delegations made by an earlier version of the consolidator, by `proxi node mine`, or by
 hand are treated the same way, so a wallet with a pile of small or stalled delegations is
@@ -118,7 +129,7 @@ same name that overrides it:
 ```yaml
 consolidate:
     # act once the consumable balance exceeds this, in PROX
-    threshold_prox: 1000
+    threshold_prox: 300
     # balance always kept in the wallet on plain outputs, in PROX
     minimum_balance_prox: 100
     # most outputs one consolidating transaction consumes
@@ -139,7 +150,7 @@ consolidate:
 
 | Key | Flag | Default | Meaning |
 |-----|------|---------|---------|
-| `threshold_prox` | `--threshold-prox` | 1000 | Balance over at least two outputs that triggers a consolidation, in PROX. Must be at least the minimum. |
+| `threshold_prox` | `--threshold-prox` | 300 | Balance over at least two outputs that triggers a consolidation, in PROX. Must be at least the minimum, and with delegation on, the threshold less the minimum should be at least the 100 PROX a top-up request must carry, or frozen delegations are never topped up; the consolidator warns at startup otherwise. |
 | `minimum_balance_prox` | `--minimum-balance-prox` | 100 | Balance kept in the wallet, in PROX. Must be at least the storage deposit of one output, about 9.25 PROX. |
 | `max_inputs` | `--max-inputs` | 30 | Outputs one transaction consumes, 2 to 256. |
 | `compact_at` | `--compact-at` | 10 | Fold the outputs into one once this many have piled up, even below the threshold. |

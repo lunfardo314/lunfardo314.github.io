@@ -84,7 +84,7 @@ delegate:
 
 consolidate:
     # settings of 'proxi node consolidate'; see the consolidator page
-    threshold_prox: 1000
+    threshold_prox: 300
     minimum_balance_prox: 100
     max_inputs: 30
     compact_at: 10
@@ -120,8 +120,8 @@ for example one of the public access points of the
 
 `delegate.minimum_cut` is the delegator cut this wallet requires of any sequencer it
 delegates to, in promille — the share of the delegation's inflation that must come back
-to you. It is the default of the `--cut` flag of `proxi node dlg` and the floor
-`proxi node mine` uses when it picks a delegation target on its own.
+to you. It is the default of the `--cut` flag of `proxi node dlg`; the consolidator does
+not read it and takes the cut each sequencer offers.
 
 `tag_along.fee` and `tag_along.sequencer_id` describe the *tag-along* mechanism, which
 every token-sending command relies on. Each transaction you send carries a small extra

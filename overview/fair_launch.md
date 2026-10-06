@@ -250,13 +250,13 @@ compliance with its rules. Each transit is a transaction that:
 - decrements the remaining-mintable counter by the amount minted;
 - carries a proof of work.
 
-About **804,000 transits** exhaust the mintable supply. The chain is then dead and no further
+About **3.3 million transits** exhaust the mintable supply. The chain is then dead and no further
 token can be minted this way.
 
 ### Flat reward, then rising
 
-The reward starts at **500 PROX** per transit and stays there for the first **~46 days**.
-After that it grows linearly, by a fixed small amount every slot, ending near 2000 PROX at the
+The reward starts at **95 PROX** per transit and stays there for the first **60 days**.
+After that it grows linearly, by a fixed small amount every slot, ending near 530 PROX at the
 last transit.
 
 The flat phase is set to the projected length of Phase 1: the reward stays constant while the
@@ -283,7 +283,8 @@ A VRF differs from a hash in one way that matters here: for a given key and mess
 exactly **one** output, and producing it needs the private key. One consequence, and one limit:
 
 - **Not outsourceable.** The private key sits inside the hot loop. Hand it to a pool and you
-  hand over the reward: the covenant forces ≥ 99 % of every payout to the signing key. Mining
+  hand over the reward: the covenant pays every reward, less a fixed fee of 1 PROX, to the
+  signing key. Mining
   pools — the largest source of concentration in every proof-of-work chain launched so far —
   have no foothold here.
 - **Not hardware-neutral.** Each attempt is one elliptic-curve scalar multiplication plus
@@ -295,11 +296,12 @@ Call it **key-bound proof of work**.
 
 ### Difficulty and competition
 
-Difficulty is **adaptive**: the covenant raises and lowers it to hold the pace near its target
-of **4 slots** per transit, whatever hashrate shows up. Transits land a little later than the
-target, because the difficulty a transit must satisfy eases as the gap grows: about 4.5 slots,
-some 46 seconds. That is the pace the projections of section 7 assume. The retarget rule is in
-the covenant.
+Difficulty is **adaptive**: the covenant raises and lowers it to hold the pace at **one transit
+per slot**, whatever hashrate shows up. It hardens one bit after a run of full slots and eases
+one bit for every empty one, which settles with about one slot in nine empty: about 1.12 slots
+per transit, some 11.5 seconds. That is the pace the projections of section 7 assume. The
+retarget rule is in the covenant, and so is a quiet start: the chain accepts no transit in the
+first 2,000 slots of a network, about 5.7 hours, so the nodes are up before the race begins.
 
 The rest follows from this being a proof-of-work race on a chain. Many miners work on the same
 tip, one lands the transit, the rest move on. Competing transits for the same step are
@@ -369,13 +371,15 @@ Everything here is a corollary of that policy:
 
 | Milestone | Condition | Projection |
 |---|---|---|
-| Phase 1 ends, transition band opens: founder can no longer advance the ledger alone | decentralization capital > 5/12 | **~46 days** |
-| Decentralization capital overtakes bootstrap capital | > 1/2 | **~63 days** |
-| Band closes, Phase 2: ledger advances without the bootstrap capital at all | decentralization capital > 7/12 | **~84 days** |
-| Emission complete | ~804,000 transits | **~14 months** |
+| Phase 1 ends, transition band opens: founder can no longer advance the ledger alone | decentralization capital > 5/12 | **~60 days** |
+| Decentralization capital overtakes bootstrap capital | > 1/2 | **~81 days** |
+| Band closes, Phase 2: ledger advances without the bootstrap capital at all | decentralization capital > 7/12 | **~105 days** |
+| Bootstrap capital under the 1/6 fork threshold | < 1/6 | **~236 days** |
+| Half of the mintable supply out | | **~304 days** |
+| Emission complete | ~3.3 million transits | **~14.5 months** |
 | End state | decentralization capital share | **~94 %** |
 
-The first line and the length of the flat reward phase are the same ~46 days by construction.
+The first line and the length of the flat reward phase are the same 60 days by construction.
 The band spans the two, and nothing marks its edges on the day they are crossed: the shares
 move continuously and the effects appear as tendencies before they are arithmetically exact.
 
@@ -504,13 +508,13 @@ Stated because they are real, not because they are resolved:
   constant nor that reading rests on a peer-reviewed model of this consensus.
 - **The length of the runway.** The design turns on one number nobody has measured: how long it
   takes for enough capital to be mined *and put to work* that the network no longer needs the
-  bootstrap capital. 46 days is a judgement. Too short and the ledger stalls instead of
+  bootstrap capital. 60 days is a judgement. Too short and the ledger stalls instead of
   decentralizing; too long and Phase 1 outlasts its purpose. The pre-launch exists in large
   part to replace that judgement with a measurement.
 - **Participation mechanics.** The milestones assume mined tokens are put to work — run in a
-  sequencer the miner controls, or delegated. The reference miner delegates its payouts by
-  default and can add to an existing delegation, but how a miner should behave across many
-  sequencers over a long run is still being learned.
+  sequencer the miner controls, or delegated. The wallet consolidator that runs beside the
+  reference miner delegates the payouts by default and tops up existing delegations, but how
+  a miner should behave across many sequencers over a long run is still being learned.
 - **Scalability of participation.** Many holders delegating to many sequencers is a regime the
   network has not been run in. How many delegations a sequencer can carry, and how that behaves
   as holders and sequencers multiply, has been modelled and needs measuring.

@@ -72,9 +72,10 @@ configuration is a separate, manual step (below).
 
 Leave enough tokens in your wallet, say 100 PROX, for ongoing fees and spending —
 don't put your entire balance into the chain. Optional flags seed the chain's initial sequencer
-parameters (all default to library values if omitted): `--fee`, `--margin`,
-`--greedy`, `--pace`, plus the immutable delegation params `--epoch-slots` and
-`--max-frozen-epochs`. These mutable parameters can be changed later on-chain with
+parameters: `--fee`, the minimum tag-along fee, 0.1 PROX unless given, and `--margin`, the
+sequencer's cut in promille, 100 unless given, so that it meets the delegators' default
+cut of 900; `--greedy` and `--pace`; and the immutable delegation params `--epoch-slots`
+and `--max-frozen-epochs`. The mutable parameters can be changed later on-chain with
 `proxi node seq set-params`.
 
 Verify the new chain:

@@ -116,7 +116,9 @@ rest to the sequencer).
 Each sequencer advertises a **margin**, also in promille — the minimum it wants
 to keep for itself. A sequencer can only accept a delegation whose cut leaves it at least
 its margin. In other words, the largest cut a sequencer will grant is
-`1000 − margin`. Ask for more than that and the sequencer rejects the delegation.
+`1000 − margin`. Ask for more than that and the sequencer rejects the delegation. A new
+sequencer starts with a margin of `100` unless its operator sets another, so the two
+defaults meet exactly: a `900` cut on a `100` margin.
 
 ### What you actually get
 
@@ -344,15 +346,22 @@ Whenever the delegation is not frozen (`unlockable by the owner` or `on hold`) y
 ## Adding to a delegation you already have
 
 If you have more tokens to delegate, you can put them into an existing delegation instead
-of creating another one:
+of creating another one, **whether it is frozen or not**:
 
 ```
-proxi node delegate topup [--delegation <delegation ID>]
+proxi node delegate topup <amount> [--delegation <delegation ID>]
 ```
 
-Without `--delegation` it tops up the smallest delegation you can currently act on. The
-same thing is available as `--add <amount>` on `delegate chain` when you are continuing a
-delegation anyway.
+Without `--delegation` it tops up your smallest delegation. What happens next depends on
+the delegation's state. One you can act on yourself is re-delegated with the added
+tokens, for the tag-along fee. A frozen one is topped up through its sequencer: the
+wallet sends the amount to the target as a **top-up request**, and the sequencer adds it
+to the delegation in place, within a tick, with the freeze and your share unchanged and
+your advance on the added tokens paid up front. A top-up request pays no fee, the amount
+itself is the request, and a sequencer takes one only from a minimum amount, 100 PROX
+unless it set more; `proxi node delegate target_info` shows it. The same thing is
+available as `--add <amount>` on `delegate chain` when you are continuing a delegation
+anyway.
 
 **Prefer this to creating another delegation.** Every delegation is a chained output that
 lives in the ledger state forever, and every node on the network carries that state for as
@@ -361,9 +370,9 @@ as one holding a tenth; ten separate delegations cost ten times as much. Nothing
 from creating many — it is a matter of not imposing an avoidable cost on everyone else,
 and topping up is cheaper for you too, since it is one transaction rather than a new chain.
 
-Topping up is a plain unwind-and-redelegate under the covers, so it costs only fees. Note
-that freshly added tokens are subject to the freeze like the rest.
+Freshly added tokens are subject to the freeze like the rest.
 
-If you mine, the miner does this for you: it delegates its payouts automatically and, once
-it is holding its configured number of delegations, tops up an existing one rather than
-starting another. See [Mining](participate/mine.md).
+If you mine, [the wallet consolidator](participate/consolidate.md) does this for you: it
+delegates the payouts automatically and, once it is holding its configured number of
+delegations, tops up an existing one rather than starting another. See
+[Mining](participate/mine.md).

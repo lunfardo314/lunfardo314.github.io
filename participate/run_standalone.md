@@ -131,12 +131,12 @@ proxi node mine
 ```
 
 This is the easiest way to exercise the mining path end to end without competing
-with anyone. Difficulty starts at the seeded value and retargets one bit per transit
-towards the target pace, so on a single idle machine it falls to the floor rather
-than stalling — and the pace relief means waiting longer always makes the next
-transit easier. By default the miner also delegates what it earns to the bootstrap
-sequencer and compacts its payouts, which exercises those paths as well; pass
-`--delegate=false` to keep the rewards in plain outputs. See
+with anyone. A standalone ledger has no quiet start: its mine chain is open from slot 0,
+where a public network keeps it closed for the first 2,000 slots. Difficulty starts at
+the seeded value and eases one bit for every empty slot, so on a single idle machine it
+falls to the floor rather than stalling, and the pace relief means waiting longer always
+makes the next transit easier. The miner only mines; to exercise delegation and the
+top-up path as well, run `proxi node consolidate` beside it on the same profile. See
 [Mining](participate/mine.md).
 
 ## Example commands

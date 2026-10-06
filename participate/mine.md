@@ -55,10 +55,11 @@ a GPU. Difficulty adapts to whatever hashrate shows up.
 
 * A wallet — but **not a wallet with any tokens in it**. You can start mining from an
   empty one. A transit's only input is the mine output itself, and the **tag-along fee**
-  paid to a sequencer comes out of the reward, not out of your balance: of the reward _A_,
-  the fee goes to the sequencer and the rest to you. Nothing is required up front. See
-  [The `proxi` wallet](participate/proxi.md) for creating the wallet and naming a
-  tag-along sequencer.
+  paid to a sequencer comes out of the reward, not out of your balance: the ledger fixes
+  it at exactly **1 PROX** per transit, the same for everybody, and the rest of the reward
+  _A_ goes to you. Nothing is required up front. See [The `proxi` wallet](participate/proxi.md)
+  for creating the wallet and naming a tag-along sequencer; a sequencer whose minimum fee
+  is above 1 PROX never takes a transit, and the default minimum is 0.1 PROX.
 * Access to a node API — your own [access node](participate/run_access.md), or a public
   one.
 * CPU cores. The `proxi` miner runs on the CPU; a GPU miner is faster.
@@ -71,11 +72,12 @@ not ask you to already hold tokens.
 Mining is **two processes on the same wallet profile**, started side by side:
 
 ```bash
-proxi node mine --disable_consolidation
+proxi node mine
 proxi node consolidate
 ```
 
-The first one mines. The second one, [the wallet consolidator](participate/consolidate.md),
+The first one mines, and nothing else: it leaves every payout where it lands. The second
+one, [the wallet consolidator](participate/consolidate.md),
 sweeps the payouts and puts them to work: by default it delegates them to a sequencer
 drawn by rating, and with `send_to_sequencer: own` in the profile it sends them to your
 own sequencer instead. **Never run the miner alone for long.** Every transit leaves a
@@ -93,48 +95,57 @@ The miner runs until you stop it, or until the chain is exhausted. Useful option
 | `--max-hashrate-khs X` | Upper limit on the mining speed of this process, all workers together, in thousands of attempts per second (KH/s). Fractions are allowed, e.g. `2.5`. Default 0 — no limit. Use it when the machine has other work to do: the workers pause between attempts, so the processor load drops with the limit. The miner prints its measured speed while it works, which tells you what your machine does without a limit. |
 | `--nonce-start N` | First nonce of every round. Default 0 — a fresh random start per round, so several processes mining under one key search different nonces instead of repeating each other. |
 | `--count N` | Stop after N transits. Default 0 — keep going. |
-| `--fee M` | Tag-along fee in motes, taken out of the reward. Default 0 uses the sequencer minimum. The ledger rules cap it at 1% of the reward; at least 99% always goes to your key. |
 | `--stream URL,…` | Additional node endpoints to receive mining transactions from. **Worth setting** — see below. |
 | `--no-stream` | Do not subscribe to the stream at all. Slower, and you will usually lose. |
-| `--refetch N` | Seconds to mine one target before re-stamping it. Default 0 — adaptive to the measured hashrate. Whatever the window, a target is re-stamped as soon as the clock leaves its slot, since every later slot is one bit easier. |
-| `--disable_consolidation` | Only mine; leave the payouts to `proxi node consolidate`. Always pass it when the consolidator runs on the same wallet, so the two do not spend the same outputs. On the next network it has no effect, because the miner only mines. |
+| `--refetch N` | Seconds to mine one target before re-stamping it. Default 0 — adaptive to the measured hashrate. Whatever the window, a round ends when the sequencers start settling its slot, since a solution found later reaches none of them in time. |
 
-The flags below drive the miner's own tidy-up of its payouts, the one the flag above
-turns off. **They are deprecated** and go away with the next network: that job belongs
-to the consolidator, which works with any miner.
+The miner used to tidy up its own payouts and carried a set of flags for that. It no
+longer does: `proxi node mine` only mines, and the old flags are gone. The one that
+remains, `--disable_consolidation`, is accepted so that old start scripts keep working
+and has no effect.
 
-| Flag | Meaning |
-|------|---------|
-| `--compact-at P` | Sweep accumulated payout outputs into one once P have piled up. Default 10. |
-| `--delegate=false` | Only mine and tidy up; do not put the rewards to work. |
-| `--delegate-amount D` | Motes put into one delegation. Default 0 — ten mine rewards. |
-| `--max-delegations N` | Advisory cap on your own delegations. Default 10; at the cap the miner tops up an existing one instead of creating another. |
-| `--reserve W` | Balance always left on ordinary outputs, in motes. Default 0 — 100 PROX. |
-| `--cut C` | Delegator cut in promille (0–1000) required of a delegation target. Default: `delegate.minimum_cut` from the wallet profile. `--minimum_cut` is a synonym. |
-| `--no-revocation-windows` | Never top up inside a delegation's safe revocation window, leaving that window available to the owner. |
+## A quiet start
+
+A fresh network opens with the mine chain closed. The ledger carries a start slot, set at
+genesis, before which the covenant accepts no transit whatever its proof of work; the
+default is **slot 2000, about 5.7 hours** after genesis, time enough for the nodes and
+sequencers to be up and settled before the first transit is contested. The miner reads
+the start slot from the node, says how long it will wait, and starts its first round a
+few slots before it, so that round targets the start slot itself. A standalone developer
+ledger opens at slot 0.
+
+Expect the first transit to be a crowd: its gap from genesis relieves the required
+difficulty to the floor, so every miner solves it at once, and the one with the smallest
+VRF output among those stamped at the start slot wins. It is one reward; from the second
+transit on the race is the ordinary one described below.
 
 ## The reward, and how it changes
 
-For roughly the first 46 days the reward _A_ is flat at **500 PROX** per transit. After
-slot 388,125 it grows by 464 motes per slot, so a transit mined later pays slightly
-more than one mined earlier.
+For the first **60 days** the reward _A_ is flat at **95 PROX** per transit. After slot
+506,250 it grows by 134 motes per slot, so a transit mined later pays slightly more than
+one mined earlier.
 
-At the pace transits actually land — about 4.5 slots each — the whole mintable supply is
-mined in **roughly 1.2 years**, with the reward near 2000 PROX by the end.
+At the pace transits actually land, about 1.12 slots each, the whole mintable supply is
+mined in about **3.3 million transits** over **roughly 443 days**, with the reward near
+530 PROX by the end.
 
 ## Difficulty, and why waiting helps
 
-The chain carries its current difficulty _B_ in bits. It is seeded at 24 and retargets by
-**one bit per transit**, aiming at a target pace of **4 slots** between transits. It
-cannot move faster than one bit at a time, so it settles at the target instead of
-oscillating around it. It stays inside a band of 10 to 40 bits.
+The pace is **one transit per slot**. The chain carries its current difficulty _B_ in
+bits, seeded at 24 and kept inside a band of 10 to 56. Every transit retargets it from
+the single gap it sees: the chain **hardens by one bit after 8 full slots in a row**,
+slots in which a transit landed, and **eases by one bit for every empty slot**. The two
+sides are deliberately unequal. A full slot says only that at least one solution came in
+time, never how many competed, so a symmetric rule would settle with half the slots
+empty; the asymmetric one settles with about one slot in nine empty and a couple of
+competing solutions in every full one.
 
 The difficulty a particular transit must actually satisfy depends on how long it has been
 since the last one:
 
 > _K_ = max( _B_ − (_M_ − _P_), _E_ )
 
-where _M_ is the gap in slots since the predecessor, _P_ is the minimum pace of 3 slots,
+where _M_ is the gap in slots since the predecessor, _P_ is the minimum pace of 1 slot,
 and _E_ is the floor of 10 bits. In words: **the longer the chain has been stuck, the
 easier the next transit becomes.** This is what stops the chain from wedging if hashrate
 disappears, and it means a lone miner on a quiet network can always make progress.
@@ -157,10 +168,13 @@ takes to mine a step — and would keep winning. Proxima closes that gap two way
   them the same way: the one stamped at the **older slot** wins, because it had to meet
   the higher difficulty, and between equal slots the one with the **smaller VRF output**,
   a value fixed by the key and the message that nobody can choose. Sequencers hold the
-  competing transits until the end of the slot before picking one, so a transit that
-  arrives a little later is judged by the rule, not by who was seen first. Nothing is
-  preferred merely for being yours, and your chance of winning a contested step is your
-  share of the hashrate, as before.
+  competing transits until a settlement window late in the slot before picking one, so a
+  transit that arrives a little later is judged by the rule, not by who was seen first.
+  At one transit per slot most contests are between equal slots, so once your miner has
+  a solution it keeps grinding for a smaller VRF output while a competitor outranks it
+  and the settlement is still ahead, and submits each improvement. Nothing is preferred
+  merely for being yours, and your chance of winning a contested step is your share of
+  the hashrate, as before.
 
 Because the stream matters this much, pass `--stream` with a couple of independent node
 endpoints. Subscribing to several means no single node can slow you down by withholding
@@ -186,32 +200,4 @@ Two ways to handle it:
   run the consolidator with `autodelegate: none` so the payout outputs are at least
   folded into one.
 
-> **Deprecated.** The rest of this section describes the tidy-up built into
-> `proxi node mine` itself on the current network. It is superseded by the consolidator
-> and is removed on the next network. Until then, start the miner with
-> `--disable_consolidation` whenever the consolidator runs on the same wallet, so the two
-> do not spend the same outputs.
-
-So the miner cleans up after itself:
-
-* **Compaction** runs unconditionally: once enough payout outputs have accumulated, they
-  are swept into one.
-* **Delegation** runs unless you turn it off. Rather than sitting idle, mined tokens are
-  delegated to sequencers, where they earn inflation and contribute to consensus. See
-  [Delegation](participate/delegate.md).
-
-The delegation target is drawn **at random** from the sequencers that are currently alive
-and leave you at least the required delegator cut, and the draw is repeated every time, so
-your tokens end up spread across sequencers rather than piled on one. Each delegation is
-worth making substantial — the default size is ten mine rewards — and the miner keeps a
-reserve of 100 PROX on ordinary outputs so the wallet can still pay the tag-along fee for
-the next compaction and the next delegation. Past `--max-delegations` it tops up an
-existing delegation instead of creating another.
-
-If no sequencer on the network leaves the cut you require, automatic delegation stops and
-the miner tells you what cut would currently work. Mining itself is unaffected, and you
-can still delegate by hand.
-
-Both run on their own, and neither slows the mining loop. If you would rather manage the
-proceeds yourself, use `--delegate=false`; compaction still runs, because leaving hundreds
-of outputs behind imposes a cost on everyone else.
+Either way, the miner itself never touches a payout once it has landed.
