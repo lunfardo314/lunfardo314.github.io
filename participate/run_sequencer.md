@@ -51,7 +51,9 @@ sequencer per node**.
 A sequencer runs as part of a normal node, so first get an **access node running
 and synced** following [Running an access node](participate/run_access.md). You also need a funded
 wallet ([Wallet configuration](participate/wallet_config.md)) — the key that creates the
-sequencer chain is the key that controls it.
+sequencer chain is the key that controls it. Check that the machine's clock is
+synced to real time ([Keep the clock synced](participate/run_access.md?id=keep-the-clock-synced));
+a sequencer is the node that suffers most from a clock that is off.
 
 ## Create the sequencer chain origin
 
@@ -222,9 +224,12 @@ reasonable choice.
 
 ## Notes
 
-- **Clock sync matters most here.** A sequencer issues timestamped transactions,
-  so keep the node's clock tightly synced to real time (see the clock note in
-  [Running an access node](participate/run_access.md)).
+- **Clock sync matters most here.** A sequencer issues timestamped transactions
+  continuously at its own clock time. A clock that is off by a fraction of a slot
+  costs it endorsements and inflation; a clock off by a few slots takes it out of
+  the consensus while the rest of the network runs fine. Keep the clock synced
+  with NTP, preferably `chrony`, and check it before every start (see
+  [Keep the clock synced](participate/run_access.md?id=keep-the-clock-synced)).
 - **Logging.** Use the `logger` and `sequencer.logging` options to control how
   much sequencer activity is written, and to a separate file if desired (see
   [Node configuration reference](participate/node_config.md)).

@@ -112,6 +112,9 @@ large enough to never need them.
 More peers cost bandwidth proportionally, and `max_dynamic_peers` is what you turn down
 if upload is the constraint.
 
+One more thing the machine needs is a **clock synced to real time**; see
+*Keep the clock synced* below.
+
 ## Build
 
 Clone the repository to `<your_dir>/proxima`, then from the repository root run:
@@ -211,15 +214,56 @@ upgrade that has since activated is detected and discarded automatically.
 > using it: `proxi snapshot check --api.node_url <NODE_API>` (and `proxi snapshot
 > info` prints a file's metadata offline).
 
-## Run the node
+## Keep the clock synced
 
-**Keep your computer's clock synced to real time** (NTP). A single node cannot do much
-harm to the network, but a node whose clock is off by even a few seconds will
-struggle to keep up with the network consensus, so it is in the operator's own
-interest to stay as close to global clock time as possible. This matters most for
-**sequencer nodes** (which issue transactions) and for nodes that **serve wallets
-over the API** (helping them build transactions) — there the tighter the sync,
-the better.
+**Before starting the node, make sure the computer's clock is synced to real time
+with NTP.** This is not a nicety: in Proxima, ledger time *is* real time.
+
+There are no blocks and no block producers to agree on what time it is. Genesis is
+pinned to a real instant, every transaction carries a timestamp in ticks of
+80 milliseconds, and every node measures those timestamps against its own clock.
+A node that does not know the real time cannot take part in the consensus, and
+the only practical way to know it is to sync the clock to a global reference.
+
+What goes wrong when the clock is off:
+
+- **Every node** accepts a transaction only once its own clock has reached the
+  transaction's timestamp, and rejects one stamped more than six slots (about a
+  minute) ahead. With a slow clock, everything the network sends you is "from the
+  future": you hold it and fall behind. With a fast clock, everything you issue is
+  held by everyone else.
+- **A node that serves wallets** over the API stamps the transactions it helps
+  build: wallets take the timestamp from the node, not from their own clock. A
+  wrong clock here means every transaction the wallet submits is held or rejected
+  by the network.
+- **A sequencer** issues timestamped transactions continuously at its own clock
+  time. Running ahead, its transactions are held by its peers and miss the
+  endorsements that give it coverage. Running behind, it builds on tips the
+  network has already moved past. Either way it earns less, and a clock a few
+  slots off takes it out of the consensus altogether while the rest of the network
+  runs fine.
+
+**How accurate:** well under one tick, that is under 80 milliseconds. Ordinary NTP
+keeps a server within a few milliseconds of the reference, which is enough. An
+unsynced clock drifts by seconds per day, so "set once by hand" is not enough.
+
+**How to do it:**
+
+- *Linux.* Ubuntu and Debian ship `systemd-timesyncd` enabled. Check with
+  `timedatectl`: it must show `System clock synchronized: yes` and
+  `NTP service: active`. If it does not, run `sudo timedatectl set-ntp true`.
+  For a sequencer, `chrony` is the better choice, since it corrects drift
+  continuously and converges faster after a reboot: `sudo apt install chrony`
+  (it replaces timesyncd), then `chronyc tracking` shows the current offset from
+  NTP time in milliseconds.
+- *Windows.* Settings → Time & language → Date & time → *Set time automatically*
+  on. `w32tm /query /status` shows the last sync.
+- *macOS.* System Settings → General → Date & Time → *Set time and date
+  automatically* on.
+- *Virtual machines and containers* take the clock from the host. Make sure the
+  host syncs, and in a VM run an NTP client in the guest as well.
+
+## Run the node
 
 Start the node from the working directory:
 
