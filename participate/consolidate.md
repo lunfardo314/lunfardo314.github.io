@@ -21,8 +21,15 @@ proxi node consolidate
 The consolidator is a general wallet utility. It only looks at the wallet account, never at
 what fills it, so it serves a miner, a shop receiving payments, or anyone who wants a tidy
 wallet whose surplus keeps earning. Miners are the common case, and it does not matter which
-mining software they use, the official one from the Proxima repository or an optimized one
-of their own.
+mining software they use, the official one from the Proxima repository, an optimized one of
+their own, or a GPU miner.
+
+**For a miner it is the part that is not optional.** The miner itself can be replaced by any
+software that produces valid transits; the consolidator is what keeps the proceeds in
+consensus, and it is highly recommended to run it with whatever mines for you. Replacing it
+with something else makes sense only if you know exactly what you are doing, and skipping
+it makes sense only if you choose to [delegate by hand](participate/delegate.md) and keep
+at it.
 
 > `proxi node mine` only mines and leaves every payout where it lands. The consolidator,
 > run beside it on the same wallet profile, is what puts the payouts to work; see

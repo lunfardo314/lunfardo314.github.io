@@ -62,7 +62,9 @@ a GPU. Difficulty adapts to whatever hashrate shows up.
   is above 1 PROX never takes a transit, and the default minimum is 0.1 PROX.
 * Access to a node API — your own [access node](participate/run_access.md), or a public
   one.
-* CPU cores. The `proxi` miner runs on the CPU; a GPU miner is faster.
+* CPU cores. The `proxi` miner runs on the CPU; a GPU miner is faster, and you are free
+  to use one. The miner is the replaceable part of the setup; the consolidator beside it
+  is not, see below.
 
 This is the point of mining in a fair launch: it is the one way into Proxima that does
 not ask you to already hold tokens.
@@ -83,9 +85,17 @@ drawn by rating, and with `send_to_sequencer: own` in the profile it sends them 
 own sequencer instead. **Never run the miner alone for long.** Every transit leaves a
 separate payout output in your wallet; left there, the tokens sit outside consensus and
 are diluted, and every output is permanent state that every node on the network carries.
-If you would rather place the tokens yourself, the alternative is to [delegate by
-hand](participate/delegate.md) now and then; the consolidator still earns its keep by
-folding the payout outputs into one.
+
+The two are not equally replaceable. **The miner is optional.** `proxi node mine` is the
+reference implementation and nothing about it is privileged: an optimized miner, a GPU
+miner, or one you write yourself competes on exactly the same terms, since the only thing
+that decides anything is whether the transaction is valid. **The consolidator is not.**
+It is not a piece of mining software: it is the wallet process that keeps what you mine
+in consensus, it works with any miner because it only looks at the wallet, and there is
+no reason to replace it with anything else unless you know exactly what you are doing.
+Whatever mines for you, run `proxi node consolidate` beside it. The one alternative is
+to [delegate by hand](participate/delegate.md) now and then, and even then the
+consolidator earns its keep by folding the payout outputs into one.
 
 The miner runs until you stop it, or until the chain is exhausted. Useful options:
 

@@ -58,7 +58,10 @@ and every output is permanent state that every node on the network has to carry.
 without tidying up costs you and costs everyone else.
 
 The rule is simple: **a miner is two processes, the miner and the consolidator, on the
-same wallet.** `proxi node consolidate` is a background process that sweeps the wallet
+same wallet.** Of the two, the miner is the replaceable one: any software that produces
+valid transits, a GPU miner included, competes on the same terms as `proxi node mine`.
+The consolidator is not, and running it is highly recommended whatever mines for you.
+`proxi node consolidate` is a background process that sweeps the wallet
 and puts what is above a kept minimum into delegations, or to your own sequencer, and it
 works with any mining software, since it only looks at the wallet. How to run and
 configure it is on its own page: [The wallet consolidator](participate/consolidate.md),
