@@ -1,4 +1,4 @@
-# Active tokens
+# Put your tokens to work
 
 > **Pre-launch notice.** The network is in its centralized pre-launch phase. The founder can
 > stop or reset it at any time, without notice. Tokens mined or held on a pre-launch network
@@ -57,8 +57,12 @@ nothing, those outputs pile up: the tokens sit outside consensus and are slowly 
 and every output is permanent state that every node on the network has to carry. Mining
 without tidying up costs you and costs everyone else.
 
-You can tidy up by hand with `proxi node compact` and `proxi node delegate amount`, or
-leave it to `proxi node consolidate`, a background process that sweeps the wallet and
-sends what is above a kept minimum to your own sequencer or into delegations. It works
-with any mining software, since it only looks at the wallet. How to run and configure it
-is on its own page: [The wallet consolidator](participate/consolidate.md).
+The rule is simple: **a miner is two processes, the miner and the consolidator, on the
+same wallet.** `proxi node consolidate` is a background process that sweeps the wallet
+and puts what is above a kept minimum into delegations, or to your own sequencer, and it
+works with any mining software, since it only looks at the wallet. How to run and
+configure it is on its own page: [The wallet consolidator](participate/consolidate.md),
+and how to start it beside the miner is on [Mining](participate/mine.md). If you prefer
+to place your tokens yourself, delegate by hand with `proxi node delegate amount` and
+check on the delegations now and then; a delegation is a standing offer at a fixed cut,
+and a sequencer that raises its margin stops freezing it.

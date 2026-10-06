@@ -68,11 +68,24 @@ not ask you to already hold tokens.
 
 ## Running the miner
 
+Mining is **two processes on the same wallet profile**, started side by side:
+
 ```bash
-proxi node mine
+proxi node mine --disable_consolidation
+proxi node consolidate
 ```
 
-It runs until you stop it, or until the chain is exhausted. Useful options:
+The first one mines. The second one, [the wallet consolidator](participate/consolidate.md),
+sweeps the payouts and puts them to work: by default it delegates them to a sequencer
+drawn by rating, and with `send_to_sequencer: own` in the profile it sends them to your
+own sequencer instead. **Never run the miner alone for long.** Every transit leaves a
+separate payout output in your wallet; left there, the tokens sit outside consensus and
+are diluted, and every output is permanent state that every node on the network carries.
+If you would rather place the tokens yourself, the alternative is to [delegate by
+hand](participate/delegate.md) now and then; the consolidator still earns its keep by
+folding the payout outputs into one.
+
+The miner runs until you stop it, or until the chain is exhausted. Useful options:
 
 | Flag | Meaning |
 |------|---------|
@@ -84,12 +97,11 @@ It runs until you stop it, or until the chain is exhausted. Useful options:
 | `--stream URL,…` | Additional node endpoints to receive mining transactions from. **Worth setting** — see below. |
 | `--no-stream` | Do not subscribe to the stream at all. Slower, and you will usually lose. |
 | `--refetch N` | Seconds to mine one target before re-stamping it. Default 0 — adaptive to the measured hashrate. Whatever the window, a target is re-stamped as soon as the clock leaves its slot, since every later slot is one bit easier. |
-| `--disable_consolidation` | Only mine. The payouts stay in the wallet as they are mined; nothing is compacted or delegated by the miner. **Use it when `proxi node consolidate` runs on the same wallet**, so the two do not spend the same outputs. |
+| `--disable_consolidation` | Only mine; leave the payouts to `proxi node consolidate`. Always pass it when the consolidator runs on the same wallet, so the two do not spend the same outputs. On the next network it has no effect, because the miner only mines. |
 
-The flags below drive the miner's built-in tidy-up of its payouts. **They are deprecated**:
-that job now belongs to `proxi node consolidate`, a separate process that works with any
-miner, and the built-in tidy-up will be removed from the miner. See
-[The wallet consolidator](participate/consolidate.md).
+The flags below drive the miner's own tidy-up of its payouts, the one the flag above
+turns off. **They are deprecated** and go away with the next network: that job belongs
+to the consolidator, which works with any miner.
 
 | Flag | Meaning |
 |------|---------|
@@ -156,21 +168,29 @@ what it has seen.
 
 ## What happens to what you mine
 
-Every confirmed transit leaves a payout output in your wallet. Left alone these
-accumulate: the tokens sit outside consensus and are diluted, and every output is
-permanent state that every node on the network carries.
+Every confirmed transit leaves a payout output in your wallet, and that is where the
+miner's job ends. What the tokens do next is up to you, and doing nothing is the one
+choice that costs you: tokens outside consensus earn no inflation and are diluted by
+those that do, and a pile of small outputs is permanent state every node has to carry.
+Why that is so is on [Put your tokens to work](participate/active_tokens.md).
 
-**The way to deal with it is `proxi node consolidate`**, a separate process you run in
-the background on the same wallet profile. It sweeps the payouts and either sends them to
-your own sequencer or delegates them, and it does so whatever mining software produced
-them. How to run it is on [The wallet consolidator](participate/consolidate.md) page, and
-why idle tokens lose value on [Active tokens](participate/active_tokens.md).
+Two ways to handle it:
+
+* **Run the consolidator**, as shown above. It sweeps the payouts into delegations, or
+  to your own sequencer, and keeps those delegations placed when a sequencer changes its
+  price. This is the default and the recommended way; it works with any mining software,
+  since it only looks at the wallet.
+* **Delegate by hand** with `proxi node delegate amount`, and keep an eye on your
+  delegations with `proxi node delegate status`, since a delegation is a standing offer
+  at a fixed cut and a sequencer that raises its margin stops freezing it. Even then,
+  run the consolidator with `autodelegate: none` so the payout outputs are at least
+  folded into one.
 
 > **Deprecated.** The rest of this section describes the tidy-up built into
-> `proxi node mine` itself. It still runs by default, but it is superseded by the
-> consolidator and will be removed. Until then, when the consolidator runs on the same
-> wallet start the miner with `--disable_consolidation`, so the two do not spend the
-> same outputs.
+> `proxi node mine` itself on the current network. It is superseded by the consolidator
+> and is removed on the next network. Until then, start the miner with
+> `--disable_consolidation` whenever the consolidator runs on the same wallet, so the two
+> do not spend the same outputs.
 
 So the miner cleans up after itself:
 

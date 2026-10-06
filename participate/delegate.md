@@ -235,6 +235,22 @@ alternative (a lower cut, or a smaller amount) that you can accept or decline.
 The command creates the delegation output with your tokens and the delegation lock. A few
 slots later the sequencer consumes it, adds the advance, and freezes it.
 
+### A delegation is a standing offer at a fixed price
+
+The cut you chose is written into the delegation and stays there for its whole life. The
+sequencer accepts it freeze after freeze for as long as that cut leaves it its margin.
+But a sequencer may raise its margin at any time, and when it does, every delegation
+whose cut it can no longer cover is simply left alone: the sequencer does not freeze it,
+nobody else can touch it, and the tokens sit unfrozen, earning nothing and diluted like
+any idle holding. Nothing on the ledger moves them for you, because only you can.
+
+So a delegation made by hand is not fire-and-forget. Either look at it from time to time
+with `proxi node delegate status`, and if its target no longer freezes it, end it and
+delegate again at the going rate, or let [the wallet consolidator](participate/consolidate.md)
+do that for you: among other things it re-delegates any of your delegations whose target
+has become inactive or refuses it as loss-making, to a sequencer drawn by the current
+rating. Running it once in delegation mode is enough to re-place a stranded delegation.
+
 ## The freeze period
 
 While frozen, your tokens work for the sequencer (you already have your cut in your

@@ -115,6 +115,62 @@ if upload is the constraint.
 One more thing the machine needs is a **clock synced to real time**; see
 *Keep the clock synced* below.
 
+## Where the node sits in the network
+
+Bandwidth is not the whole story. In Proxima the consensus runs on a clock, so
+**how far your node is from the other nodes, in round-trip time, decides how well
+it takes part.** Some numbers to keep in mind:
+
+* a slot lasts about ten seconds, and the sequencers issue transactions
+  continuously, many per slot;
+* a sequencer endorses the transactions of other sequencers **within the same
+  slot**, and the slot ends with a branch that commits the state;
+* the chain the network settles on is the one with the biggest **ledger coverage**,
+  which in practice means the one most of the token mass has built on.
+
+Picture the sequencers weighted by the tokens behind them, their own balance plus
+what is frozen in delegations to them, and the links between them weighted by
+round-trip time. Somewhere in that picture is the network's **centre of mass**: the
+place where the heaviest branches are built and seen first. A node near it sees
+the winning branch early and learns which transactions are settled within the
+slot. A node far from it hears everything late: by the time it has seen a branch,
+the rest of the network is already building on the next one.
+
+What that costs depends on what the node does:
+
+* **An access node** that only follows the ledger loses little; it syncs a little
+  behind the others and that is all.
+* **An access node that serves wallets** hands the transactions it receives to
+  the network. A transaction that reaches the sequencers late is picked up a slot
+  later, and under load it competes with fresher ones. The wallet sees slower
+  confirmation, nothing worse.
+* **A sequencer** is where distance really costs. Its transactions must reach the
+  other sequencers in time to be endorsed in the same slot, and its branches must
+  arrive before the others have committed to a competitor. A sequencer that is far
+  from the centre of mass is endorsed less, loses most of the branches it
+  proposes, and therefore earns less: fewer endorsements, less coverage, fewer
+  branch bonuses. Being big does not help if you are far away.
+
+So, in practical terms:
+
+* **Host the node in a data centre with low round-trip time to the active
+  sequencers**, not on a home connection. A residential or mobile link behind NAT
+  adds latency, drops packets, and changes address; the network sees such a node
+  as a peer that keeps disappearing. At the time of writing the active sequencers
+  sit in Europe.
+* **Peer with the sequencers directly.** Autopeering finds nodes, but it does not
+  know which ones matter. Put several of the active sequencer nodes, or the
+  public nodes closest to them, under `peering.peers` as static peers, so your
+  transactions and theirs travel one hop.
+* **Check the distance.** Every node serves a peers page in the browser at
+  `/peers`, for example `http://<node address>:8001/peers`, with the round-trip
+  time to each peer. Tens of milliseconds to the sequencers is good; hundreds
+  means your node is on the wrong continent for a sequencer, though fine for an
+  access node.
+* **Keep the UDP port open.** Peering runs over QUIC on the configured UDP port.
+  A firewall or NAT that lets you dial out but blocks inbound connections halves
+  your connectivity: nobody can reach you, you reach everybody.
+
 ## Build
 
 Clone the repository to `<your_dir>/proxima`, then from the repository root run:

@@ -9,7 +9,7 @@
 Any wallet that receives tokens in many small pieces ends up with a pile of outputs: mine
 rewards, incoming payments, fees returned by a sequencer that never took them. Each piece
 is permanent state that every node carries, and tokens sitting in a pile earn nothing and
-are slowly diluted (see [Active tokens](participate/active_tokens.md)). You can tidy up by
+are slowly diluted (see [Put your tokens to work](participate/active_tokens.md)). You can tidy up by
 hand: `proxi node compact` sweeps the outputs into one, and `proxi node delegate amount`
 puts them to work. For a wallet that keeps receiving, that is not convenient. So there is
 a command that does it for you, continuously, in the background:

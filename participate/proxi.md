@@ -83,7 +83,7 @@ delegate:
     minimum_cut: 900
 
 consolidate:
-    # settings of 'proxi node consolidate'; see the Active tokens page
+    # settings of 'proxi node consolidate'; see the consolidator page
     threshold_prox: 1000
     minimum_balance_prox: 100
     max_inputs: 30
@@ -282,7 +282,7 @@ which a sequencer does automatically. After the window your wallet can reclaim i
   kept minimum to a sequencer or into a delegation, as configured in the `consolidate`
   section of the profile. It only looks at the wallet, so it works with any mining
   software and for any wallet. See [The wallet consolidator](participate/consolidate.md)
-  for the settings, and [Active tokens](participate/active_tokens.md) for why.
+  for the settings, and [Put your tokens to work](participate/active_tokens.md) for why.
 
 * `proxi node compact scan` reports everything the account can consume, by category,
   without building any transaction. Useful before compacting.

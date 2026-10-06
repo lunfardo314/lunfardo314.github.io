@@ -37,8 +37,9 @@ sequencer per node**.
 >
 > A bigger balance does not by itself make a sequencer more competitive. What
 > decides that is how close it sits to the network's *centre of mass*, where mass
-> is balance plus frozen coverage and distance is round-trip time — beyond the
-> scope of this page. What the balance does show is how much the operator has
+> is balance plus frozen coverage and distance is round-trip time; see
+> [Where the node sits in the network](participate/run_access.md?id=where-the-node-sits-in-the-network).
+> What the balance does show is how much the operator has
 > committed to providing sequencing services to other token holders — skin in the
 > game — which is why delegators and users tend to prefer heavier sequencers.
 >
