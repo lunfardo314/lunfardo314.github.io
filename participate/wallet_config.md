@@ -42,7 +42,7 @@ profile's API settings. The node itself is configured separately — see
 | `consolidate.max_inputs` | int | Outputs one consolidating transaction consumes (2–256). Default `30` |
 | `consolidate.compact_at` | int | Fold the outputs into one once this many have piled up, even below the threshold. Default `10` |
 | `consolidate.send_to_sequencer` | `own`, hex chain ID or empty | Where the consolidator sends what is above the minimum. Default empty |
-| `consolidate.autodelegate` | `random`, hex chain ID or empty | Delegation target when `send_to_sequencer` is empty. Default empty |
+| `consolidate.autodelegate` | `random`, hex chain ID or `none` | Delegation target when `send_to_sequencer` is empty. Default `random` |
 | `consolidate.max_delegations` | int | Cap on the consolidator's own delegations. Default `10` |
 
 ---
@@ -226,7 +226,7 @@ Every key has a command-line flag of the same name that overrides it. See
 | `consolidate.max_inputs` | int, 2–256 | `30` | Most outputs one consolidating transaction consumes, smallest first; the rest wait for a later pass. Flag `--max-inputs`. |
 | `consolidate.compact_at` | int | `10` | Fold the outputs into one as soon as this many have piled up, even below the threshold; in that case nothing leaves the wallet. Flag `--compact-at`. |
 | `consolidate.send_to_sequencer` | `own`, chain ID or empty | empty | `own` sends everything above the minimum to `wallet.sequencer_id`, which must be controlled by this wallet; a sequencer ID sends it to that sequencer; empty disables sending. Flag `--send-to-sequencer`. |
-| `consolidate.autodelegate` | `random`, chain ID or empty | empty | Applies only when `send_to_sequencer` is empty. `random` delegates to an active sequencer drawn on every action, biased by a rating on the share of the inflation it leaves, its balance and how much is already delegated to it (see [The wallet consolidator](participate/consolidate.md)); a sequencer ID always delegates to that one; empty only folds the outputs into one. Flag `--autodelegate`. |
+| `consolidate.autodelegate` | `random`, chain ID or `none` | `random` | Applies only when `send_to_sequencer` is empty. `random` delegates to an active sequencer drawn on every action, biased by a rating on the share of the inflation it leaves, its balance and how much is already delegated to it (see [The wallet consolidator](participate/consolidate.md)); a sequencer ID always delegates to that one; `none` only folds the outputs into one, and empty reads as `random`. Flag `--autodelegate`. |
 | `consolidate.target_delegations` | int | `5` | Number of delegations the consolidator builds up to; beyond it existing ones are topped up and extra ones folded together. The older key `max_delegations` is read when this one is absent. Flag `--target-delegations`. |
 | `consolidate.target_delegation_prox` | uint, PROX | `10000` | Size a delegation is grown to before the next one is started. Flag `--target-delegation-prox`. |
 
@@ -237,7 +237,7 @@ consolidate:
   max_inputs: 30
   compact_at: 10
   send_to_sequencer:
-  autodelegate:
+  autodelegate: random
   target_delegations: 5
   target_delegation_prox: 10000
 ```
@@ -315,7 +315,7 @@ consolidate:
     max_inputs: 30
     compact_at: 10
     send_to_sequencer:
-    autodelegate:
+    autodelegate: random
     target_delegations: 5
     target_delegation_prox: 10000
 ```

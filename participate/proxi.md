@@ -89,7 +89,7 @@ consolidate:
     max_inputs: 30
     compact_at: 10
     send_to_sequencer:
-    autodelegate:
+    autodelegate: random
     max_delegations: 10
 ```
 

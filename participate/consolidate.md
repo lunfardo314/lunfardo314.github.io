@@ -57,11 +57,11 @@ chosen in the wallet profile:
   sequencer's capital and earn inflation without a cut. Before each transfer the
   consolidator checks that the sequencer is really controlled by this wallet and is
   currently active;
-* **into a delegation**: `autodelegate: random` draws an active sequencer on every
-  action, `autodelegate: <sequencer ID>` always delegates to that one. How the draw and
-  the delegations work is described below;
-* **nowhere**: with both settings empty the tokens stay in the wallet, folded into a single
-  output. Better than a pile, but still diluted, so set one of the two above.
+* **into a delegation**, the default: `autodelegate: random` draws an active sequencer on
+  every action, `autodelegate: <sequencer ID>` always delegates to that one. How the draw
+  and the delegations work is described below;
+* **nowhere**: with `autodelegate: none` the tokens stay in the wallet, folded into a
+  single output. Better than a pile, but still diluted.
 
 Sending takes precedence over delegating. If the chosen destination cannot be used right
 now, for example the target sequencer has not produced anything recently, the consolidator
@@ -128,8 +128,9 @@ consolidate:
     # 'own' sends everything above the minimum to wallet.sequencer_id;
     # a sequencer ID sends it to that sequencer; empty leaves it in the wallet
     send_to_sequencer:
-    # applies only when send_to_sequencer is empty: 'random' or a sequencer ID
-    autodelegate:
+    # applies only when send_to_sequencer is empty: 'random' (the default),
+    # a sequencer ID, or 'none' to only fold the outputs
+    autodelegate: random
     # number of delegations to build up to
     target_delegations: 5
     # size a delegation is grown to before the next one is started, in PROX
@@ -143,7 +144,7 @@ consolidate:
 | `max_inputs` | `--max-inputs` | 30 | Outputs one transaction consumes, 2 to 256. |
 | `compact_at` | `--compact-at` | 10 | Fold the outputs into one once this many have piled up, even below the threshold. |
 | `send_to_sequencer` | `--send-to-sequencer` | empty | `own`, a sequencer ID, or empty. |
-| `autodelegate` | `--autodelegate` | empty | `random`, a sequencer ID, or empty. Ignored while `send_to_sequencer` is set. |
+| `autodelegate` | `--autodelegate` | `random` | `random`, a sequencer ID, or `none`. Empty reads as `random`. Ignored while `send_to_sequencer` is set. |
 | `target_delegations` | `--target-delegations` | 5 | Number of delegations to build up to; beyond it existing ones are topped up, extra ones are folded together. The older name `max_delegations` is still read when this key is absent. |
 | `target_delegation_prox` | `--target-delegation-prox` | 10000 | Size a delegation is grown to before the next one is started, in PROX. |
 
