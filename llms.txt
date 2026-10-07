@@ -61,6 +61,7 @@ An ordered four-page spine, then reference pages behind it.
 - [Launch phase network](https://lunfardo314.github.io/participate/launch_network.md): what the launch phase network is and how to reach it.
 - [Delegation](https://lunfardo314.github.io/participate/delegate.md): how to put tokens to work by delegating them, without running anything.
 - [Mining](https://lunfardo314.github.io/participate/mine.md): the fair launch — at genesis only 6% of the final supply exists; the rest is mined.
+- [Pluggable nonce seekers](https://lunfardo314.github.io/participate/nonce_seeker.md): moving the miner's nonce search into an external program, the reference Rust seeker, and how to write one.
 - [Active tokens](https://lunfardo314.github.io/participate/active_tokens.md): why tokens that earn no inflation are diluted, and what to do with mined tokens.
 - [The wallet consolidator](https://lunfardo314.github.io/participate/consolidate.md): `proxi node consolidate`, the background process that sweeps any wallet's scattered outputs and sends what is above a kept minimum to a sequencer or into delegations.
 - [proxi CLI wallet](https://lunfardo314.github.io/participate/proxi.md): the command-line wallet and tool.

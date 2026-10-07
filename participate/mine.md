@@ -63,8 +63,10 @@ a GPU. Difficulty adapts to whatever hashrate shows up.
 * Access to a node API — your own [access node](participate/run_access.md), or a public
   one.
 * CPU cores. The `proxi` miner runs on the CPU; a GPU miner is faster, and you are free
-  to use one. The miner is the replaceable part of the setup; the consolidator beside it
-  is not, see below.
+  to use one. The search for a nonce can also be handed to a separate program while
+  `proxi` keeps doing the rest, see [Pluggable nonce seekers](participate/nonce_seeker.md).
+  The miner is the replaceable part of the setup; the consolidator beside it is not, see
+  below.
 
 This is the point of mining in a fair launch: it is the one way into Proxima that does
 not ask you to already hold tokens.
@@ -113,6 +115,17 @@ The miner used to tidy up its own payouts and carried a set of flags for that. I
 longer does: `proxi node mine` only mines, and the old flags are gone. The one that
 remains, `--disable_consolidation`, is accepted so that old start scripts keep working
 and has no effect.
+
+## Faster searching: nonce seekers
+
+Of everything the miner does, only the search for the nonce is work; the rest is
+bookkeeping around the mine chain. So the search can be moved out of `proxi`. With
+`mine.seeker.listen` set in the wallet profile, `proxi node mine` hands its current
+target to any number of external **nonce seekers**, checks the nonces they return,
+and does everything else as before. Proxima ships a reference seeker in Rust, about
+twice as fast per core as the miner's own workers, and the same interface serves a GPU
+seeker or one you write yourself. Configuration, running and the interface are on
+[Pluggable nonce seekers](participate/nonce_seeker.md).
 
 ## A quiet start
 

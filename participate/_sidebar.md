@@ -4,6 +4,7 @@ Join Proxima
 - [The `proxi` wallet](participate/proxi.md)
 - [Wallet configuration](participate/wallet_config.md)
 - [Mining](participate/mine.md)
+- [Pluggable nonce seekers](participate/nonce_seeker.md)
 - [Put your tokens to work](participate/active_tokens.md)
 - [The wallet consolidator](participate/consolidate.md)
 - [Delegation](participate/delegate.md)
