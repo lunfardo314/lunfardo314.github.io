@@ -1,9 +1,11 @@
 The site is dedicated to the [Proxima project](https://github.com/lunfardo314/proxima).
 
-> ### Network status: **running**
+> ### Network status: **stopped**
 >
-> The pre-launch network is running. This is its centralized phase: it can be
-> stopped and reset at any time, without notice, and tokens on it are temporary.
+> The pre-launch network (take 0) has been stopped. The next take is being
+> prepared; its genesis details will be published here when it starts. This is
+> the centralized phase: a network can be stopped and reset at any time, without
+> notice, and tokens on it are temporary.
 >
 > - Ledger description: `Proxima ledger take 0`
 > - Genesis time (slot 0): `2026-09-10 06:35:05 UTC` (Unix `1789022105`)
