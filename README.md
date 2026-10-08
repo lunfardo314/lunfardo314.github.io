@@ -6,17 +6,6 @@ The site is dedicated to the [Proxima project](https://github.com/lunfardo314/pr
 > phase: a network can be stopped and reset at any time, without notice, and
 > tokens on it are temporary.
 >
-> <!--
-> - Ledger description: `Proxima ledger take 0`
-> - Genesis time (slot 0): `2026-09-10 06:35:05 UTC` (Unix `1789022105`)
-> - Ledger definitions hash: `aee726b6bb2e29bf37277ed0cf14f04e239b2d2050e19be9f0b8a6bae824cccf`
-> - Genesis controller public key: `872c48cbadfa6bc86d7046bf74e6c38be243fb30cebc4a9cbeaa33fc34e3bdd2`
-> - Genesis file (slot 0 snapshot, 137 KB):
->   [s0-0-030000000000000000000000000000000000000000000000000000.snapshot](https://lunfardo314.github.io/static/genesis/s0-0-030000000000000000000000000000000000000000000000000000.snapshot),
->   SHA-256 `367cfdf637bf7491779496f20f2a2b2262f386d4cf4316297b93c6995293a163`
-> - [Network monitor](http://65.21.170.230:8001/monitor)
-> -->
->
 > **The next take is being prepared.** Its genesis details will be published here
 > when it starts.
 >
