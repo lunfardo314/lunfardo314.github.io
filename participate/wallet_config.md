@@ -33,6 +33,7 @@ profile's API settings. The node itself is configured separately — see
 | `wallet.holder_id` | hex | Optional consistency check against the key file                 |
 | `wallet.sequencer_id` | hex chain ID | Sequencer controlled by this wallet (for `seq withdraw` etc)    |
 | `api.node_url` | URL | Base URL of the node API `proxi` talks to (legacy name: `api.endpoint`) |
+| `api.node_urls` | list of URLs | Witness nodes that confirm the branch the ledger library is proven against; nothing else is fetched from them. Empty disables the check with a warning |
 | `api.timeout_sec` | int | Optional HTTP client timeout (seconds)                          |
 | `tag_along.fee` | uint64 | Preferred tag-along fee; the sequencer's declared minimum wins if larger |
 | `tag_along.sequencer_id` | hex chain ID or `random` | Tag-along sequencer (`random` = pick an active one; falls back to default only when unset) |
@@ -95,16 +96,51 @@ How `proxi` reaches the node's REST API.
 |-----|------|---------|-------------|
 | `api.node_url` | URL | (required) | Base URL of the node API, e.g. `http://127.0.0.1:8000`. Must point at the node's `api.port` (see [`node_config.md` § `api`](participate/node_config.md)). Overridable per-command via the `--api.node_url` flag on `node`/`snapshot` subcommands. |
 | `api.endpoint` | URL | — | Legacy name of `api.node_url`, still read (and still accepted as `--api.endpoint`) so existing profiles keep working. `api.node_url` wins if both are set. |
+| `api.node_urls` | list of URLs | empty (the generated profile lists the public nodes) | Witness nodes. Asked to confirm the branch the node's ledger library is proven against, and nothing else. Every reachable witness must confirm it; see below. Entries equal to `api.node_url` and repeats are ignored. |
 | `api.timeout_sec` | int | (client default) | HTTP client timeout in seconds. Only applied when `> 0`; otherwise the client default is used. Not written by `proxi config wallet` — add it manually if needed. |
 
 ```yaml
 api:
   node_url: http://127.0.0.1:8000
+  node_urls:
+    - http://65.21.170.230:8001
+    - http://79.137.70.25:8001
+    - http://51.254.47.76:8001
   # timeout_sec: 30
 ```
 
 > Cross-reference: `api.node_url`'s port must equal the node's `api.port`
 > (`proxima.yaml`). The public access nodes serve the API on `:8001`.
+
+### Witness nodes: why the wallet talks to more than one node
+
+`proxi` builds every transaction with the ledger library, the set of rules in force,
+which it fetches from the node at `api.node_url` over plain HTTP. Nothing the wallet
+spends can be stolen through that connection: a transaction commits to the exact
+outputs it consumes, so a node that lies about your balance or your outputs only
+makes the network reject what you sign. The one thing a lying or intercepted node
+could do is hand the wallet a doctored library, and so change what the outputs it
+*creates* mean.
+
+So the wallet does not take the library on trust. The node returns it together
+with a proof that the ledger commits to it: a recent branch of the ledger, and a
+Merkle proof that the state behind that branch holds exactly this library. The
+wallet checks the proof itself. What it cannot check alone is that the branch is
+real, and that is what the witnesses are for: before the library is used, `proxi`
+asks every node in `api.node_urls` whether it has committed that branch. A branch
+the other nodes have committed is one the network produced.
+
+The rules, once per `proxi` command:
+
+- every witness that answers must confirm the branch; one that does not know it
+  fails the command, with the witness and the branch named in the message;
+- a witness that does not answer at all is skipped with a warning;
+- if no witness answers, the command fails rather than proceed unconfirmed;
+- an empty list skips the check with a warning. Use that on a standalone or
+  private network, where the public nodes know nothing of your branches.
+
+The witnesses are asked about branch IDs and nothing else. Balances, outputs and
+the transactions you submit go only to `api.node_url`.
 
 ---
 
@@ -279,6 +315,7 @@ ensures a key file exists:
    - `default_sequencer_id:` set to the bootstrap sequencer ID, and
      `wallet.sequencer_id:` left commented out
    - `api.node_url: http://127.0.0.1:8000`, plus the public nodes as commented hints
+   - `api.node_urls:` the public nodes, as witnesses
    - `tag_along.fee: 1` and `tag_along.sequencer_id: random`
    - `delegate.minimum_cut: 900`
 
@@ -300,6 +337,10 @@ api:
     node_url: http://127.0.0.1:8000
     # hloc0: http://65.21.170.230:8001
     # oseq1: http://79.137.70.25:8001
+    node_urls:
+        - http://65.21.170.230:8001
+        - http://79.137.70.25:8001
+        - http://51.254.47.76:8001
 
 tag_along:
     fee: 1
@@ -321,7 +362,8 @@ consolidate:
 
 The commented API endpoints are the public access points a wallet is pointed at.
 A node can be a static peer and a sync source without being one of them, so
-`proxima.yaml` may list more nodes than this.
+`proxima.yaml` may list more nodes than this. The witness list under `node_urls`
+holds every public node; whichever of them is also your `node_url` is skipped.
 
 Out of the box the profile therefore tags along to whichever sequencer is
 active, at whatever fee that sequencer requires. Replace `random` with a chain

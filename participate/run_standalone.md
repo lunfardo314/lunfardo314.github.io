@@ -33,7 +33,10 @@ generated file; the settings are the same.)
 This single command creates **both** the ED25519 key and the wallet profile. It
 generates the key from system entropy, writes it to `proxima.key` (a small JSON
 keystore), and writes the profile to `proxi.yaml` (the default profile name is
-`proxi`). The generated profile:
+`proxi`). The generated profile lists the public nodes as witnesses under
+`api.node_urls`; **empty that list** before using the profile against a standalone
+node, because the public nodes know nothing of your network's branches and every
+command would fail. The profile, so adjusted:
 
 ```yaml
 # default sequencer ID is used when own or tag-along sequencer is not specified
@@ -46,6 +49,9 @@ wallet:
     # sequencer_id: <own sequencer ID>
 api:
     node_url: http://127.0.0.1:8000
+    # witness nodes: leave the list empty on a standalone network, the public nodes
+    # know nothing of its branches and every command would fail
+    node_urls: []
 
 tag_along:
     # preferred fee paid to a sequencer so the tx gets pulled; the sequencer's own

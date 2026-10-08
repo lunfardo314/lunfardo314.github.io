@@ -72,6 +72,11 @@ api:
     # public access points, offered as hints:
     # hloc0: http://65.21.170.230:8001
     # oseq1: http://79.137.70.25:8001
+    # witness nodes: asked only to confirm the branch the ledger library is proven against
+    node_urls:
+        - http://65.21.170.230:8001
+        - http://79.137.70.25:8001
+        - http://51.254.47.76:8001
 
 tag_along:
     # preferred tag-along fee, and which sequencer to tag along to
@@ -117,6 +122,13 @@ it creates the chain; while it is unset, `default_sequencer_id` is used instead.
 (`http://127.0.0.1:8000`). **Change it to the address of the node you want to use** —
 for example one of the public access points of the
 [launch phase network](participate/launch_network.md).
+
+`api.node_urls` lists the witness nodes. The wallet accepts the ledger rules it
+builds transactions with only together with a proof that the ledger commits to them,
+and asks these nodes to confirm the branch that proof is anchored to, so a lying or
+intercepted `api.node_url` cannot hand it doctored rules. The generated list holds the
+public nodes and needs no change for the launch phase network. See
+[Wallet configuration](participate/wallet_config.md) for the rules.
 
 `delegate.minimum_cut` is the delegator cut this wallet requires of any sequencer it
 delegates to, in promille — the share of the delegation's inflation that must come back
