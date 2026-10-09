@@ -18,8 +18,43 @@ any number of external programs, called **nonce seekers**. A seeker can be the r
 one shipped with Proxima, written in Rust and about twice as fast per core as the miner's
 own workers, or one you write yourself, for a GPU or anything else.
 
-This page covers configuring the miner for seekers, running the reference seeker, and
-what you need to know to write your own.
+This page covers the short way, where the miner starts the reference seeker itself,
+configuring the miner for seekers you run yourself, running the reference seeker by
+hand, and what you need to know to write your own.
+
+## The short way: let the miner start it
+
+On the machine that mines, with the reference seeker built once (see
+[Running the reference seeker](#running-the-reference-seeker) for the build) and placed
+on the PATH or next to `proxi`:
+
+```bash
+proxi node mine --seeker
+```
+
+That is the whole setup. The miner opens its job server on a free loopback port, makes up
+a token for it, starts the seeker with the port, the token, the key file and the number
+of threads filled in, and hands it the passphrase it unlocked the key with, so an
+encrypted key is asked for once. The seeker's lines appear in the miner's output marked
+`[seeker]`; if it exits, the miner starts it again; when the miner stops, the seeker
+stops with it. The miner's own workers are off in this mode, since the seeker is faster;
+`--workers N` adds some back.
+
+The same, in the wallet profile, so that a plain `proxi node mine` does it every time:
+
+```yaml
+mine:
+    seeker:
+        spawn: true
+        # the binary to start; empty means 'nonce_seeker' on the PATH or beside proxi
+        binary:
+        # search threads; 0 means every core
+        threads: 0
+```
+
+Leave a few cores free with `threads` when the machine also runs a node. Seekers on
+other machines can still connect to the same miner: set `listen` and `token` as
+described next, and the spawned one and the remote ones share the work.
 
 ## How it fits together
 
@@ -66,7 +101,9 @@ prints the address in its banner. Everything else about the miner stays as it wa
 
 * The miner's own workers keep running next to the seekers. Start it with
   `--workers 0` to leave the whole search to the seekers; the miner then only waits for
-  their solutions. Without a listener `--workers 0` still means one worker.
+  their solutions. Without any seeker configured, `--workers 0` is refused with a
+  message, so a miner that was meant to hand the search away never quietly mines on
+  one core instead.
 * `--max-hashrate-khs` and `--nonce-start` apply to the local workers only. Seekers pace
   themselves.
 * `proxi node consolidate` runs beside the miner exactly as before. Seekers change
@@ -90,8 +127,14 @@ cd proxi/node_cmd/mine/nonce_seeker
 cargo build --release
 ```
 
-The binary is `target/release/nonce_seeker`. Copy it to wherever it should run, together
-with the wallet's key file, and start it:
+The binary is `target/release/nonce_seeker`. For the short way above, put it on the
+PATH, for example with `sudo install -m 755 target/release/nonce_seeker /usr/local/bin/`,
+or next to `proxi`. Adding `RUSTFLAGS="-C target-cpu=native"` before `cargo build` lets
+it use the vector instructions of the machine it is built on, for a few percent more.
+
+To run it by hand, on the same machine or another one, copy it to wherever it should
+run, together with the wallet's key file, and start it against a miner that has
+`listen` set:
 
 ```bash
 nonce_seeker --proxi http://127.0.0.1:8100 --token choose-something-long --key-file proxima.key
@@ -150,7 +193,7 @@ switch to a new key.
 
 The protocol is three HTTP calls with JSON bodies, and the work is one well-defined
 computation. The complete specification, with every field and status code, is
-[`kb/external_nonce_seeker.md`](https://github.com/lunfardo314/proxima/blob/develop-take1/kb/external_nonce_seeker.md)
+[`kb/external_nonce_seeker.md`](https://github.com/lunfardo314/proxima/blob/develop/kb/external_nonce_seeker.md)
 in the repository; what follows is the shape of it.
 
 **The calls.** `GET /seeker/job` returns the current job, and with `?after=<id>&wait=<ms>`

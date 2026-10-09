@@ -119,12 +119,13 @@ and has no effect.
 ## Faster searching: nonce seekers
 
 Of everything the miner does, only the search for the nonce is work; the rest is
-bookkeeping around the mine chain. So the search can be moved out of `proxi`. With
-`mine.seeker.listen` set in the wallet profile, `proxi node mine` hands its current
-target to any number of external **nonce seekers**, checks the nonces they return,
-and does everything else as before. Proxima ships a reference seeker in Rust, about
-twice as fast per core as the miner's own workers, and the same interface serves a GPU
-seeker or one you write yourself. Configuration, running and the interface are on
+bookkeeping around the mine chain. So the search can be moved out of `proxi` to
+external **nonce seekers**: the miner hands them its current target, checks the nonces
+they return, and does everything else as before. Proxima ships a reference seeker in
+Rust, about twice as fast per core as the miner's own workers; with it built and on the
+PATH, `proxi node mine --seeker` starts it beside the miner and wires everything up by
+itself. The same interface serves a seeker on another machine, a GPU seeker or one you
+write yourself. Configuration, running and the interface are on
 [Pluggable nonce seekers](participate/nonce_seeker.md).
 
 ## A quiet start

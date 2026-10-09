@@ -38,13 +38,19 @@ profile's API settings. The node itself is configured separately — see
 | `tag_along.fee` | uint64 | Preferred tag-along fee; the sequencer's declared minimum wins if larger |
 | `tag_along.sequencer_id` | hex chain ID or `random` | Tag-along sequencer (`random` = pick an active one; falls back to default only when unset) |
 | `delegate.minimum_cut` | uint (promille) | Delegator cut this wallet requires from a delegation target. Default `900` |
-| `consolidate.threshold_prox` | uint (PROX) | `proxi node consolidate` acts once the consumable balance exceeds this, over at least two outputs. Default `1000` |
+| `consolidate.threshold_prox` | uint (PROX) | `proxi node consolidate` acts once the consumable balance exceeds this, over at least two outputs. Default `300` |
 | `consolidate.minimum_balance_prox` | uint (PROX) | Balance the consolidator always keeps in the wallet on plain outputs. Default `100` |
 | `consolidate.max_inputs` | int | Outputs one consolidating transaction consumes (2–256). Default `30` |
 | `consolidate.compact_at` | int | Fold the outputs into one once this many have piled up, even below the threshold. Default `10` |
 | `consolidate.send_to_sequencer` | `own`, hex chain ID or empty | Where the consolidator sends what is above the minimum. Default empty |
 | `consolidate.autodelegate` | `random`, hex chain ID or `none` | Delegation target when `send_to_sequencer` is empty. Default `random` |
-| `consolidate.max_delegations` | int | Cap on the consolidator's own delegations. Default `10` |
+| `consolidate.target_delegations` | int | Number of delegations the consolidator builds up to. Default `5` (the older key `max_delegations` is read when absent) |
+| `consolidate.target_delegation_prox` | uint (PROX) | Size a delegation is grown to before the next one is started. Default `10000` |
+| `mine.seeker.listen` | address | Address `proxi node mine` serves jobs on to external nonce seekers. Empty means none |
+| `mine.seeker.token` | string | Shared secret the seekers present. Empty means none |
+| `mine.seeker.spawn` | bool | `true` makes the miner start the reference seeker itself, wired up automatically. Default `false` |
+| `mine.seeker.binary` | path | The seeker binary to spawn. Empty means `nonce_seeker` on the PATH or beside `proxi` |
+| `mine.seeker.threads` | int | Search threads of the spawned seeker. `0` means every core |
 
 ---
 
@@ -287,6 +293,36 @@ makes requires exactly the cut its target sequencer leaves.
 
 ---
 
+## `mine`
+
+Settings of `proxi node mine`. The miner's flags stay as they are; the profile only
+configures the nonce seekers, the external programs the search for a nonce can be handed
+to. See [Pluggable nonce seekers](participate/nonce_seeker.md).
+
+| Tag | Type | Default | Description |
+|-----|------|---------|-------------|
+| `mine.seeker.listen` | address | empty | Address the miner serves jobs on to seekers you run yourself, such as `127.0.0.1:8100`, or `0.0.0.0:8100` for seekers on other machines. Empty means no job server, unless `spawn` is set, which then uses a free loopback port. |
+| `mine.seeker.token` | string | empty | Shared secret the seekers present with every call. Empty means none, reasonable only on a loopback address; a spawned seeker gets a fresh token when this is empty. |
+| `mine.seeker.spawn` | bool | `false` | The miner starts the reference seeker beside itself, with the port, the token, the key file, its passphrase and the threads filled in, restarts it if it exits and stops it with the miner. Same as `proxi node mine --seeker`. The miner's own workers are then off; `--workers N` adds some. |
+| `mine.seeker.binary` | path | empty | The binary to spawn. Empty means `nonce_seeker` on the PATH or next to `proxi`. |
+| `mine.seeker.threads` | int | `0` | Search threads of the spawned seeker. `0` means every core; leave some free when the machine also runs a node. |
+
+```yaml
+mine:
+  seeker:
+    listen:
+    token:
+    spawn: true
+    binary:
+    threads: 0
+```
+
+Starting the miner with `--workers 0` and no seeker configured at all is refused with a
+message, so a miner that was meant to hand the search away never quietly mines on one
+core.
+
+---
+
 ## Generating a wallet profile: `proxi config wallet`
 
 ```
@@ -358,6 +394,14 @@ consolidate:
     autodelegate: random
     target_delegations: 5
     target_delegation_prox: 10000
+
+mine:
+    seeker:
+        listen:
+        token:
+        spawn: false
+        binary:
+        threads: 0
 ```
 
 The commented API endpoints are the public access points a wallet is pointed at.
