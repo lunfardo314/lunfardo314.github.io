@@ -443,6 +443,17 @@ journalctl -u proxima -f
 - **Crash safety.** The database is designed to stay consistent across crashes; a
   restart continues from the last committed branch, or re-restores from a snapshot if
   the database was corrupted.
+- **After a network reset.** A reset starts a new ledger with a new genesis, and the
+  ledger a node runs is the one in its database, not in its binary. A node left running
+  on the old ledger is not on the new network: the two speak different protocols, so no
+  transaction crosses, and the new nodes cut it off. The first time such a node tries
+  to talk, the other side closes the connection and ignores it for ten minutes; a node
+  it is configured as a static peer of logs one warning, "is on another ledger", and
+  keeps the connection closed. Nothing is harmed, but the old node contributes nothing
+  until it is moved: stop it, delete the state DB (`proximadb`) and the transaction
+  store (`proximadb.txstore`), and start it again against the new network's state
+  sources, exactly as on first start. The same applies to a sequencer, whose chain
+  does not exist on the new ledger, and to a miner, which the new nodes refuse.
 
 ## If the API is public: put a reverse proxy in front of it
 

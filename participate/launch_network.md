@@ -9,6 +9,9 @@ Note that the network can be stopped and reset at any time while it is still in 
 **centralized pre-launch phase**, without notice and as many times as it takes. The point
 of the exercise is to survive the centralized phase and come out of it decentralized.
 Until that happens, treat everything on the network as temporary — tokens included.
+After a reset, a node, sequencer or miner left running on the old ledger is simply
+ignored by the new network; what to do with it is in the operational notes of
+[Running an access node](participate/run_access.md).
 
 ## Initial public access points
 
