@@ -123,6 +123,17 @@ The consolidator has no flags of its own on the miner: it is configured by the
 section cannot be used, for example because no tag-along sequencer is set, the miner says
 so at start and mines without it.
 
+## Keeping the miner current
+
+The ledger names the miner version it expects, and every transit carries the version of
+the miner that built it; a transit from any other version is invalid. When a new release
+of the miner is required, that number is raised in the ledger at an announced slot, and
+from then on an older `proxi node mine` stops with the message "update proxi", at start
+or between two rounds, and the node's mining stream refuses it with the same reason.
+Nothing is lost: the payouts already mined stay yours. Update `proxi` and start it again.
+If you mine with your own software, read the version from the node's
+`ledger_constants` and put it into the mine lock you build, as the reference miner does.
+
 ## Faster searching: nonce seekers
 
 Of everything the miner does, only the search for the nonce is work; the rest is
