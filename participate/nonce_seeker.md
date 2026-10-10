@@ -106,8 +106,8 @@ prints the address in its banner. Everything else about the miner stays as it wa
   one core instead.
 * `--max-hashrate-khs` and `--nonce-start` apply to the local workers only. Seekers pace
   themselves.
-* `proxi node consolidate` runs beside the miner exactly as before. Seekers change
-  nothing about what happens to the payouts.
+* The consolidator runs beside the miner exactly as before. Seekers change nothing
+  about what happens to the payouts.
 
 The token is not a secret worth protecting: jobs are public data. It exists so that
 strangers cannot feed the result endpoint, since each posted result costs the miner one

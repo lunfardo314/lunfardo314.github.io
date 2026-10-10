@@ -141,8 +141,8 @@ with anyone. A standalone ledger has no quiet start: its mine chain is open from
 where a public network keeps it closed for the first 2,000 slots. Difficulty starts at
 the seeded value and eases one bit for every empty slot, so on a single idle machine it
 falls to the floor rather than stalling, and the pace relief means waiting longer always
-makes the next transit easier. The miner only mines; to exercise delegation and the
-top-up path as well, run `proxi node consolidate` beside it on the same profile. See
+makes the next transit easier. The miner runs the consolidator beside itself, so
+delegation and the top-up path are exercised as the payouts come. See
 [Mining](participate/mine.md).
 
 ## Example commands

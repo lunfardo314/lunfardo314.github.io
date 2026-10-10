@@ -12,7 +12,9 @@ is permanent state that every node carries, and tokens sitting in a pile earn no
 are slowly diluted (see [Put your tokens to work](participate/active_tokens.md)). You can tidy up by
 hand: `proxi node compact` sweeps the outputs into one, and `proxi node delegate amount`
 puts them to work. For a wallet that keeps receiving, that is not convenient. So there is
-a command that does it for you, continuously, in the background:
+a process that does it for you, continuously, in the background. `proxi node mine` runs
+it beside the miner by default, so a mining wallet already has it; for any other wallet,
+or a miner that is not `proxi`, it is a command of its own:
 
 ```
 proxi node consolidate
@@ -26,7 +28,10 @@ their own, or a GPU miner.
 
 **For a miner it is the part that is not optional.** The miner itself can be replaced by any
 software that produces valid transits; the consolidator is what keeps the proceeds in
-consensus, and it is highly recommended to run it with whatever mines for you. Replacing it
+consensus, and it is highly recommended to run it with whatever mines for you. `proxi node
+mine` does that on its own unless told not to (`mine.consolidate: false` or
+`--disable_consolidation`), with the settings below and its lines prefixed `[consolidate]`
+in the miner's output. Replacing it
 with something else makes sense only if you know exactly what you are doing, and skipping
 it makes sense only if you choose to [delegate by hand](participate/delegate.md) and keep
 at it.

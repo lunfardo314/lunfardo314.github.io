@@ -57,15 +57,16 @@ nothing, those outputs pile up: the tokens sit outside consensus and are slowly 
 and every output is permanent state that every node on the network has to carry. Mining
 without tidying up costs you and costs everyone else.
 
-The rule is simple: **a miner is two processes, the miner and the consolidator, on the
+The rule is simple: **a miner is two parts, the miner and the consolidator, on the
 same wallet.** Of the two, the miner is the replaceable one: any software that produces
 valid transits, a GPU miner included, competes on the same terms as `proxi node mine`.
 The consolidator is not, and running it is highly recommended whatever mines for you.
-`proxi node consolidate` is a background process that sweeps the wallet
+`proxi node mine` runs it beside the miner by default. For any other miner,
+`proxi node consolidate` is the same process on its own: it sweeps the wallet
 and puts what is above a kept minimum into delegations, or to your own sequencer, and it
 works with any mining software, since it only looks at the wallet. How to run and
 configure it is on its own page: [The wallet consolidator](participate/consolidate.md),
-and how to start it beside the miner is on [Mining](participate/mine.md). If you prefer
+and how the miner runs it is on [Mining](participate/mine.md). If you prefer
 to place your tokens yourself, delegate by hand with `proxi node delegate amount` and
 check on the delegations now and then; a delegation is a standing offer at a fixed cut,
 and a sequencer that raises its margin stops freezing it.

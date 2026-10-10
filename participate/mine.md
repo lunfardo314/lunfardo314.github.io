@@ -73,31 +73,37 @@ not ask you to already hold tokens.
 
 ## Running the miner
 
-Mining is **two processes on the same wallet profile**, started side by side:
+One command on the wallet profile:
 
 ```bash
 proxi node mine
-proxi node consolidate
 ```
 
-The first one mines, and nothing else: it leaves every payout where it lands. The second
-one, [the wallet consolidator](participate/consolidate.md),
-sweeps the payouts and puts them to work: by default it delegates them to a sequencer
-drawn by rating, and with `send_to_sequencer: own` in the profile it sends them to your
-own sequencer instead. **Never run the miner alone for long.** Every transit leaves a
-separate payout output in your wallet; left there, the tokens sit outside consensus and
-are diluted, and every output is permanent state that every node on the network carries.
+It does two things. It mines, and beside the mining loop it runs
+[the wallet consolidator](participate/consolidate.md), which sweeps the payouts and puts
+them to work: by default it delegates them to a sequencer drawn by rating, and with
+`send_to_sequencer: own` in the profile it sends them to your own sequencer instead. The
+consolidator's lines appear in the miner's output prefixed `[consolidate]`. Its settings
+are the `consolidate` section of the profile, the same ones `proxi node consolidate`
+reads; `mine.consolidate: false` in the profile, or `--disable_consolidation` on the
+command line, leaves the payouts where they land, for a wallet that runs
+`proxi node consolidate` separately or tidies up by hand.
 
-The two are not equally replaceable. **The miner is optional.** `proxi node mine` is the
-reference implementation and nothing about it is privileged: an optimized miner, a GPU
-miner, or one you write yourself competes on exactly the same terms, since the only thing
-that decides anything is whether the transaction is valid. **The consolidator is not.**
-It is not a piece of mining software: it is the wallet process that keeps what you mine
-in consensus, it works with any miner because it only looks at the wallet, and there is
-no reason to replace it with anything else unless you know exactly what you are doing.
-Whatever mines for you, run `proxi node consolidate` beside it. The one alternative is
-to [delegate by hand](participate/delegate.md) now and then, and even then the
-consolidator earns its keep by folding the payout outputs into one.
+Why the sweep is built in: every transit leaves a separate payout output in your wallet.
+Left there, the tokens sit outside consensus and are diluted, and every output is
+permanent state that every node on the network carries. **Never leave payouts
+unswept for long.**
+
+The two parts are not equally replaceable. **The miner is optional.** `proxi node mine`
+is the reference implementation and nothing about it is privileged: an optimized miner, a
+GPU miner, or one you write yourself competes on exactly the same terms, since the only
+thing that decides anything is whether the transaction is valid. **The consolidator is
+not.** It is not a piece of mining software: it is the wallet process that keeps what you
+mine in consensus, it works with any miner because it only looks at the wallet, and there
+is no reason to replace it with anything else unless you know exactly what you are doing.
+Whatever mines for you, if it is not `proxi node mine`, run `proxi node consolidate`
+beside it. The one alternative is to [delegate by hand](participate/delegate.md) now and
+then, and even then the consolidator earns its keep by folding the payout outputs into one.
 
 The miner runs until you stop it, or until the chain is exhausted. Useful options:
 
@@ -110,11 +116,12 @@ The miner runs until you stop it, or until the chain is exhausted. Useful option
 | `--stream URL,…` | Additional node endpoints to receive mining transactions from. **Worth setting** — see below. |
 | `--no-stream` | Do not subscribe to the stream at all. Slower, and you will usually lose. |
 | `--refetch N` | Seconds to mine one target before re-stamping it. Default 0 — adaptive to the measured hashrate. Whatever the window, a round ends when the sequencers start settling its slot, since a solution found later reaches none of them in time. |
+| `--disable_consolidation` | Do not run the consolidator beside the miner. Same as `mine.consolidate: false` in the profile. |
 
-The miner used to tidy up its own payouts and carried a set of flags for that. It no
-longer does: `proxi node mine` only mines, and the old flags are gone. The one that
-remains, `--disable_consolidation`, is accepted so that old start scripts keep working
-and has no effect.
+The consolidator has no flags of its own on the miner: it is configured by the
+`consolidate` section of the profile, exactly as `proxi node consolidate` is. If that
+section cannot be used, for example because no tag-along sequencer is set, the miner says
+so at start and mines without it.
 
 ## Faster searching: nonce seekers
 

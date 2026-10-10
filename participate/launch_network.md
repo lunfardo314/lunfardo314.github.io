@@ -98,8 +98,8 @@ Delegated tokens contribute to the security of the network and receive inflation
 which is what keeps a holding from being diluted. Tokens left idle in an ordinary account
 (an address of the form `a/<hex>`) receive nothing.
 
-If you are mining, run `proxi node consolidate` beside the miner and this happens by
-itself. By default it delegates what the miner earns, each time to a sequencer drawn
+If you are mining with `proxi node mine`, this happens by itself: the miner runs the
+wallet consolidator beside itself. By default it delegates what the miner earns, each time to a sequencer drawn
 **at random** among those currently active, biased by a rating on the share they leave
 delegators. The draw is repeated for every delegation, so a miner spreads its tokens
 across the sequencers instead of piling them on one — which is exactly what the launch
