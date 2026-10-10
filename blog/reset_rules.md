@@ -83,8 +83,7 @@ The network will likely be reset if any of the following happens:
 1. **Idle mined capital share above 10%.** Almost all newly mined tokens are expected to
    join the cooperative consensus and secure the ledger. This is the one rule every holder
    can act on alone: delegate, or run a sequencer.
-2. **Fewer than 15 active community sequencers.** A sequencer carrying more than ten
-   times its own capital in delegations does not count.
+2. **Fewer than 15 active community sequencers.**
 3. **One sequencer carries 1/8 or more of the supply**, own and delegated together. 1/6
    is the share that lets one party keep two forks alive at once; 1/8 leaves a margin.
 4. **Own share of the community sequencers below 1/10.** At least a tenth of the newly
