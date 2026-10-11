@@ -96,7 +96,9 @@ round from the `consolidate` section of the profile, the same settings
 sequencer while it is active; otherwise it tops up your smallest delegation under
 `consolidate.target_delegation_prox`, opens a new one while you have fewer than
 `consolidate.target_delegations`, drawn by rating at the cut the sequencer leaves, and
-tops up the smallest after that. Each round's log line says which. Your delegations
+tops up the smallest after that. Each round's log line says which. If the sequencer you
+named in `send_to_sequencer` or `autodelegate` is not active, the miner does not wait for
+it: it delegates by the draw until it is back, and says so once. Your delegations
 are frozen and topped up in place by their sequencers; folding or moving them is
 [the wallet consolidator](participate/consolidate.md)'s job, if you ever want it.
 
