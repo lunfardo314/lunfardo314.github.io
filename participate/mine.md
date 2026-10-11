@@ -79,20 +79,30 @@ One command on the wallet profile:
 proxi node mine
 ```
 
-It does two things. It mines, and beside the mining loop it runs
-[the wallet consolidator](participate/consolidate.md), which sweeps the payouts and puts
-them to work: by default it delegates them to a sequencer drawn by rating, and with
-`send_to_sequencer: own` in the profile it sends them to your own sequencer instead. The
-consolidator's lines appear in the miner's output prefixed `[consolidate]`. Its settings
-are the `consolidate` section of the profile, the same ones `proxi node consolidate`
-reads; `mine.consolidate: false` in the profile, or `--disable_consolidation` on the
-command line, leaves the payouts where they land, for a wallet that runs
-`proxi node consolidate` separately or tidies up by hand.
+It mines, and it puts every reward to work as it is minted, because the ledger pays
+more for a reward that lands in consensus than for one that lands idle. A transit may
+pay its reward in one of three ways, and the amount depends on the way:
 
-Why the sweep is built in: every transit leaves a separate payout output in your wallet.
-Left there, the tokens sit outside consensus and are diluted, and every output is
-permanent state that every node on the network carries. **Never leave payouts
-unswept for long.**
+| The reward goes | Amount | When the miner takes it |
+|---|---|---|
+| into a **delegation you already have**, or to **your own sequencer** | the full reward, 95 PROX | whenever it can: this is the default |
+| into a **new delegation** | 80 PROX plus the 1 PROX fee | when you have fewer delegations than `consolidate.target_delegations` |
+| to **your wallet account** as a plain output | 20 PROX plus the fee | once, on a wallet the ledger does not know yet, so that it becomes known and has pocket money for fees |
+
+So a token kept idle on a plain output costs almost five times a token in consensus,
+and nobody has to run a second process to avoid that. The miner decides before every
+round from the `consolidate` section of the profile, the same settings
+`proxi node consolidate` reads: with `send_to_sequencer: own` the full reward goes to your
+sequencer while it is active; otherwise it tops up your smallest delegation under
+`consolidate.target_delegation_prox`, opens a new one while you have fewer than
+`consolidate.target_delegations`, drawn by rating at the cut the sequencer leaves, and
+tops up the smallest after that. Each round's log line says which. Your delegations
+are frozen and topped up in place by their sequencers; folding or moving them is
+[the wallet consolidator](participate/consolidate.md)'s job, if you ever want it.
+
+Why the ledger prices it this way: every reward left on a plain output sits outside
+consensus, is diluted, and is permanent state that every node on the network carries.
+The rules make the idle choice the expensive one.
 
 The two parts are not equally replaceable. **The miner is optional.** `proxi node mine`
 is the reference implementation and nothing about it is privileged: an optimized miner, a
@@ -116,12 +126,9 @@ The miner runs until you stop it, or until the chain is exhausted. Useful option
 | `--stream URL,…` | Additional node endpoints to receive mining transactions from. **Worth setting** — see below. |
 | `--no-stream` | Do not subscribe to the stream at all. Slower, and you will usually lose. |
 | `--refetch N` | Seconds to mine one target before re-stamping it. Default 0 — adaptive to the measured hashrate. Whatever the window, a round ends when the sequencers start settling its slot, since a solution found later reaches none of them in time. |
-| `--disable_consolidation` | Do not run the consolidator beside the miner. Same as `mine.consolidate: false` in the profile. |
 
-The consolidator has no flags of its own on the miner: it is configured by the
-`consolidate` section of the profile, exactly as `proxi node consolidate` is. If that
-section cannot be used, for example because no tag-along sequencer is set, the miner says
-so at start and mines without it.
+Where the reward goes has no flags of its own: it follows the `consolidate` section of
+the profile, exactly as `proxi node consolidate` does.
 
 ## Keeping the miner current
 

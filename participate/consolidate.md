@@ -26,15 +26,14 @@ wallet whose surplus keeps earning. Miners are the common case, and it does not 
 mining software they use, the official one from the Proxima repository, an optimized one of
 their own, or a GPU miner.
 
-**For a miner it is the part that is not optional.** The miner itself can be replaced by any
-software that produces valid transits; the consolidator is what keeps the proceeds in
-consensus, and it is highly recommended to run it with whatever mines for you. `proxi node
-mine` does that on its own unless told not to (`mine.consolidate: false` or
-`--disable_consolidation`), with the settings below and its lines prefixed `[consolidate]`
-in the miner's output. Replacing it
-with something else makes sense only if you know exactly what you are doing, and skipping
-it makes sense only if you choose to [delegate by hand](participate/delegate.md) and keep
-at it.
+**A `proxi` miner needs it only for tidying.** The ledger pays a mined reward in full only
+when it lands in a delegation or on a sequencer, so `proxi node mine` places every reward
+as it mines it, with the settings below (see [Mining](participate/mine.md)); the
+consolidator then only folds or moves delegations, if you want that. A miner that is not
+`proxi` and keeps paying itself to plain outputs earns far less per transit, and the
+consolidator is what puts those outputs to work; running it beside such a miner is
+highly recommended. Skipping it makes sense only if you choose to
+[delegate by hand](participate/delegate.md) and keep at it.
 
 > `proxi node mine` only mines and leaves every payout where it lands. The consolidator,
 > run beside it on the same wallet profile, is what puts the payouts to work; see
@@ -109,7 +108,7 @@ is topped up **through its target**: the consolidator sends the amount to the ta
 sequencer as a top-up request, and the sequencer adds it to the delegation in place,
 within a tick, with the freeze and the share unchanged and your advance on the added
 tokens paid up front. A top-up request pays no fee, and a sequencer takes one only from
-a minimum amount, 100 PROX unless it set more. If the delegation the rule picks cannot be
+a minimum amount, 90 PROX unless it set more. If the delegation the rule picks cannot be
 reached this pass, because its target is quiet, the amount is under the target's
 minimum, or the target now keeps more than the delegation leaves it, the consolidator
 falls through to the next delegation in the order, then to a new one, so the payouts
@@ -162,7 +161,7 @@ consolidate:
 
 | Key | Flag | Default | Meaning |
 |-----|------|---------|---------|
-| `threshold_prox` | `--threshold-prox` | 300 | Balance over at least two outputs that triggers a consolidation, in PROX. Must be at least the minimum, and with delegation on, the threshold less the minimum should be at least the 100 PROX a top-up request must carry, or frozen delegations are never topped up; the consolidator warns at startup otherwise. |
+| `threshold_prox` | `--threshold-prox` | 300 | Balance over at least two outputs that triggers a consolidation, in PROX. Must be at least the minimum, and with delegation on, the threshold less the minimum should be at least the 90 PROX a top-up request must carry, or frozen delegations are never topped up; the consolidator warns at startup otherwise. |
 | `minimum_balance_prox` | `--minimum-balance-prox` | 100 | Balance kept in the wallet, in PROX. Must be at least the storage deposit of one output, about 9.25 PROX. |
 | `max_inputs` | `--max-inputs` | 30 | Outputs one transaction consumes, 2 to 256. |
 | `compact_at` | `--compact-at` | 10 | Fold the outputs into one once this many have piled up, even below the threshold. |
