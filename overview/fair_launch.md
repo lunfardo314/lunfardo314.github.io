@@ -259,6 +259,15 @@ The reward starts at **95 PROX** per transit and stays there for the first **60 
 After that it grows linearly, by a fixed small amount every slot, ending near 530 PROX at the
 last transit.
 
+That is what a transit mints when its reward lands in consensus, in a delegation or on the
+miner's own sequencer. The covenant accepts two other layouts and pays less for them: a new
+delegation mints 80 PROX plus the 1 PROX fee, and the one-time opening payout to a plain
+output, which is how a fresh wallet becomes known to the ledger, mints 20 PROX plus the fee;
+the rest of the reward is left unminted for good. A token kept idle costs its miner almost
+five times a token at work, which is what makes putting mined capital to work the default
+rather than a courtesy. The numbers above and the projections of section 7 take every
+transit at the full reward, so they are ceilings.
+
 The flat phase is set to the projected length of Phase 1: the reward stays constant while the
 bootstrap capital can still run the ledger alone, and starts growing once it cannot.
 
@@ -512,9 +521,10 @@ Stated because they are real, not because they are resolved:
   decentralizing; too long and Phase 1 outlasts its purpose. The pre-launch exists in large
   part to replace that judgement with a measurement.
 - **Participation mechanics.** The milestones assume mined tokens are put to work — run in a
-  sequencer the miner controls, or delegated. The wallet consolidator that runs beside the
-  reference miner delegates the payouts by default and tops up existing delegations, but how
-  a miner should behave across many sequencers over a long run is still being learned.
+  sequencer the miner controls, or delegated. The covenant pays a transit in full only when
+  its reward lands there, and the reference miner places each reward as it mines it, topping
+  up its delegations and opening new ones up to a configured count, but how a miner should
+  behave across many sequencers over a long run is still being learned.
 - **Scalability of participation.** Many holders delegating to many sequencers is a regime the
   network has not been run in. How many delegations a sequencer can carry, and how that behaves
   as holders and sequencers multiply, has been modelled and needs measuring.

@@ -120,8 +120,9 @@ launch moves tokens out of the founder's hands, and it stops for good once the m
 supply is exhausted. After that the ways to take part are the ones above.
 
 What a miner does with the proceeds is the part that lasts. Mined tokens sitting idle
-earn nothing, which is why a miner runs the wallet consolidator beside the miner, and
-why the consolidator delegates the rewards by default.
+earn nothing, which is why the ledger pays a transit in full only when its reward goes
+into a delegation or onto the miner's own sequencer, and why the reference miner places
+each reward there as it mines it.
 
 See [Tokens and supply](overview/2-tokens-and-supply.md) for what is being competed for
 and [Mining](participate/mine.md) for running the miner.
@@ -181,8 +182,8 @@ different sequencers, which is the straightforward defence.
 | hold no tokens and want in | **mine** — while the launch lasts, then pick a row above |
 
 Delegating and sequencing are not exclusive, and neither excludes mining: a miner that
-delegates its rewards is already doing both, which is what the consolidator beside the
-miner does by default.
+delegates its rewards is already doing both, which is what the reference miner does by
+default.
 
 ## Where to go next
 

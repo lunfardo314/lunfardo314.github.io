@@ -372,7 +372,7 @@ and topping up is cheaper for you too, since it is one transaction rather than a
 
 Freshly added tokens are subject to the freeze like the rest.
 
-If you mine, [the wallet consolidator](participate/consolidate.md) does this for you: it
-delegates the payouts automatically and, once it is holding its configured number of
-delegations, tops up an existing one rather than starting another. See
+If you mine with `proxi`, the miner does this for you: each transit's reward opens a
+delegation while you hold fewer than your configured number and tops up an existing one
+after that, and the ledger pays a top-up in full where a new delegation earns less. See
 [Mining](participate/mine.md).

@@ -65,8 +65,8 @@ a GPU. Difficulty adapts to whatever hashrate shows up.
 * CPU cores. The `proxi` miner runs on the CPU; a GPU miner is faster, and you are free
   to use one. The search for a nonce can also be handed to a separate program while
   `proxi` keeps doing the rest, see [Pluggable nonce seekers](participate/nonce_seeker.md).
-  The miner is the replaceable part of the setup; the consolidator beside it is not, see
-  below.
+  Whatever mines, the ledger pays a transit in full only when its reward goes into
+  consensus, see below.
 
 This is the point of mining in a fair launch: it is the one way into Proxima that does
 not ask you to already hold tokens.
@@ -174,9 +174,16 @@ For the first **60 days** the reward _A_ is flat at **95 PROX** per transit. Aft
 506,250 it grows by 134 motes per slot, so a transit mined later pays slightly more than
 one mined earlier.
 
+_A_ is what a transit mints when its reward goes into consensus, into a delegation or to
+the miner's own sequencer. The two other layouts a transit may take, a new delegation at
+80 PROX and the one-time opening payout of 20 PROX to a plain output, mint that amount
+plus the 1 PROX fee and leave the rest of _A_ unminted for good. The schedule is a
+ceiling, not a promise: the ledger pays in full only for tokens that secure it.
+
 At the pace transits actually land, about 1.12 slots each, the whole mintable supply is
-mined in about **3.3 million transits** over **roughly 443 days**, with the reward near
-530 PROX by the end.
+mined in about **3.3 million transits** over **roughly 443 days** if every transit takes
+the full reward, with the reward near 530 PROX by the end; every opening and every new
+delegation pushes that a little further out.
 
 ## Difficulty, and why waiting helps
 
@@ -231,22 +238,19 @@ what it has seen.
 
 ## What happens to what you mine
 
-Every confirmed transit leaves a payout output in your wallet, and that is where the
-miner's job ends. What the tokens do next is up to you, and doing nothing is the one
-choice that costs you: tokens outside consensus earn no inflation and are diluted by
-those that do, and a pile of small outputs is permanent state every node has to carry.
-Why that is so is on [Put your tokens to work](participate/active_tokens.md).
+Every confirmed transit has already placed its reward: into one of your delegations,
+into a new one, or on your own sequencer, as described above. Your wallet holds the
+20 PROX of pocket money from the opening transit and a handful of delegations, each
+frozen and topped up in place by its sequencer. Nothing piles up, and nothing waits for
+you. Why the ledger insists on this is on
+[Put your tokens to work](participate/active_tokens.md): tokens outside consensus earn
+no inflation and are diluted by those that do, and a pile of small outputs is permanent
+state every node has to carry.
 
-Two ways to handle it:
-
-* **Run the consolidator**, as shown above. It sweeps the payouts into delegations, or
-  to your own sequencer, and keeps those delegations placed when a sequencer changes its
-  price. This is the default and the recommended way; it works with any mining software,
-  since it only looks at the wallet.
-* **Delegate by hand** with `proxi node delegate amount`, and keep an eye on your
-  delegations with `proxi node delegate status`, since a delegation is a standing offer
-  at a fixed cut and a sequencer that raises its margin stops freezing it. Even then,
-  run the consolidator with `autodelegate: none` so the payout outputs are at least
-  folded into one.
-
-Either way, the miner itself never touches a payout once it has landed.
+What is left to you is tidying, now and then: a delegation whose sequencer raised its
+margin or went quiet stops being frozen, and the miner keeps topping up the ones that
+work. [The wallet consolidator](participate/consolidate.md) re-delegates such a
+delegation and folds several into one; `proxi node delegate status` shows what you
+hold, and `proxi node delegate askstop` takes a delegation back by hand. If you mine
+with software that is not `proxi` and pays itself to plain outputs, you earn far less
+per transit, and the consolidator is what puts those outputs to work.
