@@ -79,6 +79,37 @@ peering:
   allow_local_ips: false
 ```
 
+### Appearing on the network map
+
+The network map (`/netviz` on a node's API port) draws every node it has
+heard of. It shows a node as a sequencer, with its capital, only when that
+node announces itself. A node that does not announce itself still appears,
+but as an ordinary access node. To make sure your sequencer is shown:
+
+1. **Keep the map on.** Leave `peering.connectivity.disable` unset or `false`.
+2. **Behind NAT, give the node its public IP.** On a home connection or
+   behind a router, the public IP is not on the machine's own network card,
+   so the node cannot find it and never announces itself. List it under
+   `peering.host.external_addresses` (just the IP). A server whose public IP
+   is on the machine itself does not need this.
+3. **Forward the peering port unchanged.** Forward UDP on `peering.host.port`
+   to the node, with the same port number outside and inside. If the outside
+   port differs, other nodes see your node under a different name than the
+   one it announces.
+4. **Leave `peering.disable_quicreuse` unset.** With it on, the node connects
+   out from random ports, which causes the same name mismatch.
+
+The sequencer must also be in sync: a node still catching up has no recent
+milestone of its own, so it announces no capital.
+
+To check, open `http://<your node>:<api port>/netviz`: your node should be
+orange and labelled with its capital.
+
+On the map a node is named by a hash of its IP and port, not by the plain IP.
+That hides the address but does not keep it secret, since an IPv4 address can
+be recovered from its hash. The capital shown is what each node reports about
+itself. The map is for analysis only and plays no part in consensus.
+
 ---
 
 ## `api`
