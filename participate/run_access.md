@@ -516,7 +516,7 @@ the node, with the node itself listening only on the loopback interface.
        location ^~ /api/v1/txlog/                  { return 403; }
 
        # state scans, script evaluation, explorers, snapshot download
-       location ~ ^/(api/v1/(eval|get_inactive|get_holders|get_all_chains|get_sequencers|get_cleanable_outputs|get_snapshot|get_branch_list|get_mainchain|dag_explorer/.*|chain_explorer/.*)|txapi/v1/compile_script)$ {
+       location ~ ^/(api/v1/(eval|get_inactive|get_holders|get_all_chains|get_cleanable_outputs|get_snapshot|get_branch_list|get_mainchain|dag_explorer/.*|chain_explorer/.*)|txapi/v1/compile_script)$ {
            limit_req zone=heavy burst=10 nodelay;
            proxy_pass http://proxima_api;
        }
