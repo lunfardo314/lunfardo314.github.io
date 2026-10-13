@@ -12,9 +12,8 @@ is permanent state that every node carries, and tokens sitting in a pile earn no
 are slowly diluted (see [Put your tokens to work](participate/active_tokens.md)). You can tidy up by
 hand: `proxi node compact` sweeps the outputs into one, and `proxi node delegate amount`
 puts them to work. For a wallet that keeps receiving, that is not convenient. So there is
-a process that does it for you, continuously, in the background. `proxi node mine` runs
-it beside the miner by default, so a mining wallet already has it; for any other wallet,
-or a miner that is not `proxi`, it is a command of its own:
+a process that does it for you, continuously, in the background. It is a command of its
+own; `proxi node mine` places its rewards itself and does not run it:
 
 ```
 proxi node consolidate
@@ -35,9 +34,9 @@ consolidator is what puts those outputs to work; running it beside such a miner 
 highly recommended. Skipping it makes sense only if you choose to
 [delegate by hand](participate/delegate.md) and keep at it.
 
-> `proxi node mine` only mines and leaves every payout where it lands. The consolidator,
-> run beside it on the same wallet profile, is what puts the payouts to work; see
-> [Mining](participate/mine.md).
+> A reward that `proxi node mine` cannot place, such as the 20 PROX opening, stays on a plain
+> output. Those pile up until the consolidator, run beside the miner on the same wallet
+> profile, puts them to work; see [Mining](participate/mine.md).
 
 ## Running the consolidator
 
