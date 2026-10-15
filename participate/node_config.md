@@ -39,7 +39,7 @@ implementation.
 | `health_relief` | coordinated relaxation of the healthy-branch threshold | no |
 | `trace_tags` | runtime trace tags for debugging | no |
 | `transaction_pull` | missing-tx pull retry tuning | no |
-| top-level flags | `disable_slicepool`, `disable_deadlock_catcher`, `suppress_coverage_contribution_lower_bound`, `workflow.*`, `debug.*` | no |
+| top-level flags | `disable_slicepool`, `disable_deadlock_catcher`, `workflow.*`, `debug.*` | no |
 
 ---
 
@@ -528,7 +528,6 @@ These keys live at the root of the YAML (no section).
 |-----|------|---------|-------------|
 | `disable_slicepool` | bool | false | Disable the optimized EasyFL slice-pool allocator (falls back to plain `make`). |
 | `disable_deadlock_catcher` | bool | false | Disable deadlock detection in the attacher. |
-| `suppress_coverage_contribution_lower_bound` | bool | false | Disable enforcement of the per-sequencer coverage lower bound on this node: the attacher stops rejecting branches below it, and a local sequencer will issue them. The bound **constant** stays on the ledger; only the Go-side enforcement is suppressed, for the same coordinated snapshot-restart scenario as `health_relief` (expired frozen coverage). The upper bound is a ledger constraint and is unaffected. Read by both the workflow attacher and the sequencer. |
 | `workflow.do_not_start_pruner` | bool | false | Disable the memDAG garbage collector (pruner). Debugging only — memory will grow. |
 | `workflow.max_concurrent_attachers` | int | auto: `max(20, 10 × GOMAXPROCS)` | Cap on concurrent sequencer-attacher goroutines. Gates unsolicited gossip; forward-sync and pulled attachers are exempt. `0` or unset keeps the automatic value. |
 | `debug.memdag_port` | int | 0 (disabled) | Port for the read-only memDAG debug API. It exposes internal node state, so it binds loopback only — reach it over an SSH tunnel. |
@@ -536,7 +535,6 @@ These keys live at the root of the YAML (no section).
 ```yaml
 disable_slicepool: false
 disable_deadlock_catcher: false
-# suppress_coverage_contribution_lower_bound: false
 workflow:
   do_not_start_pruner: false
   # max_concurrent_attachers: 0
