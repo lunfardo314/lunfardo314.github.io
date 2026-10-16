@@ -53,6 +53,18 @@ By default the profile is named `proxi`. You can pass a different name, for exam
 The profile is written without its explanatory comments. Add `-v` to keep them
 (`proxi config wallet -v`); the settings are the same either way.
 
+To check that a key file opens with your passphrase, without sending anything, run
+`proxi util key info --file <key file> --verify`. It asks for the passphrase and prints
+`Verification OK` or `Verification FAILED`. To check several key files that share one
+passphrase, put it in the environment variable `PROXIMA_KEY_PASSPHRASE` for that one
+terminal session, so you type it once:
+
+```
+read -rs PROXIMA_KEY_PASSPHRASE && export PROXIMA_KEY_PASSPHRASE
+for f in *.key; do proxi util key info --file "$f" --verify; done
+unset PROXIMA_KEY_PASSPHRASE
+```
+
 The generated `proxi.yaml` looks like this when created with `-v` (the
 `holder_id` value below is just an example — yours will differ):
 
@@ -95,7 +107,8 @@ consolidate:
     compact_at: 10
     send_to_sequencer:
     autodelegate: random
-    max_delegations: 10
+    target_delegations: 5
+    target_delegation_prox: 10000
 ```
 
 **You usually need to adjust the profile before using it** — in particular the API
@@ -306,7 +319,8 @@ which a sequencer does automatically. After the window your wallet can reclaim i
 
 Beyond these, `proxi node` has commands for chains (`mkchain`, `killchain`, `chain`,
 `allchains`), delegation (the `proxi node delegate` group), native tokens
-(`proxi node foundry`), sequencer control (`proxi node seq`), peers and sync status,
+(`proxi node foundry`), sequencer control (`proxi node seq`, for example
+`seq set-params` to change a sequencer's fee, cut or minimum top-up), peers and sync status,
 and more. Run `proxi node -h` to see the full list, and `proxi node <command> -h` for
 the details of each.
 

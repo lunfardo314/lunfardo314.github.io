@@ -78,6 +78,18 @@ cut of 900; `--greedy` and `--pace`; and the immutable delegation params `--epoc
 and `--max-frozen-epochs`. The mutable parameters can be changed later on-chain with
 `proxi node seq set-params`.
 
+One of them, `--min_topup`, is the smallest
+[top-up](participate/delegate.md) your sequencer accepts into a delegation, given in
+motes (1 PROX = 1,000,000 motes). A new sequencer takes top-ups from 90 PROX up, and
+a value below 90 PROX counts as 90 PROX, so a mined reward of 95 PROX can always be
+placed. For example, to take top-ups only from 500 PROX:
+
+```
+proxi node seq set-params --min_topup 500000000
+```
+
+`proxi node seq info` shows the minimum in effect.
+
 Verify the new chain:
 
 ```
