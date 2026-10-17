@@ -42,9 +42,9 @@ profile's API settings. The node itself is configured separately — see
 | `consolidate.minimum_balance_prox` | uint (PROX) | Balance the consolidator always keeps in the wallet on plain outputs. Default `100` |
 | `consolidate.max_inputs` | int | Outputs one consolidating transaction consumes (2–256). Default `30` |
 | `consolidate.compact_at` | int | Fold the outputs into one once this many have piled up, even below the threshold. Default `10` |
-| `consolidate.send_to_sequencer` | `own`, hex chain ID or empty | Where the consolidator sends what is above the minimum. Default empty |
-| `consolidate.autodelegate` | `random`, hex chain ID or `none` | Delegation target when `send_to_sequencer` is empty. Default `random` |
-| `consolidate.target_delegations` | int | Number of delegations the consolidator builds up to. Default `5` (the older key `max_delegations` is read when absent) |
+| `consolidate.send_to_sequencer` | `own`, hex chain ID or empty | Where the miner sends its rewards and the consolidator what is above the minimum. Default empty |
+| `consolidate.autodelegate` | `random`, hex chain ID or `none` | Delegation target of the miner and the consolidator when `send_to_sequencer` is empty. Default `random` |
+| `consolidate.target_delegations` | int | Number of delegations the miner and the consolidator build up to. Default `5` (the older key `max_delegations` is read when absent) |
 | `consolidate.target_delegation_prox` | uint (PROX) | Size a delegation is grown to before the next one is started. Default `10000` |
 | `mine.seeker.listen` | address | Address `proxi node mine` serves jobs on to external nonce seekers. Empty means none |
 | `mine.seeker.token` | string | Shared secret the seekers present. Empty means none |
@@ -255,12 +255,15 @@ sequencer offers. See [The wallet consolidator](participate/consolidate.md).
 
 ## `consolidate`
 
-Settings of the wallet consolidator, the permanent process that sweeps the outputs
-scattered over the wallet and puts what is above a kept minimum back into consensus. It
-runs as `proxi node consolidate`; `proxi node mine` reads the same section to decide
-where each reward goes. Every key has a command-line flag of the same name on
-`proxi node consolidate` that overrides it. See
-[The wallet consolidator](participate/consolidate.md) for what the process does.
+Where the wallet's tokens are put to work, read by two commands. `proxi node mine`
+reads `send_to_sequencer`, `autodelegate`, `target_delegations` and
+`target_delegation_prox` to decide where each reward goes, so a miner sets these and
+nothing else. All the keys are settings of the wallet consolidator,
+`proxi node consolidate`: an optional process for tidying, which sweeps the outputs
+scattered over the wallet and puts what is above a kept minimum back into consensus.
+Every key has a command-line flag of the same name on `proxi node consolidate` that
+overrides it. See [The wallet consolidator](participate/consolidate.md) for what the
+process does.
 
 | Tag | Type | Default | Description |
 |-----|------|---------|-------------|
@@ -269,7 +272,7 @@ where each reward goes. Every key has a command-line flag of the same name on
 | `consolidate.max_inputs` | int, 2–256 | `30` | Most outputs one consolidating transaction consumes, smallest first; the rest wait for a later pass. Flag `--max-inputs`. |
 | `consolidate.compact_at` | int | `10` | Fold the outputs into one as soon as this many have piled up, even below the threshold; in that case nothing leaves the wallet. Flag `--compact-at`. |
 | `consolidate.send_to_sequencer` | `own`, chain ID or empty | empty | `own` sends everything above the minimum to `wallet.sequencer_id`, which must be controlled by this wallet; a sequencer ID sends it to that sequencer; empty disables sending. Flag `--send-to-sequencer`. |
-| `consolidate.autodelegate` | `random`, chain ID or `none` | `random` | Applies only when `send_to_sequencer` is empty. `random` delegates to an active sequencer drawn on every action, biased by a rating on the share of the inflation it leaves, its balance and how much is already delegated to it (see [The wallet consolidator](participate/consolidate.md)); a sequencer ID always delegates to that one; `none` only folds the outputs into one, and empty reads as `random`. Flag `--autodelegate`. |
+| `consolidate.autodelegate` | `random`, chain ID or `none` | `random` | Applies only when `send_to_sequencer` is empty. `random` delegates to an active sequencer drawn on every action, biased by a rating on the share of the inflation it leaves, its balance, how much is already delegated to it and how steadily its chain has produced (see [The wallet consolidator](participate/consolidate.md)); a sequencer ID always delegates to that one; `none` only folds the outputs into one, and empty reads as `random`. Flag `--autodelegate`. |
 | `consolidate.target_delegations` | int | `5` | Number of delegations the consolidator builds up to; beyond it existing ones are topped up and extra ones folded together. The older key `max_delegations` is read when this one is absent. Flag `--target-delegations`. |
 | `consolidate.target_delegation_prox` | uint, PROX | `10000` | Size a delegation is grown to before the next one is started. Flag `--target-delegation-prox`. |
 
@@ -286,9 +289,9 @@ consolidate:
 ```
 
 The amounts here are in **PROX**, unlike every other amount `proxi` takes, which is in
-motes. The generated profile leaves both destinations empty, since it cannot know
-whether the wallet controls a sequencer: with neither set the process only folds
-scattered outputs into one, so set one of the two to put the tokens to work. The
+motes. The generated profile leaves `send_to_sequencer` empty, since it cannot know
+whether the wallet controls a sequencer, and sets `autodelegate: random`, so the tokens
+go into delegations unless you set otherwise. The
 tag-along target and its fee come from `tag_along` and are resolved again before every
 transaction. The consolidator does not read `delegate.minimum_cut`: each delegation it
 makes requires exactly the cut its target sequencer leaves.
@@ -300,7 +303,9 @@ makes requires exactly the cut its target sequencer leaves.
 Settings of `proxi node mine`. The miner's flags stay as they are; where each reward
 goes follows the `consolidate` section above (see [Mining](participate/mine.md)), and
 the profile configures the nonce seekers, the external programs the search for a nonce
-can be handed to. See [Pluggable nonce seekers](participate/nonce_seeker.md).
+can be handed to. A faster seeker is the recommended way to mine faster: the search is
+where all the speed is, and `proxi node mine` keeps placing every reward in consensus.
+See [Pluggable nonce seekers](participate/nonce_seeker.md).
 
 | Tag | Type | Default | Description |
 |-----|------|---------|-------------|
