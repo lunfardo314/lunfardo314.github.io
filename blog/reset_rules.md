@@ -120,6 +120,8 @@ so.
 What the community can do so that a take is worth not resetting:
 
 1. Put everything you mine to work: delegate, or run a sequencer. Keep pocket change only.
+   Mine with `proxi node mine`, which does this with every reward as it mines it, and
+   make it faster with a nonce seeker of your own rather than replacing it.
 2. If you hold a lot, run a sequencer and keep it up.
 3. If you run a sequencer, put your own capital into it. A sequencer running on
    delegations alone has nothing at stake.
@@ -130,7 +132,9 @@ What the community can do so that a take is worth not resetting:
    accept and that keep it running. Adjust when the market moves.
 6. Spread delegations. Watch the sequencer ratings, or make your own. Do not pile onto the
    bootstrap sequencers; prefer sequencers whose operators have their own capital in them,
-   and move when the terms stop being fair. `proxi node consolidate` does this for you.
+   and move when the terms stop being fair. `proxi node mine` spreads its rewards over
+   several delegations drawn by the rating, and the optional `proxi node consolidate`
+   moves a delegation whose terms stopped being fair.
 7. If you run a sequencer or public infrastructure, announce it and say who you are. A
    stable pseudonym is enough.
 8. Run an access node others can sync from.
