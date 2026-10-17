@@ -324,8 +324,13 @@ stay ahead. With it, that lead collapses to a gossip hop. A miner can subscribe 
 independent nodes at once, which makes withholding by a single node ineffective, and verifies
 every transit from the raw bytes rather than trusting the relay.
 
-The reference miner is `proxi node mine` ([Mining](participate/mine.md)). It is not privileged in any way. Write your own; the
-only thing that decides anything is whether your transaction is valid.
+The miner is `proxi node mine` ([Mining](participate/mine.md)). It is not privileged in any
+way: the only thing that decides anything is whether a transaction is valid. Like the rest of
+Proxima's software, it acts on behalf of the token holder and earns the holder as much as it
+can, which here means placing every reward in consensus, where the ledger pays it in full.
+All the speed is in the search for a nonce, and that search can be handed to a faster program
+of your own; see [Pluggable nonce seekers](participate/nonce_seeker.md). So the recommended
+way to compete is to keep `proxi node mine` and make its search faster.
 
 ### The work stops
 

@@ -38,8 +38,7 @@ when it first freezes the delegation, so your share does not depend on the seque
 staying healthy for the whole period.
 
 Delegation costs one transaction and no infrastructure. For most holders it is the right
-answer, and it is the one the wallet consolidator takes automatically with what a miner
-mines.
+answer, and it is the one the miner takes automatically with every reward it mines.
 
 [Delegation and liveness](overview/delegation.md) explains the mechanism;
 [the delegation guide](participate/delegate.md) covers the commands.
@@ -121,7 +120,7 @@ supply is exhausted. After that the ways to take part are the ones above.
 
 What a miner does with the proceeds is the part that lasts. Mined tokens sitting idle
 earn nothing, which is why the ledger pays a transit in full only when its reward goes
-into a delegation or onto the miner's own sequencer, and why the reference miner places
+into a delegation or onto the miner's own sequencer, and why `proxi node mine` places
 each reward there as it mines it.
 
 See [Tokens and supply](overview/2-tokens-and-supply.md) for what is being competed for

@@ -248,8 +248,8 @@ delegate:
 It is the default of the `--cut` / `--minimum_cut` flags of `proxi node dlg`. A
 sequencer whose own cut would leave the delegator less than this refuses the
 delegation; a new sequencer keeps `100` promille unless its operator sets another, so
-the defaults meet. The consolidator does not read this key: it takes the cut each
-sequencer offers. See [The wallet consolidator](participate/consolidate.md).
+the defaults meet. The miner and the consolidator do not read this key: they take the
+cut each sequencer offers. See [The wallet consolidator](participate/consolidate.md).
 
 ---
 
@@ -273,7 +273,7 @@ process does.
 | `consolidate.compact_at` | int | `10` | Fold the outputs into one as soon as this many have piled up, even below the threshold; in that case nothing leaves the wallet. Flag `--compact-at`. |
 | `consolidate.send_to_sequencer` | `own`, chain ID or empty | empty | `own` sends everything above the minimum to `wallet.sequencer_id`, which must be controlled by this wallet; a sequencer ID sends it to that sequencer; empty disables sending. Flag `--send-to-sequencer`. |
 | `consolidate.autodelegate` | `random`, chain ID or `none` | `random` | Applies only when `send_to_sequencer` is empty. `random` delegates to an active sequencer drawn on every action, biased by a rating on the share of the inflation it leaves, its balance, how much is already delegated to it and how steadily its chain has produced (see [The wallet consolidator](participate/consolidate.md)); a sequencer ID always delegates to that one; `none` only folds the outputs into one, and empty reads as `random`. Flag `--autodelegate`. |
-| `consolidate.target_delegations` | int | `5` | Number of delegations the consolidator builds up to; beyond it existing ones are topped up and extra ones folded together. The older key `max_delegations` is read when this one is absent. Flag `--target-delegations`. |
+| `consolidate.target_delegations` | int | `5` | Number of delegations the miner and the consolidator build up to; beyond it existing ones are topped up and extra ones folded together. The older key `max_delegations` is read when this one is absent. Flag `--target-delegations`. |
 | `consolidate.target_delegation_prox` | uint, PROX | `10000` | Size a delegation is grown to before the next one is started. Flag `--target-delegation-prox`. |
 
 ```yaml

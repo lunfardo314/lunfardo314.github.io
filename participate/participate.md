@@ -30,7 +30,7 @@ Frontend and wallet developers who want a private node to build against can spin
 * [Wallet configuration](participate/wallet_config.md) — the `proxi.yaml` wallet profile.
 * [Mining](participate/mine.md) — acquiring tokens during the launch phase.
 * [Put your tokens to work](participate/active_tokens.md) — why idle tokens are diluted, and what to do with mined tokens.
-* [The wallet consolidator](participate/consolidate.md) — `proxi node consolidate`, the background process that keeps any wallet tidy and puts what is above a kept minimum to work.
+* [The wallet consolidator](participate/consolidate.md) — `proxi node consolidate`, the optional background process that keeps any wallet tidy and puts what is above a kept minimum to work.
 * [Delegation](participate/delegate.md) — delegate funds to a sequencer that puts them to work, under ledger rules rather than trust.
 * [Running an access node](participate/run_access.md) — join and sync a full node with the launch phase network.
 * [Running a sequencer node](participate/run_sequencer.md) — run a sequencer chain.

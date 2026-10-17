@@ -186,15 +186,18 @@ disk and in backups, not from the machine it runs on: once unlocked, the key sit
 seeker's memory for as long as it mines, and whoever controls a rented machine can read
 that memory.
 
-The exposure is bounded, though. The key's only value is the payouts it has received and
-not yet moved, so:
+Know what the key is worth. `proxi node mine` puts every reward into a delegation whose
+owner is the mining key, or onto a sequencer the same key controls, so the key controls
+everything it has mined so far. Whoever copies it can take back those delegations.
+So:
 
-* mine with a **dedicated wallet** that holds nothing else, and
-* run [the consolidator](participate/consolidate.md) on it, which sweeps every payout
-  away as soon as it confirms.
-
-Then a stolen mining key loses you at most the last few payouts, and you can simply
-switch to a new key.
+* mine with a **dedicated wallet** that holds nothing else;
+* run seekers that hold the key on machines you control, where you can;
+* where you cannot, move what the mining wallet holds, from time to time, to a wallet
+  whose key never leaves your own machine: release its delegations with
+  `proxi node delegate askstop`, end them with `proxi node killchain` and send the
+  tokens over (see [Delegation](participate/delegate.md)). What a stolen key can take is
+  then at most what was mined since the last move, and you switch to a new mining key.
 
 ## Writing your own seeker
 
