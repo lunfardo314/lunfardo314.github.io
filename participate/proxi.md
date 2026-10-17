@@ -100,7 +100,8 @@ delegate:
     minimum_cut: 900
 
 consolidate:
-    # settings of 'proxi node consolidate'; see the consolidator page
+    # where tokens are put to work: 'proxi node mine' places its rewards by
+    # these, 'proxi node consolidate' tidies the wallet by them
     threshold_prox: 300
     minimum_balance_prox: 100
     max_inputs: 30
@@ -145,8 +146,8 @@ public nodes and needs no change for the launch phase network. See
 
 `delegate.minimum_cut` is the delegator cut this wallet requires of any sequencer it
 delegates to, in promille — the share of the delegation's inflation that must come back
-to you. It is the default of the `--cut` flag of `proxi node dlg`; the consolidator does
-not read it and takes the cut each sequencer offers.
+to you. It is the default of the `--cut` flag of `proxi node dlg`; the miner and the
+consolidator do not read it and take the cut each sequencer offers.
 
 `tag_along.fee` and `tag_along.sequencer_id` describe the *tag-along* mechanism, which
 every token-sending command relies on. Each transaction you send carries a small extra
@@ -298,16 +299,20 @@ which a sequencer does automatically. After the window your wallet can reclaim i
   requires a tag-along fee.
 
 * `proxi node mine` competes for the mine chain, which is how tokens are acquired
-  during the launch phase — it needs no tokens to start. See
-  [Mining](participate/mine.md) for what it does with what it earns.
+  during the launch phase — it needs no tokens to start. It places every reward in
+  consensus, into a delegation or on your own sequencer, as set in the `consolidate`
+  section of the profile. To mine faster, keep it and plug in a faster
+  [nonce seeker](participate/nonce_seeker.md). See [Mining](participate/mine.md).
 
-* `proxi node consolidate` runs permanently in the background on a wallet profile,
-  typically a miner's. Every 10 seconds it looks at the account and, once enough small
-  outputs have piled up, sweeps them into one transaction that sends everything above a
-  kept minimum to a sequencer or into a delegation, as configured in the `consolidate`
-  section of the profile. It only looks at the wallet, so it works with any mining
-  software and for any wallet. See [The wallet consolidator](participate/consolidate.md)
-  for the settings, and [Put your tokens to work](participate/active_tokens.md) for why.
+* `proxi node consolidate` is an optional process for tidying a wallet, and runs
+  permanently in the background on a wallet profile. Every 10 seconds it looks at the
+  account and, once enough small outputs have piled up, sweeps them into one
+  transaction that sends everything above a kept minimum to a sequencer or into a
+  delegation, as configured in the `consolidate` section of the profile. It also
+  re-delegates delegations that stopped working and folds several into one. It only
+  looks at the wallet, so it serves any wallet: one receiving payments, or a miner's
+  that wants tidying. See [The wallet consolidator](participate/consolidate.md) for the
+  settings, and [Put your tokens to work](participate/active_tokens.md) for why.
 
 * `proxi node compact scan` reports everything the account can consume, by category,
   without building any transaction. Useful before compacting.
