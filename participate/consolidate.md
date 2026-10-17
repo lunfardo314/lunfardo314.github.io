@@ -19,24 +19,20 @@ own; `proxi node mine` places its rewards itself and does not run it:
 proxi node consolidate
 ```
 
-The consolidator is a general wallet utility. It only looks at the wallet account, never at
-what fills it, so it serves a miner, a shop receiving payments, or anyone who wants a tidy
-wallet whose surplus keeps earning. Miners are the common case, and it does not matter which
-mining software they use, the official one from the Proxima repository, an optimized one of
-their own, or a GPU miner.
+The consolidator is an optional, general wallet utility. It only looks at the wallet
+account, never at what fills it, so it serves a shop receiving payments, a miner, or anyone
+who wants a tidy wallet whose surplus keeps earning. Like the miner and the sequencer, it
+acts on behalf of the token holder and earns the holder as much as it can, which in
+Proxima means keeping the tokens in consensus.
 
-**A `proxi` miner needs it only for tidying.** The ledger pays a mined reward in full only
-when it lands in a delegation or on a sequencer, so `proxi node mine` places every reward
-as it mines it, with the settings below (see [Mining](participate/mine.md)); the
-consolidator then only folds or moves delegations, if you want that. A miner that is not
-`proxi` and keeps paying itself to plain outputs earns far less per transit, and the
-consolidator is what puts those outputs to work; running it beside such a miner is
-highly recommended. Skipping it makes sense only if you choose to
-[delegate by hand](participate/delegate.md) and keep at it.
-
-> A reward that `proxi node mine` cannot place, such as the 20 PROX opening, stays on a plain
-> output. Those pile up until the consolidator, run beside the miner on the same wallet
-> profile, puts them to work; see [Mining](participate/mine.md).
+**A miner does not need it.** The ledger pays a mined reward in full only when it lands in
+a delegation or on a sequencer, so `proxi node mine` places every reward as it mines it,
+with the settings below (see [Mining](participate/mine.md)). The recommended way to mine
+faster is to keep `proxi node mine` and plug in a faster
+[nonce seeker](participate/nonce_seeker.md), so the rewards keep being placed. For a miner
+the consolidator is only for tidying now and then: it re-delegates a delegation that
+stopped working, folds several into one, and puts to work what collects on plain outputs,
+such as the 15 PROX opening payout or incoming payments.
 
 ## Running the consolidator
 
@@ -90,10 +86,14 @@ among the sequencers active in the last few slots. The draw is not uniform: the 
 are rated on several criteria and the better rated are drawn more often, though every
 sequencer leaving delegators anything keeps a chance. The criteria are
 
-* the share of the inflation it leaves delegators (more is better, counted twice);
+* the share of the inflation it leaves delegators (more is better, counted four times,
+  so the price weighs as much as the rest together);
 * its own balance (more is better);
 * the ratio of what is delegated to it over its own balance (less is better, so the
-  crowded ones are drawn less).
+  crowded ones are drawn less);
+* how many sequencer transactions its chain has made (more is better);
+* how many it has made per slot of its life (more is better, up to the typical rate among
+  the candidates, so it ranks gaps in a chain's life, not producing more often).
 
 `proxi node seq_rating` prints the current rating and each sequencer's draw chance.
 

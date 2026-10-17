@@ -261,10 +261,10 @@ last transit.
 
 That is what a transit mints when its reward lands in consensus, in a delegation or on the
 miner's own sequencer. The covenant accepts two other layouts and pays less for them: a new
-delegation mints 80 PROX plus the 1 PROX fee, and the one-time opening payout to a plain
-output, which is how a fresh wallet becomes known to the ledger, mints 20 PROX plus the fee;
-the rest of the reward is left unminted for good. A token kept idle costs its miner almost
-five times a token at work, which is what makes putting mined capital to work the default
+delegation mints 50 PROX plus the 1 PROX fee, and the one-time opening payout to a plain
+output, which is how a fresh wallet becomes known to the ledger, mints 15 PROX plus the fee;
+the rest of the reward is left unminted for good. A token kept idle costs its miner more
+than six times a token at work, which is what makes putting mined capital to work the default
 rather than a courtesy. The numbers above and the projections of section 7 take every
 transit at the full reward, so they are ceilings.
 

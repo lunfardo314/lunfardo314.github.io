@@ -62,11 +62,10 @@ a GPU. Difficulty adapts to whatever hashrate shows up.
   is above 1 PROX never takes a transit, and the default minimum is 0.1 PROX.
 * Access to a node API — your own [access node](participate/run_access.md), or a public
   one.
-* CPU cores. The `proxi` miner runs on the CPU; a GPU miner is faster, and you are free
-  to use one. The search for a nonce can also be handed to a separate program while
-  `proxi` keeps doing the rest, see [Pluggable nonce seekers](participate/nonce_seeker.md).
-  Whatever mines, the ledger pays a transit in full only when its reward goes into
-  consensus, see below.
+* CPU cores. The `proxi` miner searches on the CPU. For more speed, hand the search for a
+  nonce to a separate program, a GPU one for example, while `proxi` keeps doing the rest,
+  see [Pluggable nonce seekers](participate/nonce_seeker.md). The ledger pays a transit in
+  full only when its reward goes into consensus, see below.
 
 This is the point of mining in a fair launch: it is the one way into Proxima that does
 not ask you to already hold tokens.
@@ -86,10 +85,10 @@ pay its reward in one of three ways, and the amount depends on the way:
 | The reward goes | Amount | When the miner takes it |
 |---|---|---|
 | into a **delegation you already have**, or to **your own sequencer** | the full reward, 95 PROX | whenever it can: this is the default |
-| into a **new delegation** | 80 PROX plus the 1 PROX fee | when you have fewer delegations than `consolidate.target_delegations` |
-| to **your wallet account** as a plain output | 20 PROX plus the fee | once, on a wallet the ledger does not know yet, so that it becomes known and has pocket money for fees |
+| into a **new delegation** | 50 PROX plus the 1 PROX fee | when you have fewer delegations than `consolidate.target_delegations` |
+| to **your wallet account** as a plain output | 15 PROX plus the fee | once, on a wallet the ledger does not know yet, so that it becomes known and has pocket money for fees |
 
-So a token kept idle on a plain output costs almost five times a token in consensus,
+So a token kept idle on a plain output costs more than six times a token in consensus,
 and nobody has to run a second process to avoid that. The miner decides before every
 round from the `consolidate` section of the profile, the same settings
 `proxi node consolidate` reads: with `send_to_sequencer: own` the full reward goes to your
@@ -106,16 +105,22 @@ Why the ledger prices it this way: every reward left on a plain output sits outs
 consensus, is diluted, and is permanent state that every node on the network carries.
 The rules make the idle choice the expensive one.
 
-The two parts are not equally replaceable. **The miner is optional.** `proxi node mine`
-is the reference implementation and nothing about it is privileged: an optimized miner, a
-GPU miner, or one you write yourself competes on exactly the same terms, since the only
-thing that decides anything is whether the transaction is valid. **The consolidator is
-not.** It is not a piece of mining software: it is the wallet process that keeps what you
-mine in consensus, it works with any miner because it only looks at the wallet, and there
-is no reason to replace it with anything else unless you know exactly what you are doing.
-Whatever mines for you, if it is not `proxi node mine`, run `proxi node consolidate`
-beside it. The one alternative is to [delegate by hand](participate/delegate.md) now and
-then, and even then the consolidator earns its keep by folding the payout outputs into one.
+The miner follows the common pattern in Proxima: software that acts on behalf of a token
+holder and earns that holder as much as it can. Since the ledger pays for taking part in
+the cooperative consensus, earning the most for you and keeping the ledger secure are the
+same thing; see [Put your tokens to work](participate/active_tokens.md).
+
+**Stick to `proxi node mine`, and make it faster with your own nonce seeker.** Mining
+speed is all in the search for a nonce, and that search can be handed to a separate
+program: an optimized one, a GPU one, one you write and keep to yourself. See
+[Pluggable nonce seekers](participate/nonce_seeker.md). The rest of what
+`proxi node mine` does costs next to nothing, so replacing it gains you no speed. But
+that rest matters for the network: it is what puts every mined token into consensus,
+where it secures the ledger. Nothing in the rules stops you from writing a miner of your
+own, since all that counts is a valid transaction. One that does not place its rewards
+the same way earns less per transit and leaves its tokens idle.
+[The wallet consolidator](participate/consolidate.md) is optional: it tidies the wallet
+and can put idle plain outputs to work, whatever left them there.
 
 The miner runs until you stop it, or until the chain is exhausted. Useful options:
 
@@ -178,7 +183,7 @@ one mined earlier.
 
 _A_ is what a transit mints when its reward goes into consensus, into a delegation or to
 the miner's own sequencer. The two other layouts a transit may take, a new delegation at
-80 PROX and the one-time opening payout of 20 PROX to a plain output, mint that amount
+50 PROX and the one-time opening payout of 15 PROX to a plain output, mint that amount
 plus the 1 PROX fee and leave the rest of _A_ unminted for good. The schedule is a
 ceiling, not a promise: the ledger pays in full only for tokens that secure it.
 
@@ -242,7 +247,7 @@ what it has seen.
 
 Every confirmed transit has already placed its reward: into one of your delegations,
 into a new one, or on your own sequencer, as described above. Your wallet holds the
-20 PROX of pocket money from the opening transit and a handful of delegations, each
+15 PROX of pocket money from the opening transit and a handful of delegations, each
 frozen and topped up in place by its sequencer. Nothing piles up, and nothing waits for
 you. Why the ledger insists on this is on
 [Put your tokens to work](participate/active_tokens.md): tokens outside consensus earn
