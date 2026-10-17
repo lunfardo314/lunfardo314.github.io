@@ -30,11 +30,11 @@ Inflation incentives ensure continuous participation: every transaction generate
 **Sequencers** are token holders with voluntary, permissionless responsibilities: endorsing transactions of peers with their transactions, issuing branch transactions representing interim ledger states, and participating in VRF-driven branch inflation bonuses. Their discretion is never exclusive — users may target multiple sequencers, and multiple sequencers may pull the same external transactions. Because past cones overlap heavily, no sequencer controls ordering.
 Sequencers do not write on behalf of users; they assist propagation and cooperation. Users retain full write authority through their own transactions.
 
-UTXO determinism eliminates MEV at the base layer.
+UTXO determinism leaves little room for MEV at the base layer.
 
 Sybil resistance is built directly into the ledger. Influence emerges from token ownership rather than proof-of-cost or privileged roles. Total system cost remains bounded and independent of market cap. Fairness is driven by permissionless participation, the open movement of the token, and ongoing token-holder involvement.
 
-The protocol is designed to be verifiable: its properties are meant to be formally provable (e.g., with TLA+) directly from the ledger’s immutable constraint layer, within clearly stated system-wide assumptions. No such proof exists yet. Governance is not part of the protocol: only backward-compatible, formally proven refinements are allowed.
+The protocol is designed to be verifiable. Its rules are finite covenant logic: non-Turing-complete constraints that always terminate. Its properties are therefore formally provable (e.g., with TLA+) directly from the ledger’s immutable constraint layer, within clearly stated system-wide assumptions. Governance is not part of the protocol: only backward-compatible, formally proven refinements are allowed.
 
 ## Paradigm & Vision
 
