@@ -46,6 +46,12 @@ sequencer per node**.
 > The ledger deliberately leaves this to competition: a sequencer's cut is a price
 > it publishes, delegators and senders choose among sequencers, and nothing sets the
 > balance from above.
+>
+> Most delegations do not come from someone choosing by hand. `proxi node mine` places
+> its rewards, and the optional consolidator a wallet's surplus, with a sequencer drawn
+> by a rating: the share it leaves delegators weighs as much as everything else
+> together, then its balance, how crowded it is with delegations, and how steadily its
+> chain has produced. `proxi node seq_rating` shows where your sequencer stands.
 
 ## Prerequisites
 
@@ -204,6 +210,17 @@ tag_along:
 
 Then the tag-along fees on your own transactions go back to you — making your
 transactions effectively fee-less.
+
+If you also [mine](participate/mine.md) with this wallet, send the rewards to your
+sequencer:
+
+```yaml
+consolidate:
+  send_to_sequencer: own
+```
+
+`proxi node mine` then pays every reward, in full, into your sequencer chain while it is
+active, and falls back to delegating it while it is not.
 
 ## The controller key when running as a service
 
