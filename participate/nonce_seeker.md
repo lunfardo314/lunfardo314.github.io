@@ -7,12 +7,19 @@
 > [Please read before taking part](README.md).
 
 [Mining](participate/mine.md) is a race to find a **nonce**: a number such that a value
-derived from it under your key has enough trailing zero bits. Everything else the miner
-does, following the mine chain, choosing the target, building, signing and submitting the
-transaction, is bookkeeping. The search is the only part where speed matters, and the only
-part worth writing in another language or running on other hardware.
+derived from it under your key has enough trailing zero bits. The search is the only part
+where speed matters, and the only part worth writing in another language or running on
+other hardware. Everything else the miner does costs next to nothing: following the mine
+chain, choosing the target, building, signing and submitting the transaction, and
+deciding where each reward goes. That last part matters for the network: it puts every
+mined token into consensus, where it secures the ledger and the ledger pays it in full.
+See [Put your tokens to work](participate/active_tokens.md).
 
-So `proxi node mine` lets you take the search out. With one option in the wallet profile
+**So the recommended way to mine faster is to keep `proxi node mine` and replace only the
+search, with a nonce seeker.** Writing a whole miner of your own gains no speed, and one
+that does not place its rewards the same way earns less per transit.
+
+`proxi node mine` lets you take the search out. With one option in the wallet profile
 the miner becomes a small server that hands out **jobs** and accepts **solutions** from
 any number of external programs, called **nonce seekers**. A seeker can be the reference
 one shipped with Proxima, written in Rust and about twice as fast per core as the miner's
