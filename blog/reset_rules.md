@@ -1,7 +1,7 @@
 # Reset rules for the centralized phase of a take
 _What the founder will look at, and what the community can do about it_
 
-> **Draft, open for discussion.** Nothing here is final. The rules, the numbers and the
+> **Open for discussion.** Nothing here is final. The rules, the numbers and the
 > wording are up for debate, and the founder wants to hear objections before any of it is
 > settled. Comment on Discord.
 
