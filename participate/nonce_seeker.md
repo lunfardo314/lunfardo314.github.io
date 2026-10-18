@@ -176,8 +176,8 @@ What you see:
   speed and when it last reported.
 
 A seeker that stops reporting makes the miner believe it is slower than it is, and the
-miner then searches each target for a shorter time than it should. The reference seeker
-reports once a second; so should any seeker you write.
+miner then gives up waiting for a confirmation of its transits sooner than it should.
+The reference seeker reports once a second; so should any seeker you write.
 
 ## Keeping the key safe
 
@@ -215,8 +215,16 @@ configured, every call carries `Authorization: Bearer <token>`.
 **The job** carries an opaque id (`0` means there is nothing to mine right now), the fixed
 part of the message to hash (`alpha_prefix`), the required number of trailing zero bits
 (`k`), how many milliseconds the job is still worth working on (`ttl_ms`), the public key
-the solution must be found under (`pubkey`), and, while the miner is fighting over a
-contested step, a 64-byte value (`beat`) the output must be smaller than.
+the solution must be found under (`pubkey`), and, once a solution for the target is known,
+yours or a competitor's, a 64-byte value (`beat`) the output must be smaller than.
+
+**How long a job lasts.** A job covers one slot and lasts until shortly before the slot is
+settled, which is what `ttl_ms` counts down to. A solution does not end it. The slot goes
+to the smallest output the sequencers hold when they settle it, so after each accepted
+solution the seeker keeps searching the same job for a smaller one. The `beat` goes down
+as better solutions come in, yours or anyone's; the job id stays the same, so a seeker
+that works in long batches, a GPU, loses nothing in flight. A seeker that stopped at its
+first solution would make only a fraction of the draws it could.
 
 **The work.** For an 8-byte nonce of your choice, the message is `alpha_prefix || nonce`,
 and the value is the output of ECVRF-EDWARDS25519-SHA512-TAI (RFC 9381) under the key for
@@ -225,8 +233,11 @@ it by the secret scalar, and hash the result. The nonce solves the job when the 
 at least `k` zero bits at its least significant end, counting from the last byte, and is
 below `beat` when one is given.
 
-**The answer.** `200` means accepted and the job is over; `409` means the job had already
-ended, nothing to fix; `422` means the nonce does not solve the job as the miner sees it,
+**The answer.** `200` comes with `accepted` and `beat`. `accepted: true` means the miner
+took your solution; `accepted: false` means it is valid but no longer below the job's
+`beat`, because a better one got there first. Either way the job is still open: take the
+`beat` from the answer and keep searching. `409` means the job has ended, nothing to fix;
+poll for the next one. `422` means the nonce does not solve the job as the miner sees it,
 which is a bug in the seeker, and the reply says why. Send your own output in the result
 as `beta`: the miner compares it with its own computation, and a mismatch is the fastest
 way to find out that your hash-to-curve or your scalar multiplication differs.
