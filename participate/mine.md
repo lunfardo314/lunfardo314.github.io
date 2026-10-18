@@ -130,9 +130,9 @@ The miner runs until you stop it, or until the chain is exhausted. Useful option
 | `--max-hashrate-khs X` | Upper limit on the mining speed of this process, all workers together, in thousands of attempts per second (KH/s). Fractions are allowed, e.g. `2.5`. Default 0 — no limit. Use it when the machine has other work to do: the workers pause between attempts, so the processor load drops with the limit. The miner prints its measured speed while it works, which tells you what your machine does without a limit. |
 | `--nonce-start N` | First nonce of every round. Default 0 — a fresh random start per round, so several processes mining under one key search different nonces instead of repeating each other. |
 | `--count N` | Stop after N transits. Default 0 — keep going. |
-| `--stream URL,…` | Additional node endpoints to receive mining transactions from. **Worth setting** — see below. |
+| `--stream URL,…` | Additional node endpoints to receive mining transactions from, and to send each of your transits to as well. **Worth setting** — see below. |
 | `--no-stream` | Do not subscribe to the stream at all. Slower, and you will usually lose. |
-| `--refetch N` | Seconds to mine one target before re-stamping it. Default 0 — adaptive to the measured hashrate. Whatever the window, a round ends when the sequencers start settling its slot, since a solution found later reaches none of them in time. |
+| `--refetch N` | No effect since v1.0.2: a round always lasts until shortly before its slot is settled. Still accepted, so older start scripts keep working. |
 
 Where the reward goes has no flags of its own: it follows the `consolidate` section of
 the profile, exactly as `proxi node consolidate` does.
@@ -158,7 +158,9 @@ Rust, about twice as fast per core as the miner's own workers; with it built and
 PATH, `proxi node mine --seeker` starts it beside the miner and wires everything up by
 itself. The same interface serves a seeker on another machine, a GPU seeker or one you
 write yourself. Configuration, running and the interface are on
-[Pluggable nonce seekers](participate/nonce_seeker.md).
+[Pluggable nonce seekers](participate/nonce_seeker.md). Update the reference seeker
+together with `proxi`: since v1.0.2 a seeker keeps searching the same job after each
+accepted solution, and one built before that goes idle after its first.
 
 ## A quiet start
 
@@ -233,15 +235,19 @@ takes to mine a step — and would keep winning. Proxima closes that gap two way
   a value fixed by the key and the message that nobody can choose. Sequencers hold the
   competing transits until a settlement window late in the slot before picking one, so a
   transit that arrives a little later is judged by the rule, not by who was seen first.
-  At one transit per slot most contests are between equal slots, so once your miner has
-  a solution it keeps grinding for a smaller VRF output while a competitor outranks it
-  and the settlement is still ahead, and submits each improvement. Nothing is preferred
-  merely for being yours, and your chance of winning a contested step is your share of
-  the hashrate, as before.
+  At one transit per slot most contests are between equal slots. So your miner searches
+  every slot until about 0.7 seconds before it is settled, not only until its first
+  solution: it submits the first one at once, and after that each solution with a
+  smaller VRF output than the best one known, its own or a competitor's. A miner that
+  stopped at its first solution would make only a fraction of its draws. Nothing is
+  preferred merely for being yours, and since every miner searches the whole slot, your
+  chance of winning a contested step is your share of the hashrate.
 
 Because the stream matters this much, pass `--stream` with a couple of independent node
 endpoints. Subscribing to several means no single node can slow you down by withholding
-what it has seen.
+what it has seen. Your miner also sends each transit to these nodes, not only to its
+own: from a slow connection, a transit sent along one path can reach the sequencers
+after the slot is settled.
 
 ## What happens to what you mine
 
