@@ -1,13 +1,18 @@
 The site is dedicated to the [Proxima project](https://github.com/lunfardo314/proxima).
 
-> ### Network status: **stopped**
+> ### Network status: **running**
 >
-> The pre-launch network (take 0) has been stopped. This is the centralized
-> phase: a network can be stopped and reset at any time, without notice, and
-> tokens on it are temporary.
+> The pre-launch network is running. This is its centralized phase: it can be
+> stopped and reset at any time, without notice, and tokens on it are temporary.
 >
-> **The next take is being prepared.** Its genesis details will be published here
-> when it starts.
+> - Ledger description: `Proxima take 1. Hinc itur ad astra`
+> - Genesis time (slot 0): `2026-10-18 06:32:19 UTC` (Unix `1792305139`)
+> - Ledger definitions hash: `ec557ffc6c9a64c9c3fcd3161a7d1cab8d2276e5a45a7d52070e2bc46f203428`
+> - Genesis controller public key: `387ff8f9358e8a4307231bba35aecbb477c2bcc42e6b09700acfa5aca290fd5a`
+> - Genesis file (slot 0 snapshot, 150 KB):
+>   [s0-0-030000000000000000000000000000000000000000000000000000.snapshot](https://lunfardo314.github.io/static/genesis/s0-0-030000000000000000000000000000000000000000000000000000.snapshot),
+>   SHA-256 `0b22efd5018e6e77fd17e172d21c8b592f16cb21888da623b46262ff07be3a0e`
+> - [Network monitor](http://65.21.170.230:8001/monitor)
 >
 > How to join: [Join the Proxima effort](participate/participate.md).
 
