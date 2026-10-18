@@ -2,8 +2,9 @@ The site is dedicated to the [Proxima project](https://github.com/lunfardo314/pr
 
 > ### Network status: **running**
 >
-> The pre-launch network is running. This is its centralized phase: it can be
-> stopped and reset at any time, without notice, and tokens on it are temporary.
+> The network is running. Until decentralized, it is in its centralized phase: it
+> can be stopped and reset at any time, without notice, and tokens on it are
+> temporary.
 >
 > - Ledger description: `Proxima take 1. Hinc itur ad astra`
 > - Genesis time (slot 0): `2026-10-18 06:32:19 UTC` (Unix `1792305139`)
