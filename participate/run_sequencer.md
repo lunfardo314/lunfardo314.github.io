@@ -144,8 +144,7 @@ sequencer:
   headroom — a handful of branching sequencers per slot is all the network needs.
 
 The other sequencer options (`max_tag_along_inputs`, `tag_along_drain_rate`,
-`max_frozen_delegations`, `logging`, `force_activity`,
-`standalone`, …) are documented in
+`logging`, `force_activity`, `standalone`, …) are documented in
 [Node configuration reference](participate/node_config.md).
 
 ## (Optional) Encrypt the controller key

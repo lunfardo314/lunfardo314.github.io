@@ -197,7 +197,7 @@ a manual operator step.
 | `sequencer.pace` | int | ledger minimum | Distance in ticks between two consecutive sequencer transactions. Clamped up to the ledger-defined minimum sequencer pace (cannot be smaller).                                                   |
 | `sequencer.max_tag_along_inputs` | int | 15 | Max tag-along inputs consumed per milestone (batch size). `0` = the sequencer accepts no tag-along inputs; an absent key keeps the default 15.                                    |
 | `sequencer.tag_along_drain_rate` | int | 100 | Target tag-alongs to drain per slot (~10 TPS/sequencer: 100 ÷ 10.24 s slot). With `max_tag_along_inputs`, controls drain milestones per slot. Values `< 1` ignored.                   |
-| `sequencer.max_frozen_delegations` | int | 300 | Approximate per-epoch cap on the number of delegations the sequencer freezes. A freeze into a reachable epoch already holding this many is refused (the delegation stays unfrozen, retried later). `0` = the sequencer freezes no delegations; an absent key keeps the default 300. |
+| `sequencer.max_frozen_delegations` | int | — | **Deprecated, ignored.** The cap on how many delegations the sequencer freezes per epoch is now part of the sequencer's own parameters on its chain, where delegators' wallets can see it: `proxi node seq set-params --max_frozen_delegations <n>`, default 300. A node that still has this key in its config logs a warning. |
 | `sequencer.logging` | bool | false | Write a separate sequencer log file.                                                                                                                                                             |
 | `sequencer.global_logging` | bool | false | If `logging` is true, also duplicate those messages into the node's main log.                                                                                                                    |
 | `sequencer.force_activity` | bool | false | Always issue a branch + milestone regardless of throttle pressure. Use for bootstrap sequencers that must maintain liveness.                                                                     |
@@ -220,7 +220,6 @@ sequencer:
   pace: 12
   max_tag_along_inputs: 15
   tag_along_drain_rate: 100
-  max_frozen_delegations: 300
   logging: false
   global_logging: false
   # standalone: true   # single-node dev network only
@@ -689,6 +688,5 @@ sequencer:
   pace: 12
   max_tag_along_inputs: 15
   tag_along_drain_rate: 100
-  max_frozen_delegations: 300
   standalone: true       # single-node only — never on a networked sequencer
 ```
