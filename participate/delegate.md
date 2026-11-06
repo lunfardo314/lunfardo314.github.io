@@ -282,16 +282,24 @@ revocation window that the delegation covenant enforces after every freeze — y
 your tokens back at any time; the state is `unlockable by the owner`:
 
 ```
-proxi node killchain <delegation ID>
+proxi node endchain <delegation ID>
 ```
 
-This ends the delegation and returns the whole balance to an ordinary `sigLock` output in
-your wallet. Several delegations can be ended at once, in one transaction, by listing
-their IDs:
+This ends the delegation and returns its balance, less the tag-along fee, to an ordinary
+`sigLock` output in your wallet. Several delegations can be ended at once, in one
+transaction, by listing their IDs:
 
 ```
-proxi node killchain <delegation ID> <delegation ID> ...
+proxi node endchain <delegation ID> <delegation ID> ...
 ```
+
+To send the tokens to another account instead of your wallet, name it with `-t`:
+
+```
+proxi node endchain <delegation ID> -t a/<holder ID>
+```
+
+`killchain` and `discontinue-chain` are other names for the same command.
 
 **While it is frozen**, you can ask the sequencer to release it early:
 
@@ -336,9 +344,9 @@ immediately re-freezing them, guaranteeing you a chance to do as you wish.
 
 Whenever the delegation is not frozen (`unlockable by the owner` or `on hold`) you can:
 
-* **End it** — `proxi node killchain <delegation ID>` returns all the funds to an ordinary
-  address-locked output in your wallet. Give several IDs to end several delegations in
-  one transaction.
+* **End it** — `proxi node endchain <delegation ID>` returns the funds, less the tag-along
+  fee, to an ordinary address-locked output in your wallet, or to the account given with
+  `-t a/<holder ID>`. Give several IDs to end several delegations in one transaction.
 * **Continue it** — `proxi node delegate chain <delegation ID> [--cut <promille>]
   [-q <sequencer ID>] [--add <amount>]` re-delegates the same chain to the same or a
   different sequencer, optionally moving more tokens in at the same time.

@@ -252,6 +252,72 @@ largely defeats the point of encrypting the key — so on a single dedicated hos
 unencrypted, permission-locked key file is usually the simpler and equally
 reasonable choice.
 
+## Limit what the sequencer freezes
+
+When your sequencer freezes a delegation, it pays the delegator in advance the
+delegator's share of the inflation for the whole freeze, up to 60 epochs. An epoch is
+600 slots, about 1 hour 42 minutes, so a freeze lasts up to about 4.3 days. The
+sequencer earns the advance back over that time. Two parameters on the sequencer's
+chain limit how much it takes on:
+
+* `--max_frozen <motes>`: the most delegated tokens the sequencer holds frozen at once
+  (1 PROX = 1,000,000 motes). There is no limit unless you set one;
+  `--max_frozen unlimited` removes it.
+* `--max_frozen_delegations <n>`: the most delegations the sequencer freezes into any
+  one epoch, 300 unless you set it; `--max_frozen_delegations default` goes back to 300.
+  All delegations frozen into one epoch become free at the same moment, and this keeps
+  the work of freezing them again within one or two of the sequencer's transactions.
+
+Both are set like the other parameters, for example:
+
+```
+proxi node seq set-params --max_frozen 5000000000000
+```
+
+Wallets read them from the chain. When the sequencer has no room for a delegation,
+`proxi node delegate` refuses it, and the random draws of `proxi node consolidate` and
+`proxi node mine` pass the sequencer over. Delegations already frozen are not affected.
+`proxi node seq info` shows both limits. Setting either to 0 means the sequencer freezes
+nothing more, which is how you shut it down (next section).
+
+The node configuration key `sequencer.max_frozen_delegations` is no longer read.
+
+## Shut down a sequencer
+
+Stopping a sequencer while delegations are frozen to it costs you and the network. You
+lose the part of every advance the sequencer has not yet earned back, since a stopped
+sequencer earns nothing. The network loses the coverage of your sequencer and of every
+delegation frozen to it, and those delegators' tokens stay locked, earning nothing,
+until their freezes end. Stopping costs nothing once no delegation is frozen. To get
+there:
+
+1. Stop freezing:
+
+   ```
+   proxi node seq set-params --max_frozen 0
+   ```
+
+   Keep the node running. Each frozen delegation becomes free when its freeze ends, at
+   most about 4.3 days later. Delegators who run `proxi node consolidate` are moved to
+   other sequencers automatically; others can take their tokens back themselves.
+2. Check progress with `proxi node seq info`. Its decommissioning section shows how many
+   delegations are still frozen, when the last freeze ends, the advance you would lose by
+   stopping now, and how many requests are still waiting for the sequencer. When nothing
+   is frozen and nothing is waiting, it says the sequencer can be stopped at no loss.
+3. Stop the node, and wait a few slots for its last transactions to settle.
+4. End the sequencer chain. Its whole balance goes to your wallet:
+
+   ```
+   proxi node endchain <sequencer chain ID>
+   ```
+
+   Do not end the chain while the node is running: the two would compete for the same
+   chain output.
+5. Put the tokens back to work, for example with `proxi node delegate` or
+   `proxi node consolidate`. Sitting in the wallet, they earn nothing and add nothing to
+   the network's coverage, and your sequencer's own balance is usually the largest part
+   of what it contributed.
+
 ## Notes
 
 - **Clock sync matters most here.** A sequencer issues timestamped transactions

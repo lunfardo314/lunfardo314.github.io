@@ -195,8 +195,9 @@ So:
 * run seekers that hold the key on machines you control, where you can;
 * where you cannot, move what the mining wallet holds, from time to time, to a wallet
   whose key never leaves your own machine: release its delegations with
-  `proxi node delegate askstop`, end them with `proxi node killchain` and send the
-  tokens over (see [Delegation](participate/delegate.md)). What a stolen key can take is
+  `proxi node delegate askstop`, then end them with
+  `proxi node endchain <delegation ID> ... -t a/<holder ID>`, which sends the tokens straight
+  to that wallet (see [Delegation](participate/delegate.md)). What a stolen key can take is
   then at most what was mined since the last move, and you switch to a new mining key.
 
 ## Writing your own seeker

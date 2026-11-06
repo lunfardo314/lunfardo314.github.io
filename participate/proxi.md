@@ -322,7 +322,7 @@ which a sequencer does automatically. After the window your wallet can reclaim i
 
 * `proxi node info` displays information about the node.
 
-Beyond these, `proxi node` has commands for chains (`mkchain`, `killchain`, `chain`,
+Beyond these, `proxi node` has commands for chains (`mkchain`, `endchain`, `chain`,
 `allchains`), delegation (the `proxi node delegate` group), native tokens
 (`proxi node foundry`), sequencer control (`proxi node seq`, for example
 `seq set-params` to change a sequencer's fee, cut or minimum top-up), peers and sync status,

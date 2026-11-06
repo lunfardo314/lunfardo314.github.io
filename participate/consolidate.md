@@ -84,7 +84,10 @@ never refused by its target as unprofitable.
 **A random draw biased by a rating.** With `autodelegate: random` the target is drawn
 among the sequencers active in the last few slots. The draw is not uniform: the sequencers
 are rated on several criteria and the better rated are drawn more often, though every
-sequencer leaving delegators anything keeps a chance. The criteria are
+sequencer leaving delegators anything keeps a chance. A sequencer that has set limits on
+what it freezes and has no room left for the delegation is left out of the draw (see
+[Limit what the sequencer freezes](participate/run_sequencer.md?id=limit-what-the-sequencer-freezes)).
+The criteria are
 
 * the share of the inflation it leaves delegators (more is better, counted four times,
   so the price weighs as much as the rest together);
@@ -120,8 +123,12 @@ out of the delegation itself:
 * with more delegations than the target number, the smallest one is folded into the
   largest one, which is delegated again with the combined balance;
 * a delegation whose target has gone quiet, or now keeps more than the delegation
-  leaves it (its target refuses to renew it), or is not the sequencer you configured,
-  or has sat unfrozen for longer than an epoch, is delegated again to a fresh target;
+  leaves it (its target refuses to renew it), or has no room left under the limits it
+  set on what it freezes, or is not the sequencer you configured, is delegated again to
+  a fresh target. So is a delegation its target has put on hold, and one its target has
+  not frozen within 60 slots (about 10 minutes) of when it could have. When a freeze
+  ends, the target cannot freeze the delegation again during the first 60 slots, which
+  are reserved for you; the 10 minutes count from the end of that time;
   one too small to be delegated again on its own is folded into the largest delegation
   the wallet can spend, or, when there is none, ended and its balance returned to the
   wallet, where the next sweep picks it up.
