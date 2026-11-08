@@ -163,6 +163,28 @@ proof of work. How mining works, and why, is explained in
   plain tokens instead, set the new key `mine.payout_address` in the wallet profile to an
   address (a holder ID, 32 bytes in hex): every reward then goes there, less the fee paid
   to the sequencer that includes the transit.
+* **Why the consolidator is now crucial.** This is the biggest practical change for a miner.
+  Until now the ledger itself rewarded keeping mined tokens at work: a reward placed into a
+  delegation or onto your own sequencer was paid in full, one paid as plain tokens to your
+  wallet only a fraction of it. The miner alone was enough to keep rewards working, and the
+  consolidator was an optional tidying tool. From the upgrade the ledger pays the full
+  reward wherever it goes, so nothing in the rules keeps your tokens at work any more:
+  that is now the job of your wallet's software, and the consolidator is the part that does
+  it. Run `proxi node consolidate` beside `proxi node mine`, on every mining wallet:
+  * it puts tokens that pile up in the wallet to work, into delegations or your own
+    sequencer: for instance rewards paid as plain tokens when `mine.payout_address` is the
+    wallet's own holder ID (paid to another holder, they are that holder's to put to work);
+  * it moves a delegation whose sequencer stopped, now leaves less than the share the
+    delegation requires, or can no longer freeze it, to a better one, and folds the
+    smallest delegations together when there are more than you set;
+  * it moves your delegations off sequencers under 10,000 PROX of their own (see
+    [Delegators](participate/upgrade6.md?id=delegators)): it asks such a sequencer to
+    release a frozen delegation early and re-delegates it, which works only while that
+    sequencer still runs.
+
+  A token left idle earns nothing, while one in a delegation or on a sequencer earns its
+  share of the inflation every slot and adds to the weight that keeps the ledger secure.
+  See [The wallet consolidator](participate/consolidate.md).
 * **The pause.** No transit is accepted for 1,000 slots after the activation, from slot
   196000 to slot 197000, so that every miner and node has moved to the new rules before the
   first transit under them.
