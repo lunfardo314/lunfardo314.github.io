@@ -63,7 +63,7 @@ For mining, the rules are set up to make this so. A token in consensus, in a del
 or on your own sequencer, earns inflation every slot; a token idle in your wallet earns
 nothing. Until library upgrade 6 the ledger also paid a mined reward in full only when it
 landed in consensus, and only a fraction of it to a plain output. From the upgrade (slot
-194000, see [Upgrade 6](participate/upgrade6.md)) every reward is paid in full wherever it
+196000, see [Upgrade 6](participate/upgrade6.md)) every reward is paid in full wherever it
 goes, and what it earns afterwards makes the difference.
 
 `proxi node mine` acts on this for you. Before every round it picks where the next reward

@@ -3,8 +3,8 @@
 > **What and when**
 >
 > * **Release:** v1.6.0, out on Sunday 8 November 2026, about 17:00 UTC.
-> * **The new rules start:** at slot 194000, Tuesday 10 November 2026, about 06:22 UTC.
-> * **Mining pauses** from that slot for 1,000 slots and resumes at slot 195000, about 09:12 UTC.
+> * **The new rules start:** at slot 196000, Tuesday 10 November 2026, about 12:03 UTC.
+> * **Mining pauses** from that slot for 1,000 slots and resumes at slot 197000, about 14:54 UTC.
 > * **Who must act:** everyone. Every node, every wallet, every miner and every other program
 >   that signs transactions must run v1.6.0 or later before the slot.
 > * **Most urgent:** sequencers holding less than 10,000 PROX of their own, and the people
@@ -28,7 +28,7 @@ often a sequencer may issue transactions, and how much a sequencer must hold of 
 
 ### Everyone: update before the slot
 
-Update the node (`proxima`) and the wallet (`proxi`) to v1.6.0 or later before slot 194000.
+Update the node (`proxima`) and the wallet (`proxi`) to v1.6.0 or later before slot 196000.
 This applies to access nodes, sequencer nodes, wallets used only for sending, and any
 program of your own that builds and signs transactions: from the slot, the transaction ID
 is computed differently (see [What changes](participate/upgrade6.md?id=what-changes)), and a transaction signed the
@@ -50,7 +50,7 @@ If you build from source, rebuild both programs from the release, as described i
   sequencers that can no longer hold them frozen (see [Delegators](participate/upgrade6.md?id=delegators)) and keeps
   the wallet tidy. See [The wallet consolidator](participate/consolidate.md).
 * **Nothing to do for the pause.** A v1.6.0 miner started before or during the pause waits
-  until slot 195000 by itself.
+  until slot 197000 by itself.
 * Your wallet profile works unchanged. One setting is new and optional, see
   [Mining](participate/upgrade6.md?id=mining) below.
 
@@ -164,7 +164,7 @@ proof of work. How mining works, and why, is explained in
   address (a holder ID, 32 bytes in hex): every reward then goes there, less the fee paid
   to the sequencer that includes the transit.
 * **The pause.** No transit is accepted for 1,000 slots after the activation, from slot
-  194000 to slot 195000, so that every miner and node has moved to the new rules before the
+  196000 to slot 197000, so that every miner and node has moved to the new rules before the
   first transit under them.
 * **Difficulty.** The lowest difficulty the ledger allows rises from 10 to 24 bits. After
   the pause the difficulty starts at that floor and rises by one bit for every 8 slots in a
@@ -184,7 +184,7 @@ A sequencer's **own balance** is what its chain holds itself, apart from the del
 frozen to it. The upgrade sets two minimums. Each is a separate value in the ledger, which
 a later upgrade may change.
 
-* **5,000 PROX, for new sequencers.** A sequencer chain started at or after slot 194000
+* **5,000 PROX, for new sequencers.** A sequencer chain started at or after slot 196000
   must hold at least 5,000 PROX of its own when it starts and at every later step.
   Sequencers started before the slot are not affected by this minimum.
 * **10,000 PROX, for every sequencer.** A sequencer holding less than this of its own:
@@ -204,5 +204,5 @@ a later upgrade may change.
 | Event | Slot | Time (UTC) |
 |-------|------|------------|
 | Release v1.6.0 | | Sunday 8 November 2026, about 17:00 |
-| Upgrade 6 activates; mining pauses | 194000 | Tuesday 10 November 2026, about 06:22 |
-| Mining resumes | 195000 | Tuesday 10 November 2026, about 09:12 |
+| Upgrade 6 activates; mining pauses | 196000 | Tuesday 10 November 2026, about 12:03 |
+| Mining resumes | 197000 | Tuesday 10 November 2026, about 14:54 |

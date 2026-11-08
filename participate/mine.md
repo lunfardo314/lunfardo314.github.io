@@ -35,14 +35,14 @@ complete at 1,000,000,000 PROX.
 
 ## Library upgrade 6: what changes for miners
 
-Library upgrade 6 changes the rules of mining at **slot 194000**, on Tuesday 2026-11-10
-at about 06:22 UTC. It ships in release **v1.6.0** of `proxima` and `proxi`. In short:
+Library upgrade 6 changes the rules of mining at **slot 196000**, on Tuesday 2026-11-10
+at about 12:03 UTC. It ships in release **v1.6.0** of `proxima` and `proxi`. In short:
 
 * **Update before the slot.** From the slot, the ID of every transaction includes the key
   that signs it. Every wallet, the miner and every tool that signs transactions must be
   the v1.6.0 build or later; an older `proxi` and the old miner stop working at the slot.
   The new release mines by today's rules until then, so update now.
-* **Mining pauses for 1,000 slots**, from slot 194000 to slot **195000** (about 09:12 UTC
+* **Mining pauses for 1,000 slots**, from slot 196000 to slot **197000** (about 14:54 UTC
   the same day). No transit is valid in between; the miner says so and waits.
 * **The work becomes plain hashing**, described next, and graphics cards (GPUs) now
   outpace processors (CPUs) by far. A GPU seeker is published with the release.
@@ -73,7 +73,7 @@ about 100 million with the reference CPU seeker, under 1% of one such card. A CP
 still mine, but expect to be outpaced by anyone who brings a GPU. Difficulty adapts to
 whatever hashrate shows up.
 
-Until slot 194000 the work is still the older one: the output of a verifiable random
+Until slot 196000 the work is still the older one: the output of a verifiable random
 function under your own key, which every attempt needed the key for. The rest of this
 page describes the rules from upgrade 6.
 
@@ -233,7 +233,7 @@ Configuration, running a seeker on another machine, and the interface are on
 
 ## A quiet start
 
-**The pause of upgrade 6.** Mining stops at slot 194000 and resumes at slot 195000. The
+**The pause of upgrade 6.** Mining stops at slot 196000 and resumes at slot 197000. The
 miner reads this from the node and waits. The first transit after the pause has a gap of
 1,000 slots behind it, so its difficulty is relieved to the floor of 24 bits (see
 below): every miner solves it at once, and the smallest hash among those stamped at the

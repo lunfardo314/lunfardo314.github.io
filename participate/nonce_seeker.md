@@ -28,7 +28,7 @@ external programs, called **nonce seekers**. Proxima ships two reference seekers
 
 A CPU is under 1% of one such card. A GPU version for AMD and Intel cards is to follow.
 
-**From library upgrade 6, slot 194000, a seeker needs no key.** A job carries the bytes of
+**From library upgrade 6, slot 196000, a seeker needs no key.** A job carries the bytes of
 the transaction to hash, not a key, so a seeker can run on a machine you do not trust
 with your key. Every seeker must be the build of release v1.6.0 or later: an older build
 gets no jobs after the slot. Until the slot, mining uses the older work: the GPU seeker

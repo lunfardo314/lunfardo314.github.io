@@ -156,7 +156,7 @@ until they thaw. The one exception follows.
 
 ## Delegations at small sequencers
 
-From [library upgrade 6](participate/upgrade6.md), slot 194000, a sequencer holding less
+From [library upgrade 6](participate/upgrade6.md), slot 196000, a sequencer holding less
 than **10,000 PROX of its own** can no longer freeze delegations, produce branches or work
 in the last ticks of a slot. It regains all of that once its balance reaches the bound.
 A delegation already frozen at such a sequencer would stay there until its freeze runs

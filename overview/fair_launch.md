@@ -249,8 +249,8 @@ compliance with its rules. Each transit is a transaction that:
 - decrements the remaining-mintable counter by the amount minted;
 - carries a proof of work.
 
-How the reward is paid out changes with library upgrade 6, at slot 194000 (Tuesday
-10 November 2026, about 06:22 UTC). Until then the covenant pays the reward, less a fixed fee
+How the reward is paid out changes with library upgrade 6, at slot 196000 (Tuesday
+10 November 2026, about 12:03 UTC). Until then the covenant pays the reward, less a fixed fee
 of 1 PROX to a sequencer of the miner's choice, to the key that signed the transaction. From
 then on the miner decides how the reward is split among the transit's other outputs,
 including what it pays the sequencer that includes the transit; the covenant checks only the
@@ -267,7 +267,7 @@ The reward starts at **95 PROX** per transit and stays there for the first **60 
 After that it grows linearly, by a fixed small amount every slot, ending near 530 PROX at the
 last transit.
 
-From library upgrade 6 (slot 194000) every transit mints the full reward, wherever it is
+From library upgrade 6 (slot 196000) every transit mints the full reward, wherever it is
 paid. Until then that is what a transit mints only when its reward lands in consensus, in a
 delegation or on the miner's own sequencer. The covenant accepts two other layouts until the
 upgrade and pays less for them: a new delegation mints 50 PROX plus the 1 PROX fee, and the
@@ -290,10 +290,10 @@ transits early and a smaller share late.
 
 ### The proof of work
 
-The work function changes with library upgrade 6, at slot 194000 (Tuesday 10 November 2026,
-about 06:22 UTC).
+The work function changes with library upgrade 6, at slot 196000 (Tuesday 10 November 2026,
+about 12:03 UTC).
 
-**From slot 194000: the transaction's own ID.** The work is the transit's transaction ID, a
+**From slot 196000: the transaction's own ID.** The work is the transit's transaction ID, a
 BLAKE2b hash of the transaction, which must end in at least `K` zero bits. The miner varies a
 nonce carried in the transaction and hashes again until the ID qualifies. The ID covers the
 mine output being spent, every output with its amount, and, from the upgrade, the key that
@@ -308,7 +308,7 @@ mining hardware: a reference GPU seeker is published with the release, measured 
 Difficulty adapts to whatever hashrate arrives. Details and reasons are in
 [How mining works](participate/mining_architecture.md).
 
-**Until slot 194000: a VRF under the miner's key.** The work function is a **verifiable random
+**Until slot 196000: a VRF under the miner's key.** The work function is a **verifiable random
 function** (a VRF, RFC 9381). The miner varies a nonce; for each nonce the VRF turns the
 predecessor output, the target slot and the nonce into one 64-byte output, and that output
 must end in at least `K` zero bits. The winning transit carries the VRF proof next to the
@@ -327,7 +327,7 @@ upgrade 6, 24 bits from it, since a hash attempt is far cheaper than a VRF one. 
 rule is in the covenant, and so is a quiet start: the chain accepts no transit in the first
 2,000 slots of a network, about 5.7 hours, so the nodes are up before the race begins. The
 upgrade adds a pause of the same kind: no transit is accepted for 1,000 slots after it
-activates, from slot 194000 until slot 195000 (about 09:12 UTC), so that every miner and node
+activates, from slot 196000 until slot 197000 (about 14:54 UTC), so that every miner and node
 has moved to the new rules. After the pause the difficulty starts at the floor.
 
 The rest follows from this being a proof-of-work race on a chain. Many miners work on the same
