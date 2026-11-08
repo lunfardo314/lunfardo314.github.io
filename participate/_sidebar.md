@@ -1,9 +1,11 @@
 Join Proxima
 - [Join Proxima](participate/participate.md)
+- [Upgrade 6: what changes, what to do](participate/upgrade6.md)
 - [Launch phase network](participate/launch_network.md)
 - [The `proxi` wallet](participate/proxi.md)
 - [Wallet configuration](participate/wallet_config.md)
 - [Mining](participate/mine.md)
+- [How mining works](participate/mining_architecture.md)
 - [Pluggable nonce seekers](participate/nonce_seeker.md)
 - [Put your tokens to work](participate/active_tokens.md)
 - [The wallet consolidator](participate/consolidate.md)

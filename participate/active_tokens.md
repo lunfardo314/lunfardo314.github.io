@@ -59,26 +59,29 @@ pays for taking part in the cooperative consensus, earning the most for the hold
 keeping the ledger secure turn out to be the same thing. Nobody has to be asked to
 cooperate, because cooperating is what pays.
 
-For mining, the rules are set up to make this so. A mined reward is paid in full only
-when it lands in consensus, in a delegation or on your own sequencer. A reward paid to a
-plain output in your wallet gets only a fraction of that, and only once, as pocket money
-for a new wallet. So a token kept idle costs its miner more than six times a token at
-work.
+For mining, the rules are set up to make this so. A token in consensus, in a delegation
+or on your own sequencer, earns inflation every slot; a token idle in your wallet earns
+nothing. Until library upgrade 6 the ledger also paid a mined reward in full only when it
+landed in consensus, and only a fraction of it to a plain output. From the upgrade (slot
+194000, see [Upgrade 6](participate/upgrade6.md)) every reward is paid in full wherever it
+goes, and what it earns afterwards makes the difference.
 
 `proxi node mine` acts on this for you. Before every round it picks where the next reward
 goes, whichever pays you most: your own sequencer, a top-up of one of your delegations,
-or a new delegation with one of the active sequencers. You end up with a little pocket
-money and a handful of delegations, each frozen and topped up in place by its sequencer.
-Nothing piles up, and there is no second process to run. How the miner decides, and how
-to steer it, is on [Mining](participate/mine.md). To mine faster, keep `proxi node mine`
+or a new delegation with one of the active sequencers. You end up with a handful of
+delegations, each frozen and topped up in place by its sequencer.
+Nothing piles up. How the miner decides, and how to steer it, is on
+[Mining](participate/mine.md). To mine faster, keep `proxi node mine`
 and plug in a faster nonce seeker of your own: that is where all the speed is, and the
 miner keeps placing the rewards.
 
-What is left to you is tidying now and then. If a sequencer raises its margin or goes
-quiet, your delegation with it is no longer frozen and stops earning. Pocket money and
-incoming payments can also collect on plain outputs. `proxi node delegate status` shows
-how your delegations are doing. You can tidy by hand: `proxi node delegate amount` puts
-tokens into a delegation and `proxi node compact` sweeps plain outputs into one. Or you
-can run [the wallet consolidator](participate/consolidate.md), an optional background
-process that does this for you. It moves delegations that stopped working, folds
-several into one, and puts plain outputs above a minimum you choose to work.
+The miner only places new rewards. If a sequencer raises its margin, goes quiet, or
+holds too little of its own to freeze delegations, your delegation with it is no longer
+frozen and stops earning. So **every mining wallet must also run
+[the wallet consolidator](participate/consolidate.md)**, `proxi node consolidate`, beside
+the miner. It moves delegations that stopped working, asks small sequencers to release
+the delegations they can no longer freeze, folds several delegations into one, and puts
+plain outputs above a minimum you choose to work. Any other wallet can run it too, or be
+tidied by hand: `proxi node delegate status` shows how your delegations are doing,
+`proxi node delegate amount` puts tokens into a delegation and `proxi node compact`
+sweeps plain outputs into one.

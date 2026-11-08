@@ -245,10 +245,18 @@ compliance with its rules. Each transit is a transaction that:
 
 - consumes the predecessor and produces the successor;
 - mints the current reward out of thin air;
-- pays **at least 99 %** of it to the key that signed the transaction;
-- pays **at most 1 %** as a tag-along fee to a sequencer of the miner's choice;
+- pays it out;
 - decrements the remaining-mintable counter by the amount minted;
 - carries a proof of work.
+
+How the reward is paid out changes with library upgrade 6, at slot 194000 (Tuesday
+10 November 2026, about 06:22 UTC). Until then the covenant pays the reward, less a fixed fee
+of 1 PROX to a sequencer of the miner's choice, to the key that signed the transaction. From
+then on the miner decides how the reward is split among the transit's other outputs,
+including what it pays the sequencer that includes the transit; the covenant checks only the
+mine chain itself and that those outputs receive exactly the reward. See
+[How mining works](participate/mining_architecture.md) and
+[Library upgrade 6](participate/upgrade6.md).
 
 About **3.3 million transits** exhaust the mintable supply. The chain is then dead and no further
 token can be minted this way.
@@ -259,14 +267,14 @@ The reward starts at **95 PROX** per transit and stays there for the first **60 
 After that it grows linearly, by a fixed small amount every slot, ending near 530 PROX at the
 last transit.
 
-That is what a transit mints when its reward lands in consensus, in a delegation or on the
-miner's own sequencer. The covenant accepts two other layouts and pays less for them: a new
-delegation mints 50 PROX plus the 1 PROX fee, and the one-time opening payout to a plain
-output, which is how a fresh wallet becomes known to the ledger, mints 15 PROX plus the fee;
-the rest of the reward is left unminted for good. A token kept idle costs its miner more
-than six times a token at work, which is what makes putting mined capital to work the default
-rather than a courtesy. The numbers above and the projections of section 7 take every
-transit at the full reward, so they are ceilings.
+From library upgrade 6 (slot 194000) every transit mints the full reward, wherever it is
+paid. Until then that is what a transit mints only when its reward lands in consensus, in a
+delegation or on the miner's own sequencer. The covenant accepts two other layouts until the
+upgrade and pays less for them: a new delegation mints 50 PROX plus the 1 PROX fee, and the
+one-time opening payout to a plain output, which is how a fresh wallet becomes known to the
+ledger, mints 15 PROX plus the fee; the rest of the reward is left unminted for good. The
+upgrade does not change the schedule itself. The numbers above and the projections of
+section 7 take every transit at the full reward.
 
 The flat phase is set to the projected length of Phase 1: the reward stays constant while the
 bootstrap capital can still run the ledger alone, and starts growing once it cannot.
@@ -277,31 +285,36 @@ keeps a transit worth attempting as difficulty tracks hashrate, which carries th
 exhaustion.
 
 Reward per transit is therefore lower early and higher late; difficulty moves the other way,
-tracking whatever hashrate shows up. A given amount of CPU wins a larger share of the transits
-early and a smaller share late.
+tracking whatever hashrate shows up. A given amount of hashrate wins a larger share of the
+transits early and a smaller share late.
 
 ### The proof of work
 
-The work function is a **verifiable random function** (a VRF, RFC 9381) under the miner's own
-key. The miner varies a nonce; for each nonce the VRF turns the predecessor output, the target
-slot and the nonce into one 64-byte output, and that output must end in at least `K` zero
-bits. The winning transit carries the VRF proof next to the nonce, and the covenant verifies
-the proof under the key that signs the transaction.
+The work function changes with library upgrade 6, at slot 194000 (Tuesday 10 November 2026,
+about 06:22 UTC).
 
-A VRF differs from a hash in one way that matters here: for a given key and message there is
-exactly **one** output, and producing it needs the private key. One consequence, and one limit:
+**From slot 194000: the transaction's own ID.** The work is the transit's transaction ID, a
+BLAKE2b hash of the transaction, which must end in at least `K` zero bits. The miner varies a
+nonce carried in the transaction and hashes again until the ID qualifies. The ID covers the
+mine output being spent, every output with its amount, and, from the upgrade, the key that
+signs the transaction. So a solution is bound to the signer and to the payout: signed by
+another key, or paying anyone else, it is another transaction with another ID, and the work is
+lost. A solution cannot be redirected.
 
-- **Not outsourceable.** The private key sits inside the hot loop. Hand it to a pool and you
-  hand over the reward: the covenant pays every reward, less a fixed fee of 1 PROX, to the
-  signing key. Mining
-  pools — the largest source of concentration in every proof-of-work chain launched so far —
-  have no foothold here.
-- **Not hardware-neutral.** Each attempt is one elliptic-curve scalar multiplication plus
-  hashing. A GPU runs that in parallel several times faster than a CPU, and dedicated hardware
-  could go further. The VRF buys non-outsourceability, not equality between machines;
-  difficulty adapts to whatever hashrate arrives.
+The search itself needs no key, so it can run on any machine, and miners can pool their search
+if they choose. Plain hashing is what graphics cards (GPUs) do best, and they become the main
+mining hardware: a reference GPU seeker is published with the release, measured at about
+15 billion attempts per second on one card, against about 100 million on an 8-core processor.
+Difficulty adapts to whatever hashrate arrives. Details and reasons are in
+[How mining works](participate/mining_architecture.md).
 
-Call it **key-bound proof of work**.
+**Until slot 194000: a VRF under the miner's key.** The work function is a **verifiable random
+function** (a VRF, RFC 9381). The miner varies a nonce; for each nonce the VRF turns the
+predecessor output, the target slot and the nonce into one 64-byte output, and that output
+must end in at least `K` zero bits. The winning transit carries the VRF proof next to the
+nonce, and the covenant verifies the proof under the key that signs the transaction. Producing
+a VRF output needs the private key, so the key sits inside the search, and each attempt costs
+an elliptic-curve scalar multiplication, which a GPU runs several times faster than a CPU.
 
 ### Difficulty and competition
 
@@ -309,8 +322,13 @@ Difficulty is **adaptive**: the covenant raises and lowers it to hold the pace a
 per slot**, whatever hashrate shows up. It hardens one bit after a run of full slots and eases
 one bit for every empty one, which settles with about one slot in nine empty: about 1.12 slots
 per transit, some 11.5 seconds. That is the pace the projections of section 7 assume. The
-retarget rule is in the covenant, and so is a quiet start: the chain accepts no transit in the
-first 2,000 slots of a network, about 5.7 hours, so the nodes are up before the race begins.
+difficulty never rises above 56 bits and never falls below a floor: 10 bits until library
+upgrade 6, 24 bits from it, since a hash attempt is far cheaper than a VRF one. The retarget
+rule is in the covenant, and so is a quiet start: the chain accepts no transit in the first
+2,000 slots of a network, about 5.7 hours, so the nodes are up before the race begins. The
+upgrade adds a pause of the same kind: no transit is accepted for 1,000 slots after it
+activates, from slot 194000 until slot 195000 (about 09:12 UTC), so that every miner and node
+has moved to the new rules. After the pause the difficulty starts at the floor.
 
 The rest follows from this being a proof-of-work race on a chain. Many miners work on the same
 tip, one lands the transit, the rest move on. Competing transits for the same step are
@@ -327,10 +345,12 @@ every transit from the raw bytes rather than trusting the relay.
 The miner is `proxi node mine` ([Mining](participate/mine.md)). It is not privileged in any
 way: the only thing that decides anything is whether a transaction is valid. Like the rest of
 Proxima's software, it acts on behalf of the token holder and earns the holder as much as it
-can, which here means placing every reward in consensus, where the ledger pays it in full.
+can, which here means placing every reward in consensus, where it earns: until library
+upgrade 6 the only place the ledger pays it in full.
 All the speed is in the search for a nonce, and that search can be handed to a faster program
-of your own; see [Pluggable nonce seekers](participate/nonce_seeker.md). So the recommended
-way to compete is to keep `proxi node mine` and make its search faster.
+of your own; see [Pluggable nonce seekers](participate/nonce_seeker.md), which covers the
+GPU seeker. So the recommended way to compete is to keep `proxi node mine` and make its search
+faster.
 
 ### The work stops
 
@@ -526,18 +546,18 @@ Stated because they are real, not because they are resolved:
   decentralizing; too long and Phase 1 outlasts its purpose. The pre-launch exists in large
   part to replace that judgement with a measurement.
 - **Participation mechanics.** The milestones assume mined tokens are put to work — run in a
-  sequencer the miner controls, or delegated. The covenant pays a transit in full only when
-  its reward lands there, and the reference miner places each reward as it mines it, topping
-  up its delegations and opening new ones up to a configured count, but how a miner should
-  behave across many sequencers over a long run is still being learned.
+  sequencer the miner controls, or delegated. Until library upgrade 6 the covenant pays a
+  transit in full only when its reward lands there; from the upgrade the payout is the
+  miner's choice. The reference miner places each reward as it mines it, on its own sequencer,
+  topping up its delegations or opening new ones up to a configured count, but how a miner
+  should behave across many sequencers over a long run is still being learned.
 - **Scalability of participation.** Many holders delegating to many sequencers is a regime the
   network has not been run in. How many delegations a sequencer can carry, and how that behaves
   as holders and sequencers multiply, has been modelled and needs measuring.
 - **Early concentration.** Whoever shows up first with the most hashrate takes a large share
   of the first weeks' emission — expect the largest single actor somewhere around a third to a
-  half of month-one emission. Non-outsourceability limits how large, the
-  flat opening reward keeps the first weeks from being disproportionately valuable, and the
-  ~14-month tail dilutes what remains. It will not be even. **Fair launch means equal rules,
+  half of month-one emission. The flat opening reward keeps the first weeks from being
+  disproportionately valuable, and the ~14-month tail dilutes what remains. It will not be even. **Fair launch means equal rules,
   not equal outcomes.**
 - **Reach.** Where a network is announced decides who mines first, and therefore what early
   concentration looks like. That is a practical problem rather than a protocol one, and it is

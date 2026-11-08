@@ -13,26 +13,37 @@ are slowly diluted (see [Put your tokens to work](participate/active_tokens.md))
 hand: `proxi node compact` sweeps the outputs into one, and `proxi node delegate amount`
 puts them to work. For a wallet that keeps receiving, that is not convenient. So there is
 a process that does it for you, continuously, in the background. It is a command of its
-own; `proxi node mine` places its rewards itself and does not run it:
+own, run beside anything else on the same wallet profile, `proxi node mine` included:
 
 ```
 proxi node consolidate
 ```
 
-The consolidator is an optional, general wallet utility. It only looks at the wallet
-account, never at what fills it, so it serves a shop receiving payments, a miner, or anyone
-who wants a tidy wallet whose surplus keeps earning. Like the miner and the sequencer, it
+The consolidator is a general wallet utility. It only looks at the wallet account, never
+at what fills it, so it serves a shop receiving payments, a miner, or anyone who wants a
+tidy wallet whose surplus keeps earning. Like the miner and the sequencer, it
 acts on behalf of the token holder and earns the holder as much as it can, which in
 Proxima means keeping the tokens in consensus.
 
-**A miner does not need it.** The ledger pays a mined reward in full only when it lands in
-a delegation or on a sequencer, so `proxi node mine` places every reward as it mines it,
-with the settings below (see [Mining](participate/mine.md)). The recommended way to mine
-faster is to keep `proxi node mine` and plug in a faster
-[nonce seeker](participate/nonce_seeker.md), so the rewards keep being placed. For a miner
-the consolidator is only for tidying now and then: it re-delegates a delegation that
-stopped working, folds several into one, and puts to work what collects on plain outputs,
-such as the 15 PROX opening payout or incoming payments.
+**Every miner must run it.** On every mining wallet, GPU miners included, run
+`proxi node consolidate` permanently beside `proxi node mine`. Earlier versions of these
+pages called it optional for miners; that no longer holds. The miner places each new
+reward (see [Mining](participate/mine.md)); the consolidator looks after the delegations
+the rewards are already in, and without it they slowly stop earning:
+
+* it re-delegates a delegation whose sequencer stopped, or can no longer freeze it, to
+  one that can, since a delegation earns only while it is frozen;
+* it folds small delegations together and sweeps plain outputs into consensus;
+* it moves delegations off small sequencers, which from
+  [library upgrade 6](participate/upgrade6.md) cannot freeze them; see
+  [Delegations at small sequencers](participate/consolidate.md?id=delegations-at-small-sequencers)
+  below. This works only while those sequencers still run, so start the consolidator now.
+
+It does all this without asking. It needs **a few PROX of the wallet's own** on plain
+outputs, to pay the fee of a stop request; it always keeps `minimum_balance_prox` there.
+A mining wallet's rewards all go into consensus, so a new one has none: send it a few PROX
+from another wallet, or let one reward go to the wallet itself with `mine.payout_address`
+(see [Mining](participate/mine.md)).
 
 ## Running the consolidator
 
@@ -87,16 +98,19 @@ are rated on several criteria and the better rated are drawn more often, though 
 sequencer leaving delegators anything keeps a chance. A sequencer that has set limits on
 what it freezes and has no room left for the delegation is left out of the draw (see
 [Limit what the sequencer freezes](participate/run_sequencer.md?id=limit-what-the-sequencer-freezes)).
-The criteria are
+So is a sequencer holding less than the minimum sequencer balance, which cannot freeze
+delegations (see below). The criteria are
 
-* the share of the inflation it leaves delegators (more is better, counted four times,
+* the share of the inflation it leaves delegators (more is better, counted six times,
   so the price weighs as much as the rest together);
 * its own balance (more is better);
 * the ratio of what is delegated to it over its own balance (less is better, so the
   crowded ones are drawn less);
-* how many sequencer transactions its chain has made (more is better);
+* how many sequencer transactions its chain has made (more is better, up to the typical
+  count among the candidates; counted twice);
 * how many it has made per slot of its life (more is better, up to the typical rate among
-  the candidates, so it ranks gaps in a chain's life, not producing more often).
+  the candidates, so it ranks gaps in a chain's life, not producing more often; counted
+  twice).
 
 `proxi node seq_rating` prints the current rating and each sequencer's draw chance.
 
@@ -124,7 +138,8 @@ out of the delegation itself:
   largest one, which is delegated again with the combined balance;
 * a delegation whose target has gone quiet, or now keeps more than the delegation
   leaves it (its target refuses to renew it), or has no room left under the limits it
-  set on what it freezes, or is not the sequencer you configured, is delegated again to
+  set on what it freezes, or holds less than the minimum sequencer balance, or is not
+  the sequencer you configured, is delegated again to
   a fresh target. So is a delegation its target has put on hold, and one its target has
   not frozen within 60 slots (about 10 minutes) of when it could have. When a freeze
   ends, the target cannot freeze the delegation again during the first 60 slots, which
@@ -136,8 +151,32 @@ out of the delegation itself:
 Delegations made by an earlier version of the consolidator, by `proxi node mine`, or by
 hand are treated the same way, so a wallet with a pile of small or stalled delegations is
 brought to the target count and put back to work without any action on your part.
-Frozen delegations are never touched: they are earning, and they belong to their target
-until they thaw.
+Frozen delegations are left alone: they are earning, and they belong to their target
+until they thaw. The one exception follows.
+
+## Delegations at small sequencers
+
+From [library upgrade 6](participate/upgrade6.md), slot 194000, a sequencer holding less
+than **10,000 PROX of its own** can no longer freeze delegations, produce branches or work
+in the last ticks of a slot. It regains all of that once its balance reaches the bound.
+A delegation already frozen at such a sequencer would stay there until its freeze runs
+out, and could not be frozen there again.
+
+The consolidator does not wait for that. For each delegation frozen at an active
+sequencer under the minimum, it sends that sequencer a **stop request**, one per pass and
+not repeated while the first may still be taken. The sequencer puts the delegation on
+hold; on a later pass the consolidator re-delegates it to a sequencer that can freeze it,
+as for any delegation that stopped working. The part of the inflation the sequencer paid
+you in advance, for the time it will no longer hold the delegation, goes back to it.
+
+The request fee comes from the wallet's own plain outputs. If there are not enough, the
+consolidator says so in its log and the delegation waits for its freeze to end. Only a
+running sequencer can take a stop request: once a small sequencer has shut down, its
+delegations wait for their freezes to end. That is why the consolidator has to be running
+while those sequencers still are.
+
+`proxi node delegate status` shows where your delegations are, and
+`proxi node delegate askstop` sends the same kind of request by hand.
 
 **Configuration.** A section of the wallet profile, created by `proxi config wallet` with
 all keys commented and both destinations empty. Every key has a command-line flag of the

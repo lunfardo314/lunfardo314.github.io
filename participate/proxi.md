@@ -101,7 +101,7 @@ delegate:
 
 consolidate:
     # where tokens are put to work: 'proxi node mine' places its rewards by
-    # these, 'proxi node consolidate' tidies the wallet by them
+    # these, 'proxi node consolidate' (which every miner must run) by all of them
     threshold_prox: 300
     minimum_balance_prox: 100
     max_inputs: 30
@@ -304,14 +304,14 @@ which a sequencer does automatically. After the window your wallet can reclaim i
   section of the profile. To mine faster, keep it and plug in a faster
   [nonce seeker](participate/nonce_seeker.md). See [Mining](participate/mine.md).
 
-* `proxi node consolidate` is an optional process for tidying a wallet, and runs
-  permanently in the background on a wallet profile. Every 10 seconds it looks at the
+* `proxi node consolidate` looks after a wallet, and runs permanently in the background
+  on a wallet profile. **Every mining wallet must run it** beside `proxi node mine`. Every 10 seconds it looks at the
   account and, once enough small outputs have piled up, sweeps them into one
   transaction that sends everything above a kept minimum to a sequencer or into a
   delegation, as configured in the `consolidate` section of the profile. It also
-  re-delegates delegations that stopped working and folds several into one. It only
-  looks at the wallet, so it serves any wallet: one receiving payments, or a miner's
-  that wants tidying. See [The wallet consolidator](participate/consolidate.md) for the
+  re-delegates delegations that stopped working, moves them off sequencers too small to
+  freeze them, and folds several into one. It only looks at the wallet, so it serves
+  any wallet: one receiving payments, or a miner's. See [The wallet consolidator](participate/consolidate.md) for the
   settings, and [Put your tokens to work](participate/active_tokens.md) for why.
 
 * `proxi node compact scan` reports everything the account can consume, by category,

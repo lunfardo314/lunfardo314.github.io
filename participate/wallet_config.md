@@ -46,6 +46,7 @@ profile's API settings. The node itself is configured separately — see
 | `consolidate.autodelegate` | `random`, hex chain ID or `none` | Delegation target of the miner and the consolidator when `send_to_sequencer` is empty. Default `random` |
 | `consolidate.target_delegations` | int | Number of delegations the miner and the consolidator build up to. Default `5` (the older key `max_delegations` is read when absent) |
 | `consolidate.target_delegation_prox` | uint (PROX) | Size a delegation is grown to before the next one is started. Default `10000` |
+| `mine.payout_address` | holder ID or empty | From upgrade 6: every reward to this holder as a plain output, less the inclusion fee, instead of being placed. Empty means placed as usual |
 | `mine.seeker.listen` | address | Address `proxi node mine` serves jobs on to external nonce seekers. Empty means none |
 | `mine.seeker.token` | string | Shared secret the seekers present. Empty means none |
 | `mine.seeker.spawn` | bool | `true` makes the miner start the reference seeker itself, wired up automatically. Default `false` |
@@ -257,10 +258,10 @@ cut each sequencer offers. See [The wallet consolidator](participate/consolidate
 
 Where the wallet's tokens are put to work, read by two commands. `proxi node mine`
 reads `send_to_sequencer`, `autodelegate`, `target_delegations` and
-`target_delegation_prox` to decide where each reward goes, so a miner sets these and
-nothing else. All the keys are settings of the wallet consolidator,
-`proxi node consolidate`: an optional process for tidying, which sweeps the outputs
-scattered over the wallet and puts what is above a kept minimum back into consensus.
+`target_delegation_prox` to decide where each reward goes. All the keys are settings of the wallet consolidator,
+`proxi node consolidate`, which looks after the delegations, sweeps the outputs scattered
+over the wallet and puts what is above a kept minimum back into consensus. Every mining
+wallet must run it beside the miner.
 Every key has a command-line flag of the same name on `proxi node consolidate` that
 overrides it. See [The wallet consolidator](participate/consolidate.md) for what the
 process does.
@@ -309,6 +310,7 @@ See [Pluggable nonce seekers](participate/nonce_seeker.md).
 
 | Tag | Type | Default | Description |
 |-----|------|---------|-------------|
+| `mine.payout_address` | holder ID | empty | From library upgrade 6: the miner pays every reward, less the inclusion fee, as a plain output to this holder (64 hex characters) instead of placing it into delegations or a sequencer. The holder's own consolidator then puts it to work. Empty means the reward is placed as usual. |
 | `mine.seeker.listen` | address | empty | Address the miner serves jobs on to seekers you run yourself, such as `127.0.0.1:8100`, or `0.0.0.0:8100` for seekers on other machines. Empty means no job server, unless `spawn` is set, which then uses a free loopback port. |
 | `mine.seeker.token` | string | empty | Shared secret the seekers present with every call. Empty means none, reasonable only on a loopback address; a spawned seeker gets a fresh token when this is empty. |
 | `mine.seeker.spawn` | bool | `false` | The miner starts the reference seeker beside itself, with the port, the token, the key file, its passphrase and the threads filled in, restarts it if it exits and stops it with the miner. Same as `proxi node mine --seeker`. The miner's own workers are then off; `--workers N` adds some. |
