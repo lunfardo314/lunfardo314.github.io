@@ -2,11 +2,13 @@
 
 > **What and when**
 >
-> * **Release:** v1.6.0, out on Sunday 8 November 2026, about 17:00 UTC.
+> * **Release:** v1.6.0, out on Sunday 8 November 2026, about 17:00 UTC; **v1.6.1 for nodes**,
+>   out on Monday 9 November 2026, raising the minimum for new sequencers to 10,000 PROX.
 > * **The new rules start:** at slot 196000, Tuesday 10 November 2026, about 12:03 UTC.
 > * **Mining pauses** from that slot for 1,000 slots and resumes at slot 197000, about 14:54 UTC.
 > * **Who must act:** everyone. Every node, every wallet, every miner and every other program
->   that signs transactions must run v1.6.0 or later before the slot.
+>   that signs transactions must run v1.6.0 or later before the slot, and **every node must run
+>   v1.6.1** (see [Nodes: v1.6.1](participate/upgrade6.md?id=nodes-v161)).
 > * **Most urgent:** sequencers holding less than 10,000 PROX of their own, and the people
 >   who delegate to them. See [Sequencers](participate/upgrade6.md?id=sequencers) and [Delegators](participate/upgrade6.md?id=delegators).
 
@@ -33,6 +35,16 @@ This applies to access nodes, sequencer nodes, wallets used only for sending, an
 program of your own that builds and signs transactions: from the slot, the transaction ID
 is computed differently (see [What changes](participate/upgrade6.md?id=what-changes)), and a transaction signed the
 old way is refused.
+
+### Nodes: v1.6.1
+
+Release v1.6.1 changes one rule of the upgrade before it starts: a sequencer chain started
+from the slot on must hold at least 10,000 PROX of its own, not 5,000. **Every node, access
+and sequencer, must run v1.6.1 before slot 196000.** At its first start it replaces the
+upgrade definitions v1.6.0 stored, and logs `PENDING LIBRARY UPGRADE REPLACED`. A node still
+on v1.6.0 at the slot holds the old definitions and stops following the network.
+
+Wallets, miners and nonce seekers of v1.6.0 keep working: they take the rules from the node.
 
 If you build from source, rebuild both programs from the release, as described in
 [The `proxi` wallet](participate/proxi.md) and
@@ -69,13 +81,13 @@ cards are expected later. How the miner and seekers fit together is on
 
 * **Update the node before the slot.** From the slot a sequencer must leave at least
   6 ticks between each of its transactions and the inputs it consumes, instead of 3 (a
-  tick is 1/128 of a slot, 80 ms). The v1.6.0 sequencer follows the new rule by itself.
+  tick is 1/128 of a slot, 80 ms). The v1.6.1 sequencer follows the new rule by itself.
 * **Check your own balance.** This is what the sequencer chain holds itself, not counting
   delegations. `proxi node seq info` shows it. Two minimums now apply, explained under
   [Minimum own balance of a sequencer](participate/upgrade6.md?id=minimum-own-balance-of-a-sequencer):
   * **10,000 PROX for every sequencer**, old ones included. Below it a sequencer keeps
     running but can no longer produce branches or freeze new delegations.
-  * **5,000 PROX for a sequencer chain started from the slot on**, on its first output and
+  * **10,000 PROX for a sequencer chain started from the slot on**, on its first output and
     on every later one. Chains started before the slot are not affected by this one.
 
 **If your sequencer holds less than 10,000 PROX of its own, decide now.** On 7 November
@@ -206,8 +218,8 @@ A sequencer's **own balance** is what its chain holds itself, apart from the del
 frozen to it. The upgrade sets two minimums. Each is a separate value in the ledger, which
 a later upgrade may change.
 
-* **5,000 PROX, for new sequencers.** A sequencer chain started at or after slot 196000
-  must hold at least 5,000 PROX of its own when it starts and at every later step.
+* **10,000 PROX, for new sequencers.** A sequencer chain started at or after slot 196000
+  must hold at least 10,000 PROX of its own when it starts and at every later step.
   Sequencers started before the slot are not affected by this minimum.
 * **10,000 PROX, for every sequencer.** A sequencer holding less than this of its own:
   * cannot produce branches (a **branch** is the transaction that closes a slot and
@@ -226,5 +238,6 @@ a later upgrade may change.
 | Event | Slot | Time (UTC) |
 |-------|------|------------|
 | Release v1.6.0 | | Sunday 8 November 2026, about 17:00 |
+| Release v1.6.1 (nodes) | | Monday 9 November 2026 |
 | Upgrade 6 activates; mining pauses | 196000 | Tuesday 10 November 2026, about 12:03 |
 | Mining resumes | 197000 | Tuesday 10 November 2026, about 14:54 |
