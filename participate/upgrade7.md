@@ -73,8 +73,10 @@ delegations. To get back in, do one of:
 
 ### Delegators
 
-* **Update `proxi`.** Its consolidator, its target choice and `proxi node delegate` follow
-  the new rules.
+* **Update `proxi` before the slot**, above all if you run the consolidator. Its target
+  choice and `proxi node delegate` follow the new rules. An older consolidator does not know
+  that a sequencer can qualify by coverage: it would ask your delegations at such a sequencer
+  to stop, and move them elsewhere.
 * Delegations frozen to a sequencer that no longer qualifies stay frozen until they expire
   and earn as before. That sequencer then does not freeze them again. If you run the
   [wallet consolidator](participate/consolidate.md), it moves them to a qualifying sequencer
