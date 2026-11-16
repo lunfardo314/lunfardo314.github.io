@@ -73,8 +73,8 @@ peering:
     id: 12D3KooW...
     port: 4000
   peers:
-    hloc0: /ip4/65.21.170.230/udp/4001/quic-v1/p2p/12D3KooWG8zty1Yfbxw4mpiLW6Eoh6wTpPNdqn2B3f22XqArLsnT
     oseq1: /ip4/79.137.70.25/udp/4001/quic-v1/p2p/12D3KooWPG5KW9JuunvpU5kBm51HZKYv7taYbtx1ThdjXPN533u8
+    oloc2: /ip4/51.254.47.76/udp/4001/quic-v1/p2p/12D3KooWCr6wCc67V7NRDJXK1iduefVvyA5tLWUHkvYdNpPdEt3t
   max_dynamic_peers: 10
   allow_local_ips: false
 ```
@@ -295,7 +295,6 @@ reachable API; the node cycles to the next source on failure.
 
 ```yaml
 sources:
-  - "http://65.21.170.230:8001"
   - "http://79.137.70.25:8001"
   - "http://51.254.47.76:8001"
 ```
@@ -590,7 +589,7 @@ peering:
     id: 12D3KooW...
     port: 4000
   peers:
-    hloc0: /ip4/65.21.170.230/udp/4001/quic-v1/p2p/12D3KooW...
+    oseq1: /ip4/79.137.70.25/udp/4001/quic-v1/p2p/12D3KooW...
   max_dynamic_peers: 10
   allow_local_ips: false
 

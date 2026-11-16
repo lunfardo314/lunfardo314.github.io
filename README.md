@@ -13,7 +13,7 @@ The site is dedicated to the [Proxima project](https://github.com/lunfardo314/pr
 > - Genesis file (slot 0 snapshot, 150 KB):
 >   [s0-0-030000000000000000000000000000000000000000000000000000.snapshot](https://lunfardo314.github.io/static/genesis/s0-0-030000000000000000000000000000000000000000000000000000.snapshot),
 >   SHA-256 `0b22efd5018e6e77fd17e172d21c8b592f16cb21888da623b46262ff07be3a0e`
-> - [Network monitor](http://65.21.170.230:8001/monitor)
+> - [Network monitor](http://79.137.70.25:8001/monitor)
 >
 > How to join: [Join the Proxima effort](participate/participate.md).
 

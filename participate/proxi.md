@@ -82,11 +82,10 @@ wallet:
 api:
     node_url: http://127.0.0.1:8000
     # public access points, offered as hints:
-    # hloc0: http://65.21.170.230:8001
     # oseq1: http://79.137.70.25:8001
+    # oloc2: http://51.254.47.76:8001
     # witness nodes: asked only to confirm the branch the ledger library is proven against
     node_urls:
-        - http://65.21.170.230:8001
         - http://79.137.70.25:8001
         - http://51.254.47.76:8001
 

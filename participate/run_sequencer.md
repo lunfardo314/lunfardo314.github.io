@@ -107,8 +107,8 @@ Or look at it in the browser: every access node serves a **chain explorer** at
 `/chain_explorer`, which lists the chained accounts in the latest reliable branch
 and lets you filter for sequencers and open yours to see its current output. On
 the initial access points that is
-[alpha](http://65.21.170.230:8001/chain_explorer) or
-[beta](http://79.137.70.25:8001/chain_explorer).
+[beta](http://79.137.70.25:8001/chain_explorer) or
+[gamma](http://51.254.47.76:8001/chain_explorer).
 
 ## Configure the sequencer section in `proxima.yaml`
 

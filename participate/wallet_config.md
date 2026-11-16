@@ -110,7 +110,6 @@ How `proxi` reaches the node's REST API.
 api:
   node_url: http://127.0.0.1:8000
   node_urls:
-    - http://65.21.170.230:8001
     - http://79.137.70.25:8001
     - http://51.254.47.76:8001
   # timeout_sec: 30
@@ -381,10 +380,9 @@ wallet:
     # sequencer_id: <own sequencer ID>
 api:
     node_url: http://127.0.0.1:8000
-    # hloc0: http://65.21.170.230:8001
     # oseq1: http://79.137.70.25:8001
+    # oloc2: http://51.254.47.76:8001
     node_urls:
-        - http://65.21.170.230:8001
         - http://79.137.70.25:8001
         - http://51.254.47.76:8001
 

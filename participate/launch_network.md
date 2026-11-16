@@ -15,16 +15,15 @@ ignored by the new network; what to do with it is in the operational notes of
 
 ## Initial public access points
 
-* alpha — `http://65.21.170.230:8001`
 * beta — `http://79.137.70.25:8001`
 * gamma — `http://51.254.47.76:8001`
 
-Any of them can be used to reach the network from your wallet, and any can be listed as a
+Either of them can be used to reach the network from your wallet, and any can be listed as a
 trusted source for bootstrapping a new node, in the node's configuration.
 
 ## Other public access points
 
-Three access points is a starting point. A handful of entry points that
+Two access points is a starting point. A handful of entry points that
 everyone depends on is exactly the shape the launch phase exists to grow out of, and it is
 the easiest thing for a newcomer to fix.
 
@@ -41,27 +40,27 @@ Each public access node also serves a few read-only browser tools on its API por
 * **Launch phase monitor** — a high-level view of where the ledger and the network stand:
   supply and distribution, fair-launch mining progress, and decentralization. Aggregates
   only; per-chain and per-transaction browsing is in the explorers below.
-  Open it on [alpha](http://65.21.170.230:8001/monitor) or
-  [beta](http://79.137.70.25:8001/monitor).
+  Open it on [beta](http://79.137.70.25:8001/monitor) or
+  [gamma](http://51.254.47.76:8001/monitor).
 * **Chain explorer** — the _chained accounts_ (sequencers, delegations, foundries) in the
   latest reliable branch, with the UTXOs of each chain. A good starting point to see which
   sequencers are running and what delegations exist.
-  Open it on [alpha](http://65.21.170.230:8001/chain_explorer) or
-  [beta](http://79.137.70.25:8001/chain_explorer).
+  Open it on [beta](http://79.137.70.25:8001/chain_explorer) or
+  [gamma](http://51.254.47.76:8001/chain_explorer).
 * **DAG explorer** — an interactive view of the transaction DAG read from the node's
   transaction store: browse by slot, search for a transaction, and inspect a transaction
   together with its past cone.
-  Open it on [alpha](http://65.21.170.230:8001/dag_explorer) or
-  [beta](http://79.137.70.25:8001/dag_explorer).
+  Open it on [beta](http://79.137.70.25:8001/dag_explorer) or
+  [gamma](http://51.254.47.76:8001/dag_explorer).
 * **DAG visualizer** — a real-time visualizer of the **tangle**, the transaction DAG being
   built by the node as transactions arrive. It needs transaction streaming to be enabled on
   that node, so it may not be available on every access point.
-  Open it on [alpha](http://65.21.170.230:8001/dagviz) or
-  [beta](http://79.137.70.25:8001/dagviz).
+  Open it on [beta](http://79.137.70.25:8001/dagviz) or
+  [gamma](http://51.254.47.76:8001/dagviz).
 * **Peers** — an auto-refreshing dashboard of the node's peers: static or dynamic, alive or
   dead, with round-trip times.
-  Open it on [alpha](http://65.21.170.230:8001/peers) or
-  [beta](http://79.137.70.25:8001/peers).
+  Open it on [beta](http://79.137.70.25:8001/peers) or
+  [gamma](http://51.254.47.76:8001/peers).
 
 The same paths work on any access node, including your own.
 
