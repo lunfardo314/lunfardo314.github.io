@@ -366,7 +366,7 @@ tokens, for the tag-along fee. A frozen one is topped up through its sequencer: 
 wallet sends the amount to the target as a **top-up request**, and the sequencer adds it
 to the delegation in place, within a tick, with the freeze and your share unchanged and
 your advance on the added tokens paid up front. A top-up request pays no fee, the amount
-itself is the request, and a sequencer takes one only from a minimum amount, 100 PROX
+itself is the request, and a sequencer takes one only from a minimum amount, 90 PROX
 unless it set more; `proxi node delegate target_info` shows it. The same thing is
 available as `--add <amount>` on `delegate chain` when you are continuing a delegation
 anyway.
@@ -379,6 +379,13 @@ from creating many — it is a matter of not imposing an avoidable cost on every
 and topping up is cheaper for you too, since it is one transaction rather than a new chain.
 
 Freshly added tokens are subject to the freeze like the rest.
+
+**Topping up someone else's delegation.** From [library upgrade 7](participate/upgrade7.md)
+anyone can top up any delegation, not only its owner, for example a mining pool or an
+exchange paying straight into a user's delegation. Name it with `--delegation`; the request
+goes to its sequencer as above. The tokens become the delegation owner's, and the owner's
+rights do not change. If the sequencer does not take the request, the payer can take the
+tokens back after 30 slots.
 
 If you mine with `proxi`, the miner does this for you: each transit's reward opens a
 delegation while you hold fewer than your configured number and tops up an existing one

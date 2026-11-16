@@ -62,6 +62,21 @@ sequencer chain is the key that controls it. Check that the machine's clock is
 synced to real time ([Keep the clock synced](participate/run_access.md?id=keep-the-clock-synced));
 a sequencer is the node that suffers most from a clock that is off.
 
+## How much the sequencer needs
+
+* **To start a sequencer chain:** at least **10,000 PROX of its own** on the chain.
+* **To issue branches and freeze new delegations:** from
+  [library upgrade 7](participate/upgrade7.md) (slot 264000, 18 November 2026), either
+  **20,000 PROX of its own** or **100,000 PROX of coverage**, its own balance plus the
+  delegations frozen to it. Below both, the sequencer keeps running: it issues milestones,
+  takes tag-alongs and keeps its frozen delegations until they expire, but it issues no
+  branches and freezes no new delegations.
+
+The sequencer's own balance is controlled by a key that sits on an always-online server.
+To keep less there, qualify by coverage: delegate the rest to your own sequencer from a
+wallet whose key stays offline. The server's key can freeze that delegation but cannot take
+it. `proxi node seq info` shows where your sequencer stands against both amounts.
+
 ## Create the sequencer chain origin
 
 This is a **wallet-side** step. From the wallet that holds your tokens:
@@ -95,6 +110,20 @@ proxi node seq set-params --min_topup 500000000
 ```
 
 `proxi node seq info` shows the minimum in effect.
+
+Another, `--bonus`, is the **branch bonus** your sequencer asks, in motes, from 1 to
+5000000 (5 PROX). From [library upgrade 7](participate/upgrade7.md) each sequencer chooses
+the bonus its branches earn. Among branches of equal coverage the one with the highest
+lottery number minus its bonus wins, so asking less wins more often but earns less each
+time; with N sequencers competing the bonus settles near 10 / N PROX. Without the setting
+the sequencer asks 5 PROX, the most allowed, and loses nearly every tie to a sequencer
+asking less. For example, to ask 0.5 PROX:
+
+```
+proxi node seq set-params --bonus 500000
+```
+
+`proxi node seq info` shows the bonus asked.
 
 Verify the new chain:
 

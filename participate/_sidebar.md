@@ -1,5 +1,6 @@
 Join Proxima
 - [Join Proxima](participate/participate.md)
+- [Upgrade 7: what changes, what to do](participate/upgrade7.md)
 - [Upgrade 6: what changes, what to do](participate/upgrade6.md)
 - [Launch phase network](participate/launch_network.md)
 - [The `proxi` wallet](participate/proxi.md)

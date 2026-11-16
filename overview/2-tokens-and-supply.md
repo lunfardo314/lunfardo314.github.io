@@ -127,23 +127,29 @@ of the ledger stops being a candidate among many and becomes settled and durable
 thing later transactions are built on and the thing a node restarts from. Everything else
 in the tangle is provisional until a branch commits it.
 
-Producing one is real work, so the ledger pays for it. A sequencer that issues a branch
-draws a bonus of at most **5 PROX**, produced by a verifiable random function from its
-own signature. Nobody can predict the draw, nobody can grind for a better one, and
-everybody can check it afterwards — random and trustless at the same time.
+Producing one is real work, so the ledger pays for it: a sequencer that issues a branch
+mints a **branch bonus** of at most **5 PROX**. From library upgrade 7 (slot 264000,
+18 November 2026) **the sequencer chooses the amount itself**, anywhere from one mote to
+5 PROX. Before that, the bonus was a random draw of up to 5 PROX.
 
-The randomness is there for a reason, and the reason is **tie-breaking**. Several
-sequencers may commit competing versions of the state at the same moment, and the
-consensus needs a decisive, ungameable way to prefer one of them — otherwise the network
-splits over which commit to build on. The drawn bonus provides it: a branch that drew
-more is worth more to build on, so the network converges instead of forking.
+The bonus also decides between competing commits. Several sequencers may commit versions
+of the state with the same coverage at the same moment, and the consensus needs a decisive
+way to prefer one of them that nobody can game, otherwise the network splits over which
+commit to build on. Each branch carries a **lottery number** between 0 and 10 PROX,
+produced by a verifiable random function: nobody can predict it, nobody can grind for a
+better one, and everybody can check it afterwards. The bonus a branch asks for is
+subtracted from its lottery number, and the highest result wins. Asking for more means a
+bigger prize but a smaller chance; asking for less, a better chance but a smaller prize.
+Bids are sealed: each sequencer commits to its bonus before the slot ends and reveals it
+only in its branch.
 
-That competition is also why the bonus actually paid is **just below the 5 PROX maximum**
-on average. What gets recorded is the winning draw, not a typical one — the branches that
-drew poorly are the ones that lose. Reasoning from a single draw in isolation would
-suggest something near half the maximum, and that is not what the ledger sees.
+So the bonus is set by a **market**. With N sequencers competing it settles near
+10 / N PROX: about a third of a PROX with 28 sequencers. The more sequencers compete, the
+less each one asks, and sequencers start or stop until the bonus pays for running the
+machine. The bonus thus follows the real cost of running a sequencer and the price of the
+token, instead of a schedule, and it is far below the 5 PROX ceiling.
 
-The amount is flat from genesis onward — it does not decay on a schedule. What falls over
+The ceiling is flat from genesis onward and does not decay on a schedule. What falls over
 time is its significance: five PROX a slot is a meaningful addition when the supply is
 sixty million, and a rounding error once the supply is in the billions.
 
@@ -159,8 +165,8 @@ inflation is the permanent one. Nothing switches it on or off, and there is no s
 to run out.
 
 It rises ever more slowly, though. Chain inflation is a proportional rate that declines
-as supply grows, and the branch bonus is a fixed amount whose share of a growing supply
-shrinks. The result is a steep launch flattening into a long, slow climb.
+as supply grows, and the branch bonus is capped at a fixed amount whose share of a growing
+supply shrinks. The result is a steep launch flattening into a long, slow climb.
 
 <p style="text-align:center;"><img src="../static/img/supply-30y.png">
 

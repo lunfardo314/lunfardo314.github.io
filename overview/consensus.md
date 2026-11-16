@@ -164,11 +164,11 @@ All branches on the same slot boundary are intentionally conflicting. Let's expl
 
 It's important to note that we adhere strictly to the same ledger coverage rule, keeping it as straightforward as possible: each sequencer aims to produce a valid next transaction in the chain with the maximum ledger coverage achievable within a given time period. We do not introduce any special transaction types or outputs beyond the requirement that transactions must satisfy immutable global ledger constraints.
 
-Sequencers are incentivized to include branch transactions in their chains because only branch transactions can potentially include a random **branch inflation bonus**.
+Sequencers are incentivized to include branch transactions in their chains because only branch transactions can earn the **branch inflation bonus**.
 
 However, only one of several conflicting branch transactions will be incorporated into the future consensus ledger state. The determination of which branch survives is left to the biggest ledger coverage rule. This process resembles a kind of lottery among branches, with the outcome dictated by the rule favoring the transaction with the highest ledger coverage. Our goal is to ensure this lottery remains unbiased and fair.
 
-Sequencer chains whose branches do not achieve the highest coverage (due to factors including the random branch inflation bonus) must revert back to the chain transaction from the previous slot and resume their chain from there. While they lose out on the branch inflation bonus lottery, they retain the ability to continue their chains uninterrupted.
+Sequencer chains whose branches do not achieve the highest coverage (or lose the tie-break between branches of equal coverage) must revert back to the chain transaction from the previous slot and resume their chain from there. While they lose out on the branch inflation bonus lottery, they retain the ability to continue their chains uninterrupted.
 
 <p style="text-align:center;"><img src="../static/img/branch_cooperation.png">
 </p>
@@ -183,7 +183,7 @@ The solution involves adjusting the calculation of ledger coverage by considerin
 
 This kind of bias would be highly undesirable because it would mean the network will quickly centralize around the richest sequencers.
 
-Proxima addresses this issue with a provably random branch inflation bonus. Using a verifiable random function (VRF), similar to Algorand's approach, sequencers are required to provide a pseudo-random yet deterministic (non-manipulable) value for new inflated tokens on each branch. The biggest ledger coverage rule then favors the branch with the highest branch inflation bonus for endorsement by other sequencers, irrespective of the token amount on the chain output. This approach ensures that the branch with the largest branch inflation bonus becomes the (random) winner of the branch lottery at the slot boundary, promoting fairness and equal opportunity among sequencers.
+Proxima addresses this issue with a provably random tie-break. Using a verifiable random function (VRF), similar to Algorand's approach, each branch carries a pseudo-random yet deterministic (non-manipulable) lottery number, irrespective of the token amount on the chain output. Among branches of equal coverage, the one whose lottery number minus the branch inflation bonus it asked for is the highest is favored for endorsement by other sequencers. Since library upgrade 7 each sequencer chooses its own bonus, up to 5 PROX, and commits to it before the branches are made: asking less raises the chance to win, so the bonus is set by competition between sequencers, while the draw itself stays random. This promotes fairness and equal opportunity among sequencers.
 
 For more detailed analysis, please refer to the Proxima whitepaper.
 

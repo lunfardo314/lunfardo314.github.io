@@ -188,9 +188,11 @@ already in, and without it a miner's delegations slowly stop earning:
 * It re-delegates a delegation whose sequencer stopped, or can no longer freeze it, to a
   sequencer that can. A delegation earns only while it is frozen.
 * It folds small delegations together, and sweeps plain outputs into consensus.
-* **It moves delegations off small sequencers.** From upgrade 6 a sequencer holding
-  less than **10,000 PROX of its own** can no longer freeze delegations, produce
-  branches or work in the last ticks of a slot. A delegation already frozen there would
+* **It moves delegations off small sequencers.** From
+  [upgrade 7](participate/upgrade7.md) a sequencer holding less than **20,000 PROX of its
+  own** and less than **100,000 PROX of coverage** (its own balance plus the delegations
+  frozen to it) can no longer freeze new delegations, produce branches or work in the last
+  ticks of a slot. A delegation already frozen there would
   wait for its freeze to run out. The consolidator does not wait: it asks that sequencer
   to stop the delegation early, and then re-delegates it to a sequencer that can freeze
   it. Asking works only while the small sequencer is still running, so the consolidator

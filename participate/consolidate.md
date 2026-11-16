@@ -98,8 +98,7 @@ are rated on several criteria and the better rated are drawn more often, though 
 sequencer leaving delegators anything keeps a chance. A sequencer that has set limits on
 what it freezes and has no room left for the delegation is left out of the draw (see
 [Limit what the sequencer freezes](participate/run_sequencer.md?id=limit-what-the-sequencer-freezes)).
-So is a sequencer holding less than the minimum sequencer balance, which cannot freeze
-delegations (see below). The criteria are
+So is a sequencer below the minimum a sequencer needs to freeze delegations (see below). The criteria are
 
 * the share of the inflation it leaves delegators (more is better, counted six times,
   so the price weighs as much as the rest together);
@@ -138,7 +137,7 @@ out of the delegation itself:
   largest one, which is delegated again with the combined balance;
 * a delegation whose target has gone quiet, or now keeps more than the delegation
   leaves it (its target refuses to renew it), or has no room left under the limits it
-  set on what it freezes, or holds less than the minimum sequencer balance, or is not
+  set on what it freezes, or is below the minimum a sequencer needs to freeze delegations, or is not
   the sequencer you configured, is delegated again to
   a fresh target. So is a delegation its target has put on hold, and one its target has
   not frozen within 60 slots (about 10 minutes) of when it could have. When a freeze
@@ -156,9 +155,11 @@ until they thaw. The one exception follows.
 
 ## Delegations at small sequencers
 
-From [library upgrade 6](participate/upgrade6.md), slot 196000, a sequencer holding less
-than **10,000 PROX of its own** can no longer freeze delegations, produce branches or work
-in the last ticks of a slot. It regains all of that once its balance reaches the bound.
+From [library upgrade 7](participate/upgrade7.md), slot 264000, a sequencer holding less
+than **20,000 PROX of its own** and less than **100,000 PROX of coverage** (its own balance
+plus the delegations frozen to it) can no longer freeze new delegations, produce branches
+or work in the last ticks of a slot. It regains all of that once it reaches either bound.
+(From upgrade 6 until then, the bound was 10,000 PROX of its own.)
 A delegation already frozen at such a sequencer would stay there until its freeze runs
 out, and could not be frozen there again.
 
