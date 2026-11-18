@@ -1,9 +1,9 @@
-# Library upgrade 7: what to do before 18 November
+# Library upgrade 7: what to do before 20 November
 
 > **What and when**
 >
-> * **Release:** v1.7.0, out on Tuesday 17 November 2026, about 12:00 UTC.
-> * **The new rules start:** at slot 264000, Wednesday 18 November 2026, 13:28 UTC.
+> * **Release:** v1.7.0, out on Thursday 19 November 2026, about 09:00 UTC.
+> * **The new rules start:** at slot 280000, Friday 20 November 2026, 10:59 UTC.
 > * **Who must act:** every node operator, and above all **sequencer operators**: the branch
 >   bonus becomes a market, and a sequencer needs more weight behind it to issue branches.
 > * **Delegators and miners:** update `proxi`; the consolidator moves your delegations where
@@ -23,7 +23,7 @@ a delegation.
 
 ### Everyone: update before the slot
 
-Update the node (`proxima`) and the wallet (`proxi`) to v1.7.0 before slot 264000. No
+Update the node (`proxima`) and the wallet (`proxi`) to v1.7.0 before slot 280000. No
 configuration change is needed. If you run several sequencers, restart them one at a time,
 waiting until each is producing again. A node configured with `sequencer.version: v2` now
 runs `v3`, the only sequencer version left.
@@ -98,7 +98,8 @@ ledger. From the slot, **each sequencer chooses its own bonus**, from 1 mote to 
 
 When the best branches of a slot have the same coverage, which is the usual case, one of
 them must be chosen. Each gets a **lottery number** between 0 and 10 PROX that nobody can
-choose, and the bonus it asked for is subtracted from it. The highest result wins. So:
+choose, and the bonus it asked for is subtracted from it. The highest result wins. The result
+can be negative (a lottery number of 2 with a bonus of 4 gives -2): only the order counts. So:
 
 * asking for **more** gives a bigger prize but a smaller chance to win;
 * asking for **less** gives a smaller prize but a better chance.
