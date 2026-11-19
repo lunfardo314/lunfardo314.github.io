@@ -66,7 +66,7 @@ a sequencer is the node that suffers most from a clock that is off.
 
 * **To start a sequencer chain:** at least **10,000 PROX of its own** on the chain.
 * **To issue branches and freeze new delegations:** from
-  [library upgrade 7](participate/upgrade7.md) (slot 280000, 20 November 2026), either
+  [library upgrade 7](participate/upgrade7.md) (slot 283000, 20 November 2026), either
   **20,000 PROX of its own** or **100,000 PROX of coverage**, its own balance plus the
   delegations frozen to it. Below both, the sequencer keeps running: it issues milestones,
   takes tag-alongs and keeps its frozen delegations until they expire, but it issues no

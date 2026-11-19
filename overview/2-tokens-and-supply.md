@@ -128,7 +128,7 @@ thing later transactions are built on and the thing a node restarts from. Everyt
 in the tangle is provisional until a branch commits it.
 
 Producing one is real work, so the ledger pays for it: a sequencer that issues a branch
-mints a **branch bonus** of at most **5 PROX**. From library upgrade 7 (slot 280000,
+mints a **branch bonus** of at most **5 PROX**. From library upgrade 7 (slot 283000,
 20 November 2026) **the sequencer chooses the amount itself**, anywhere from one mote to
 5 PROX. Before that, the bonus was a random draw of up to 5 PROX.
 

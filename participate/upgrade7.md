@@ -2,8 +2,8 @@
 
 > **What and when**
 >
-> * **Release:** v1.7.0, out on Thursday 19 November 2026, about 09:00 UTC.
-> * **The new rules start:** at slot 280000, Friday 20 November 2026, 10:59 UTC.
+> * **Release:** v1.7.0, out on Thursday 19 November 2026.
+> * **The new rules start:** at slot 283000, Friday 20 November 2026, 19:31 UTC.
 > * **Who must act:** every node operator, and above all **sequencer operators**: the branch
 >   bonus becomes a market, and a sequencer needs more weight behind it to issue branches.
 > * **Delegators and miners:** update `proxi`; the consolidator moves your delegations where
@@ -23,7 +23,7 @@ a delegation.
 
 ### Everyone: update before the slot
 
-Update the node (`proxima`) and the wallet (`proxi`) to v1.7.0 before slot 280000. No
+Update the node (`proxima`) and the wallet (`proxi`) to v1.7.0 before slot 283000. No
 configuration change is needed. If you run several sequencers, restart them one at a time,
 waiting until each is producing again. A node configured with `sequencer.version: v2` now
 runs `v3`, the only sequencer version left.
