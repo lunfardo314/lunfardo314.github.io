@@ -227,8 +227,9 @@ it**:
 proxi node seq withdraw <amount> [-t <target address>]
 ```
 
-(The withdrawn amount has to cover the minimum storage deposit of the output it
-creates — 9,250,000 motes for a plain address.) It is also smart to set your
+(The withdrawn amount must be at least 1 PROX and cover the storage deposit of
+the output it creates, 9.25 PROX for a plain address; `proxi` refuses a smaller
+amount before sending the request.) It is also smart to set your
 wallet's tag-along sequencer to your **own** sequencer in `proxi.yaml`:
 
 ```yaml

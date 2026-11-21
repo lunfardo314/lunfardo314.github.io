@@ -291,13 +291,31 @@ Trusted node API endpoints the node fetches ledger data from. This is a
 catch-up) and snapshot acquisition (downloading a snapshot when one is needed) —
 it belongs to neither subsystem. Self URLs (`localhost` with the node's own
 `api.port`) are skipped automatically. A source must be a synced node with a
-reachable API; the node cycles to the next source on failure.
+reachable API.
+
+**No single source decides which ledger your node starts on.** Before downloading
+a snapshot, the node asks every configured source which ledger it is on. A strict
+majority of all configured sources must agree, counting the ones that do not
+answer; only sources of that ledger are downloaded from, and the downloaded file
+is checked to be of that ledger. In the same way, when the node checks whether its
+database has fallen too far behind, it takes the median of what the sources
+report, not the highest value, so one source cannot make a valid database look
+too old.
+
+Configure **at least three independent sources**. With two, both must answer and
+agree. With only one, the node refuses to download a snapshot unless you set
+`trust_single_source: true`, accepting that this one source decides for your node.
 
 ```yaml
 sources:
   - "http://79.137.70.25:8001"
   - "http://51.254.47.76:8001"
+  - "http://<ANOTHER_NODE_API>"
 ```
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| `trust_single_source` | bool | `false` | **Top-level.** Let a node with exactly one configured source download a snapshot from it. Leave it off unless you run that source yourself. |
 
 ---
 

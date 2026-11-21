@@ -248,14 +248,24 @@ The node restores from a snapshot when the `proximadb` state database is absent 
 corrupted — and also when the database is intact but has fallen too far behind the
 network to catch up, which is treated exactly like corruption. In those cases it:
 
-1. asks every source for its snapshot info, skipping itself and any source that
-   declines to serve one;
+1. asks every source which ledger it is on and for its snapshot info, skipping
+   itself. A **strict majority of all configured sources** must agree on the ledger,
+   counting the ones that do not answer; otherwise the download is refused. Only
+   sources of that ledger are used, and the downloaded file is checked to be of that
+   ledger;
 2. prefers a snapshot that is **old enough** — so that a sequencer does not have to
    wait out its start guard — and takes the newest one within that preference. It is
    downloaded into `snapshot.directory` (default: the working directory), and a
    downloaded snapshot takes priority over whatever is already on disk;
 3. restores the database from it, falling back to the newest **local** snapshot only
    if every download fails. If neither is available, the node refuses to start.
+
+Whether the database has fallen too far behind is judged by the **median** of what
+the sources report, not the highest value, so one source cannot make a valid
+database look too old. List **at least three independent sources**: with two, both
+must answer and agree; with one, the node refuses to download a snapshot unless
+`trust_single_source: true` is set (see
+[Node configuration reference](participate/node_config.md)).
 
 The same `sources` list is also used for ongoing branch-by-branch
 forward-sync, so configuring it serves both purposes — in fact, an empty `sources`
